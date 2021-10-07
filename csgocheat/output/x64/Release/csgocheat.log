@@ -1,0 +1,159 @@
+﻿  pch.cpp
+  init.cpp
+  dllentry.cpp
+  math.cpp
+  vec2.cpp
+  vec3.cpp
+  Code wird generiert.
+  Previous IPDB and IOBJ mismatch, fall back to full compilation.
+  All 2 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Codegenerierung ist abgeschlossen.
+  csgocheat.vcxproj -> D:\MyProgramming\C++\csgocheat\outputx64\Release\csgocheat.dll
+
+Leistungszusammenfassung für das Projekt:
+     5106 ms D:\MyProgramming\C++\csgocheat\csgocheat\csgocheat.vcxproj   1 Aufrufe
+               5106 ms Build                                      1 Aufrufe
+
+Leistungszusammenfassung für das Ziel:
+        0 ms AfterBuildCompileEvent                     1 Aufrufe
+        0 ms _Link                                      1 Aufrufe
+        0 ms AfterLink                                  1 Aufrufe
+        0 ms ComputeLinkImportLibraryOutputsForClean    1 Aufrufe
+        0 ms ComputeLinkSwitches                        1 Aufrufe
+        0 ms PreLinkEvent                               1 Aufrufe
+        0 ms DoLinkOutputFilesMatch                     1 Aufrufe
+        0 ms PrepareResourceNames                       1 Aufrufe
+        0 ms CreateCustomManifestResourceNames          1 Aufrufe
+        0 ms ComputeManifestInputsTargets               1 Aufrufe
+        0 ms ComputeLinkInputsFromProject               1 Aufrufe
+        0 ms _ALink                                     1 Aufrufe
+        0 ms ComputeManifestGeneratedLinkerInputs       1 Aufrufe
+        0 ms ComputeRCOutputs                           1 Aufrufe
+        0 ms BeforeLink                                 1 Aufrufe
+        0 ms ComputeLegacyManifestEmbedding             1 Aufrufe
+        0 ms BuildLinkTraverse                          1 Aufrufe
+        0 ms BuildCompile                               1 Aufrufe
+        0 ms _BuildCompileAction                        1 Aufrufe
+        0 ms _ResourceCompile                           1 Aufrufe
+        0 ms AfterResourceCompile                       1 Aufrufe
+        0 ms MakeDirsForResourceCompile                 1 Aufrufe
+        0 ms BeforeResourceCompile                      1 Aufrufe
+        0 ms ComputeRCGeneratedLinkInputs               1 Aufrufe
+        0 ms _Manifest                                  1 Aufrufe
+        0 ms RegisterOutput                             1 Aufrufe
+        0 ms ResolvedXDCMake                            1 Aufrufe
+        0 ms AfterBuild                                 1 Aufrufe
+        0 ms BuildLink                                  1 Aufrufe
+        0 ms _BuildLinkAction                           1 Aufrufe
+        0 ms PostBuildEvent                             1 Aufrufe
+        0 ms PrepareForRun                              1 Aufrufe
+        0 ms CopyFilesToOutputDirectory                 1 Aufrufe
+        0 ms _CopySourceItemsToOutputDirectory          1 Aufrufe
+        0 ms _GetCopyToOutputDirectoryItemsFromThisProject   1 Aufrufe
+        0 ms GetCopyToOutputDirectoryXamlAppDefs        1 Aufrufe
+        0 ms _PopulateCommonStateForGetCopyToOutputDirectoryItems   1 Aufrufe
+        0 ms _Deploy                                    1 Aufrufe
+        0 ms _Appverifier                               1 Aufrufe
+        0 ms CreateSatelliteAssemblies                  1 Aufrufe
+        0 ms _GenerateSatelliteAssemblyInputs           1 Aufrufe
+        0 ms ContentFilesProjectOutputGroup             1 Aufrufe
+        0 ms MakeDirsForFxc                             1 Aufrufe
+        0 ms SatelliteDllsProjectOutputGroup            1 Aufrufe
+        0 ms _BscMake                                   1 Aufrufe
+        0 ms MakeDirsForBscMake                         1 Aufrufe
+        0 ms ComputeCLCompileGeneratedSbrFiles          1 Aufrufe
+        0 ms _XdcMake                                   1 Aufrufe
+        0 ms MakeDirsForXdcMake                         1 Aufrufe
+        0 ms ComputeCLCompileGeneratedXDCFiles          1 Aufrufe
+        0 ms _ClCompile                                 1 Aufrufe
+        0 ms AfterClCompile                             1 Aufrufe
+        0 ms Build                                      1 Aufrufe
+        0 ms SelectClCompile                            1 Aufrufe
+        0 ms ComputeCustomBuildOutput                   1 Aufrufe
+        0 ms SelectCustomBuild                          1 Aufrufe
+        0 ms _SelectedFiles                             1 Aufrufe
+        0 ms PreBuildEvent                              1 Aufrufe
+        0 ms BeforeBuildGenerateSources                 1 Aufrufe
+        0 ms ResolveReferences                          1 Aufrufe
+        0 ms AfterResolveReferences                     1 Aufrufe
+        0 ms ResolveAssemblyReferences                  1 Aufrufe
+        0 ms ExpandSDKReferences                        1 Aufrufe
+        0 ms CopyFileToFolders                          1 Aufrufe
+        0 ms ResolveSDKReferences                       1 Aufrufe
+        0 ms GetResolvedWinMD                           1 Aufrufe
+        0 ms AddExternalIncludDirectoriesToPaths        1 Aufrufe
+        0 ms GetFrameworkPaths                          1 Aufrufe
+        0 ms PrepareProjectReferences                   1 Aufrufe
+        0 ms _AddOutputPathToGlobalPropertiesToRemove   1 Aufrufe
+        0 ms _SplitProjectReferencesByFileExistence     1 Aufrufe
+        0 ms BeforeResolveReferences                    1 Aufrufe
+        0 ms _PrepareForReferenceResolution             1 Aufrufe
+        0 ms _PrepareForBuild                           1 Aufrufe
+        0 ms SetCABuildNativeEnvironmentVariables       1 Aufrufe
+        0 ms _Xsd                                       1 Aufrufe
+        0 ms BuildGenerateSourcesTraverse               1 Aufrufe
+        0 ms ComputeCLInputPDBName                      1 Aufrufe
+        0 ms _BuildGenerateSourcesAction                1 Aufrufe
+        0 ms AfterBuildGenerateSourcesEvent             1 Aufrufe
+        0 ms AfterBuildGenerateSources                  1 Aufrufe
+        0 ms BeforeClCompile                            1 Aufrufe
+        0 ms BuildGenerateSources                       1 Aufrufe
+        0 ms _Midl                                      1 Aufrufe
+        0 ms BuildCompileTraverse                       1 Aufrufe
+        0 ms FindReferenceAssembliesForReferences       1 Aufrufe
+        0 ms GetReferencedVCProjectsInfo                1 Aufrufe
+        0 ms ComputeMIDLGeneratedCompileInputs          1 Aufrufe
+        0 ms AfterMidl                                  1 Aufrufe
+        1 ms _GetCopyToOutputDirectoryItemsFromTransitiveProjectReferences   1 Aufrufe
+        1 ms ComputeCLOutputs                           1 Aufrufe
+        1 ms BuiltProjectOutputGroup                    1 Aufrufe
+        1 ms SetBuildDefaultEnvironmentVariables        1 Aufrufe
+        1 ms ComputeReferenceCLInput                    1 Aufrufe
+        1 ms MakeDirsForMidl                            1 Aufrufe
+        1 ms _CheckWindowsSDKInstalled                  1 Aufrufe
+        1 ms MakeDirsForLink                            1 Aufrufe
+        1 ms IncrementalClean                           1 Aufrufe
+        1 ms GetReferenceAssemblyPaths                  1 Aufrufe
+        1 ms FinalizeBuildStatus                        1 Aufrufe
+        1 ms FixupCLCompileOptions                      1 Aufrufe
+        1 ms _CheckForCompileOutputs                    1 Aufrufe
+        1 ms ResolveProjectReferences                   1 Aufrufe
+        2 ms AssignTargetPaths                          1 Aufrufe
+        2 ms ComputeCLGeneratedLinkInputs               1 Aufrufe
+        2 ms SplitResourcesByCulture                    1 Aufrufe
+        2 ms AssignProjectConfiguration                 1 Aufrufe
+        3 ms WarnCompileDuplicatedFilename              1 Aufrufe
+        4 ms _CleanGetCurrentAndPriorFileWrites         1 Aufrufe
+        4 ms MakeDirsForCl                              1 Aufrufe
+        4 ms SetTelemetryEnvironmentVariables           1 Aufrufe
+        8 ms CustomBuild                                1 Aufrufe
+       13 ms GetCopyToOutputDirectoryItems              1 Aufrufe
+       15 ms CreateRecipeFile                           1 Aufrufe
+       17 ms _CheckForInvalidConfigurationAndPlatform   1 Aufrufe
+       18 ms PrepareForBuild                            1 Aufrufe
+       19 ms InitializeBuildStatus                      1 Aufrufe
+       36 ms _GetProjectReferenceTargetFrameworkProperties   1 Aufrufe
+      219 ms Link                                       1 Aufrufe
+     4720 ms ClCompile                                  1 Aufrufe
+
+Leistungszusammenfassung für die Aufgabe:
+        1 ms CheckVCToolsetVersion                      1 Aufrufe
+        1 ms MSBuild                                    1 Aufrufe
+        1 ms AssignTargetPath                           7 Aufrufe
+        1 ms ConvertToAbsolutePath                      1 Aufrufe
+        1 ms AssignCulture                              1 Aufrufe
+        1 ms RemoveDuplicates                           2 Aufrufe
+        1 ms SetEnv                                     9 Aufrufe
+        1 ms AssignProjectConfiguration                 1 Aufrufe
+        2 ms WriteLinesToFile                           1 Aufrufe
+        2 ms FindUnderPath                              5 Aufrufe
+        2 ms MakeDir                                   10 Aufrufe
+        2 ms Delete                                     2 Aufrufe
+        3 ms Message                                    3 Aufrufe
+        3 ms ReadLinesFromFile                          2 Aufrufe
+        7 ms GetOutOfDateItems                          3 Aufrufe
+       13 ms CallTarget                                 2 Aufrufe
+       14 ms Touch                                      2 Aufrufe
+       15 ms GenerateDesktopDeployRecipe                1 Aufrufe
+      216 ms Link                                       1 Aufrufe
+     4717 ms CL                                         2 Aufrufe

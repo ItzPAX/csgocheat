@@ -1,17 +1,83 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Quelldateien">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="core">
+      <UniqueIdentifier>{ea3ce34a-dfbe-4198-a105-90120ca213c0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headerdateien">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="core\features">
+      <UniqueIdentifier>{ce83181d-1afb-45f7-8ce5-4ee46b4e0249}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Ressourcendateien">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="core\hooks">
+      <UniqueIdentifier>{ee62d94d-0a39-4a17-9de6-be187abde5bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="core\features\source">
+      <UniqueIdentifier>{49e30550-8ffb-4184-b013-e7c987fbf46f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\features\header">
+      <UniqueIdentifier>{5a1fa677-3117-40cc-a93d-f8b0ff290b0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk">
+      <UniqueIdentifier>{ec61663e-ed81-4e32-be1b-b8c8f0c9cc35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities">
+      <UniqueIdentifier>{5a2021c0-2957-4d14-9d4e-55440a303308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\hooklib">
+      <UniqueIdentifier>{11ff3034-4ade-4082-b447-8eec5c3430bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pch">
+      <UniqueIdentifier>{c6caf9f7-2d9d-4ecb-86e7-2f31f1a66640}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\math">
+      <UniqueIdentifier>{e83a3804-467e-403f-8518-aeadcad44b00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\structures">
+      <UniqueIdentifier>{e16934f1-94c3-4332-8dc6-d9d1eca2c024}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\structures\vec3">
+      <UniqueIdentifier>{5012432c-65fb-4e46-8720-6d886f3f1ed3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\structures\vec2">
+      <UniqueIdentifier>{bc62744a-dd82-44f1-ae33-722b26cb5516}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\init">
+      <UniqueIdentifier>{28740dff-b4af-4f39-96c7-85fb2202c1a6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\pch\pch.cpp">
+      <Filter>pch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dllentry.cpp" />
+    <ClCompile Include="..\core\init\init.cpp">
+      <Filter>core\init</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utilities\structures\vec3\vec3.cpp">
+      <Filter>utilities\structures\vec3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utilities\structures\vec2\vec2.cpp">
+      <Filter>utilities\structures\vec2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utilities\math\math.cpp">
+      <Filter>utilities\math</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\pch\pch.h">
+      <Filter>pch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes.h" />
+    <ClInclude Include="..\core\init\init.h">
+      <Filter>core\init</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\structures\vec3\vec3.h">
+      <Filter>utilities\structures\vec3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\structures\vec2\vec2.h">
+      <Filter>utilities\structures\vec2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\math\math.h">
+      <Filter>utilities\math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
