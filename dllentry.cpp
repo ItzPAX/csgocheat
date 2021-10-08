@@ -1,4 +1,3 @@
-#include "pch/pch.h"
 #include "includes.h"
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {

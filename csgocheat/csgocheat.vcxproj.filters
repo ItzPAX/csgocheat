@@ -25,59 +25,62 @@
     <Filter Include="utilities\hooklib">
       <UniqueIdentifier>{11ff3034-4ade-4082-b447-8eec5c3430bc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="pch">
-      <UniqueIdentifier>{c6caf9f7-2d9d-4ecb-86e7-2f31f1a66640}</UniqueIdentifier>
-    </Filter>
     <Filter Include="utilities\math">
       <UniqueIdentifier>{e83a3804-467e-403f-8518-aeadcad44b00}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="utilities\structures">
-      <UniqueIdentifier>{e16934f1-94c3-4332-8dc6-d9d1eca2c024}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="utilities\structures\vec3">
-      <UniqueIdentifier>{5012432c-65fb-4e46-8720-6d886f3f1ed3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="utilities\structures\vec2">
-      <UniqueIdentifier>{bc62744a-dd82-44f1-ae33-722b26cb5516}</UniqueIdentifier>
     </Filter>
     <Filter Include="core\init">
       <UniqueIdentifier>{28740dff-b4af-4f39-96c7-85fb2202c1a6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="utilities\structs">
+      <UniqueIdentifier>{bf06d8df-707d-46bf-9042-f1b561884ab3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\structs\vec3d">
+      <UniqueIdentifier>{6b82f51d-da96-4eda-af6a-d39a40584acf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\structs\vec2d">
+      <UniqueIdentifier>{57a13869-00ec-463e-b74f-2f66f3aa4861}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\pch\pch.cpp">
-      <Filter>pch</Filter>
-    </ClCompile>
     <ClCompile Include="..\dllentry.cpp" />
     <ClCompile Include="..\core\init\init.cpp">
       <Filter>core\init</Filter>
     </ClCompile>
-    <ClCompile Include="..\utilities\structures\vec3\vec3.cpp">
-      <Filter>utilities\structures\vec3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\utilities\structures\vec2\vec2.cpp">
-      <Filter>utilities\structures\vec2</Filter>
-    </ClCompile>
     <ClCompile Include="..\utilities\math\math.cpp">
       <Filter>utilities\math</Filter>
     </ClCompile>
+    <ClCompile Include="..\utilities\structures\vec2d\vec2d.cpp">
+      <Filter>utilities\structs\vec2d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utilities\structures\vec3d\vec3d.cpp">
+      <Filter>utilities\structs\vec3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utilities\hooklib\hooklib.cpp">
+      <Filter>utilities\hooklib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\core\hooks\hooks.cpp">
+      <Filter>core\hooks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\pch\pch.h">
-      <Filter>pch</Filter>
-    </ClInclude>
     <ClInclude Include="..\includes.h" />
     <ClInclude Include="..\core\init\init.h">
       <Filter>core\init</Filter>
     </ClInclude>
-    <ClInclude Include="..\utilities\structures\vec3\vec3.h">
-      <Filter>utilities\structures\vec3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\utilities\structures\vec2\vec2.h">
-      <Filter>utilities\structures\vec2</Filter>
-    </ClInclude>
     <ClInclude Include="..\utilities\math\math.h">
       <Filter>utilities\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\structures\vec2d\vec2d.h">
+      <Filter>utilities\structs\vec2d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\structures\vec3d\vec3d.h">
+      <Filter>utilities\structs\vec3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\hooklib\hooklib.h">
+      <Filter>utilities\hooklib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\hooks\hooks.h">
+      <Filter>core\hooks</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

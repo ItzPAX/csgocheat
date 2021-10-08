@@ -77,6 +77,7 @@
     <TargetName>csgocheat</TargetName>
     <IncludePath>$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
+    <IntDir>output\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -84,6 +85,7 @@
     <TargetName>csgocheat</TargetName>
     <IncludePath>$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
+    <IntDir>output\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -111,10 +113,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,10 +133,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -174,29 +180,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\core\hooks\hooks.cpp" />
     <ClCompile Include="..\core\init\init.cpp" />
     <ClCompile Include="..\dllentry.cpp" />
-    <ClCompile Include="..\pch\pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeaderFile>
-    </ClCompile>
+    <ClCompile Include="..\utilities\hooklib\hooklib.cpp" />
     <ClCompile Include="..\utilities\math\math.cpp" />
-    <ClCompile Include="..\utilities\structures\vec2\vec2.cpp" />
-    <ClCompile Include="..\utilities\structures\vec3\vec3.cpp" />
+    <ClCompile Include="..\utilities\structures\vec2d\vec2d.cpp" />
+    <ClCompile Include="..\utilities\structures\vec3d\vec3d.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\core\hooks\hooks.h" />
     <ClInclude Include="..\core\init\init.h" />
     <ClInclude Include="..\includes.h" />
-    <ClInclude Include="..\pch\pch.h" />
+    <ClInclude Include="..\utilities\hooklib\hooklib.h" />
     <ClInclude Include="..\utilities\math\math.h" />
-    <ClInclude Include="..\utilities\structures\vec2\vec2.h" />
-    <ClInclude Include="..\utilities\structures\vec3\vec3.h" />
+    <ClInclude Include="..\utilities\structures\vec2d\vec2d.h" />
+    <ClInclude Include="..\utilities\structures\vec3d\vec3d.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,6 +2,7 @@
 
 class Init {
 private:
+	bool bAllocConsole = true;
 
 public:
 	// setup everything and place hooks here

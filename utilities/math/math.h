@@ -4,11 +4,8 @@
 
 class Math {
 public:
-	template <typename T>
-	T Clamp(T tNum, T tNumMax, T tNumMin);
-
-	template <typename T>
-	T ScaleNumber(T flVal, T flValMax, T flValMin, T flNewMax, T flNewMin);
+	float Clamp(float tNum, float tNumMax, float tNumMin);
+	float ScaleNumber(float flVal, float flValMax, float flValMin, float flNewMax, float flNewMin);
 };
 
 extern Math g_Math;

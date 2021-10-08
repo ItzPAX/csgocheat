@@ -1,10 +1,8 @@
 #include "../../includes.h"
-#include "../../pch/pch.h"
 
 Math g_Math;
 
-template<typename T>
-inline T Math::Clamp(T tNum, T tNumMax, T tNumMin) {
+float Math::Clamp(float tNum, float tNumMax, float tNumMin) {
     if (tNum >= tNumMax)
         return tNumMax;
     else if (tNum <= tNumMin)
@@ -13,8 +11,7 @@ inline T Math::Clamp(T tNum, T tNumMax, T tNumMin) {
         return tNum;
 }
 
-template<typename T>
-T Math::ScaleNumber(T flVal, T flValMax, T flValMin, T flNewMax, T flNewMin) {
+float Math::ScaleNumber(float flVal, float flValMax, float flValMin, float flNewMax, float flNewMin) {
     float flValToScale = g_Math.Clamp(flVal, flValMax, flValMin);
     float flValPrc = (flValToScale - flValMin) / (flValMax - flValMin);
     return flNewMin + flValPrc * (flNewMax - flNewMin);
