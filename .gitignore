@@ -42,4 +42,6 @@ output/Release
 *.db
 *.iobj
 *.log
-*.txt
+*.suo
+*.tlog
+*.pdb

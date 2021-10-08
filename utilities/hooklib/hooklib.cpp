@@ -13,11 +13,13 @@ LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
         }
     }
 
+    // check if we found an exception at a hooked address, if we do change eip and continue execution
     if (dwAddr != -1 && pExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION) {
         pExceptionInfo->ContextRecord->Eip = dwAddr;
         return EXCEPTION_CONTINUE_EXECUTION;
     }
 
+    // if we arrive here, there was no excpetion at a hook, so we let the normal handler deal with it
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
@@ -63,6 +65,7 @@ BOOL HookLib::InitHooks() {
     if (!g_HookLib.pVEHHandle)
         return false;
 
+    // Something went wrong when trying to trigger the exception
     if (!DestroyPointers())
         return false;
 
