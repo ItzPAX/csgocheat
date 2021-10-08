@@ -40,6 +40,9 @@
     <Filter Include="utilities\structs\vec2d">
       <UniqueIdentifier>{57a13869-00ec-463e-b74f-2f66f3aa4861}</UniqueIdentifier>
     </Filter>
+    <Filter Include="utilities\tools">
+      <UniqueIdentifier>{f7558737-6a75-4628-a179-45ee6d3543cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dllentry.cpp" />
@@ -81,6 +84,9 @@
     </ClInclude>
     <ClInclude Include="..\core\hooks\hooks.h">
       <Filter>core\hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\tools\xor.h">
+      <Filter>utilities\tools</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

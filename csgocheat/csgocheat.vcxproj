@@ -196,6 +196,7 @@
     <ClInclude Include="..\utilities\math\math.h" />
     <ClInclude Include="..\utilities\structures\vec2d\vec2d.h" />
     <ClInclude Include="..\utilities\structures\vec3d\vec3d.h" />
+    <ClInclude Include="..\utilities\tools\xor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

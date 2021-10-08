@@ -12,14 +12,13 @@ using ulong = unsigned long;
 #include "utilities/math/math.h"
 #include "utilities/hooklib/hooklib.h"
 #include "core/hooks/hooks.h"
-
-// standard libs
-
+#include "utilities/tools/xor.h"
 
 // Other libs
 #include <iostream>
 #include <algorithm>
 #include <memory>
+#include <stdio.h>
 
 // Data structs
 #include <string>

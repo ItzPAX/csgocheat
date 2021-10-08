@@ -9,5 +9,4 @@ public:
 	static ulong __stdcall OnInject(void* p);
 };
 
-// make global accesible
 extern Init g_Init;

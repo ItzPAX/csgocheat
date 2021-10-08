@@ -1,6 +1,7 @@
 #pragma once
 
-#define M_PI 3.1415926535897932384f
+#define M_PI 3.1415926535897932384
+#define M_PI2 M_PI * 2
 
 class Math {
 public:
