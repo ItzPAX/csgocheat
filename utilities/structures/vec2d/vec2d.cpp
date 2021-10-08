@@ -1,4 +1,5 @@
-#include "../../../includes.h"
+#include "pch.h"
+#include "includes.h"
 
 Vec2D::Vec2D(const Vec2D& vec) {
     x = vec.x;

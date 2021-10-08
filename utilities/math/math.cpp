@@ -1,4 +1,5 @@
-#include "../../includes.h"
+#include "pch.h"
+#include "includes.h"
 
 Math g_Math;
 

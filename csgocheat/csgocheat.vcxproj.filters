@@ -43,6 +43,9 @@
     <Filter Include="utilities\tools">
       <UniqueIdentifier>{f7558737-6a75-4628-a179-45ee6d3543cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="pch">
+      <UniqueIdentifier>{0b39cea8-a73a-4469-b436-e3b30d97c5f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dllentry.cpp" />
@@ -63,6 +66,12 @@
     </ClCompile>
     <ClCompile Include="..\core\hooks\hooks.cpp">
       <Filter>core\hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utilities\tools\tools.cpp">
+      <Filter>utilities\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pch\pch.cpp">
+      <Filter>pch</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +96,12 @@
     </ClInclude>
     <ClInclude Include="..\utilities\tools\xor.h">
       <Filter>utilities\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\tools\tools.h">
+      <Filter>utilities\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pch\pch.h">
+      <Filter>pch</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

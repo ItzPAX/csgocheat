@@ -1,4 +1,5 @@
-#include "../../includes.h"
+#include "pch.h"
+#include "includes.h"
 
 #pragma region HookDefs
 namespace ExampleFunction {

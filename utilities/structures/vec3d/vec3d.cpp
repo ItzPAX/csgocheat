@@ -1,4 +1,5 @@
-#include "../../../includes.h"
+#include "pch.h"
+#include "includes.h"
 
 Vec3D::Vec3D(const Vec3D& vec) {
     x = vec.x;

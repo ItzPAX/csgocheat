@@ -45,3 +45,4 @@ output/Release
 *.suo
 *.tlog
 *.pdb
+*.txt

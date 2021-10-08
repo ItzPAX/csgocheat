@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "hooklib.h"
 
 // The VEHHandler, it will change EIP accordingly to the hooked function we added
