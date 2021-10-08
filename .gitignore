@@ -35,3 +35,17 @@
 *.iobj
 *.ipdb
 *.pch
+output/Release/csgocheat.pdb
+csgocheat/output/Release/vc142.pdb
+csgocheat/output/Release/csgocheat.tlog/link.write.1.tlog
+csgocheat/output/Release/csgocheat.tlog/CL.write.1.tlog
+csgocheat/output/Release/csgocheat.tlog/CL.read.1.tlog
+csgocheat/output/Release/csgocheat.tlog/CL.command.1.tlog
+csgocheat/output/Release/csgocheat.ipdb
+csgocheat/output/Release/csgocheat.log
+csgocheat/output/Release/csgocheat.iobj
+.vs/csgocheat/v17/Preview/ipch/AutoPCH/8bb3b94e1b2b139a/DLLENTRY.ipch
+.vs/csgocheat/v17/Preview/Browse.VC.opendb
+.vs/csgocheat/v17/Preview/Browse.VC.db-wal
+.vs/csgocheat/v17/Preview/Browse.VC.db-shm
+.vs/csgocheat/v17/.suo
