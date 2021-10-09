@@ -1,15 +1,28 @@
 #include "pch.h"
 #include "includes.h"
 
-Math g_Math;
+Math g_Math{ };
 
 float Math::Clamp(float tNum, float tNumMax, float tNumMin) {
     if (tNum >= tNumMax)
         return tNumMax;
-    else if (tNum <= tNumMin)
+    if (tNum <= tNumMin)
         return tNumMin;
-    else
-        return tNum;
+    return tNum;
+}
+
+void Math::Clamp(float* tNum, float tNumMax, float tNumMin) {
+    if (!tNum)
+        return;
+
+    if (*tNum >= tNumMax)
+        *tNum = tNumMax;
+    if (*tNum <= tNumMin)
+        *tNum = tNumMin;
+}
+
+float Math::NormalizeIntoRange(float flVal, float flMax, float flMin) {
+    return (flVal - flMin) / (flMax - flMin);
 }
 
 float Math::ScaleNumber(float flVal, float flValMax, float flValMin, float flNewMax, float flNewMin) {

@@ -8,6 +8,7 @@ LONG WINAPI VEHHandler(EXCEPTION_POINTERS* pExceptionInfo);
 
 struct HookStatus {
 public:
+    HookStatus() { pBaseFnc = NULL; pHkAddr = nullptr; iIndex = NULL; }
     uintptr_t pBaseFnc;
     PVOID pHkAddr;
     INT   iIndex;
@@ -24,13 +25,15 @@ private:
     std::vector<UINT16>        nIndex;
     PVOID                    pVEHHandle;
     PVOID                    pVTableAddr;
-    INT                        iCounter = 0;
+    INT                      iCounter;
 
     // private functions
 private:
     BOOL DestroyPointers();
 
 public:
+    HookLib() { iCounter = 0; pVEHHandle = nullptr; pVTableAddr = nullptr; } // constructor
+
     // hooks function and returns a pointer to the original function
     LPVOID AddHook(PVOID pHkFunc, PVOID pVTable, UINT16 iIndex, const char* sName = "");
     BOOL InitHooks();

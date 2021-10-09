@@ -46,6 +46,33 @@
     <Filter Include="pch">
       <UniqueIdentifier>{0b39cea8-a73a-4469-b436-e3b30d97c5f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sdk\manager">
+      <UniqueIdentifier>{0e39bdad-3d0e-4f07-a6d1-40cce495baa3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk\manager\interface">
+      <UniqueIdentifier>{797c684b-97dc-4f27-bc22-0eab1702402b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk\manager\netvars">
+      <UniqueIdentifier>{6a17d351-2b30-421b-826e-9213ce1fb868}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\framework">
+      <UniqueIdentifier>{55bf72aa-8e3f-4432-8de2-781715267020}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\framework\header">
+      <UniqueIdentifier>{b170ebd4-c085-4435-8875-a4c63bd653a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\framework\source">
+      <UniqueIdentifier>{13cc16f2-4005-4975-bdab-376b9a7fe150}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk\manager\interface\classes">
+      <UniqueIdentifier>{3c3a4860-9100-4f81-83dd-7628b95e9638}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk\classes">
+      <UniqueIdentifier>{356fa429-6007-438c-be69-70595e5d1d71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\structs\color">
+      <UniqueIdentifier>{ae6e64c1-2f9b-4c44-95d3-927c6a14cdbb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dllentry.cpp" />
@@ -73,6 +100,12 @@
     <ClCompile Include="..\pch\pch.cpp">
       <Filter>pch</Filter>
     </ClCompile>
+    <ClCompile Include="..\sdk\manager\interface\interface.cpp">
+      <Filter>sdk\manager\interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdk\manager\netvars\netvars.cpp">
+      <Filter>sdk\manager\netvars</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes.h" />
@@ -94,14 +127,32 @@
     <ClInclude Include="..\core\hooks\hooks.h">
       <Filter>core\hooks</Filter>
     </ClInclude>
-    <ClInclude Include="..\utilities\tools\xor.h">
-      <Filter>utilities\tools</Filter>
-    </ClInclude>
     <ClInclude Include="..\utilities\tools\tools.h">
       <Filter>utilities\tools</Filter>
     </ClInclude>
     <ClInclude Include="..\pch\pch.h">
       <Filter>pch</Filter>
     </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\interface.h">
+      <Filter>sdk\manager\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\netvars\netvars.h">
+      <Filter>sdk\manager\netvars</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientEntityList.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IBaseClientDLL.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\classes\entity.h">
+      <Filter>sdk\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\structures\color\color.h">
+      <Filter>utilities\structs\color</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
   </ItemGroup>
 </Project>

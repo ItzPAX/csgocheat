@@ -6,6 +6,9 @@
 #include <memory>
 #include <stdio.h>
 
+// File Managment
+#include <fstream>
+
 // Data structs
 #include <string>
 #include <vector>

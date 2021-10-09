@@ -2,11 +2,20 @@
 #include "includes.h"
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
-	if (fdwReason == DLL_PROCESS_ATTACH) {
+	switch (fdwReason) {
+		// dll has been injected
+	case DLL_PROCESS_ATTACH: {
 		// Create thread and init our cheat
-		HANDLE hThread = CreateThread(nullptr, 0, Init::OnInject, nullptr, 0, nullptr);
-		if (!hThread)
-			return 0;
-		return 1;
+		HANDLE hThread = CreateThread(nullptr, NULL, Init::OnInject, hinstDLL, NULL, nullptr);
+		if (hThread) CloseHandle(hThread);
+		break;
 	}
+
+		// dll has been detached
+	case DLL_PROCESS_DETACH:
+		g_Init.OnUnload(hinstDLL);
+		break; 	
+
+	}
+	return 1;
 }

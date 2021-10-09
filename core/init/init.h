@@ -1,12 +1,12 @@
 #pragma once
 
 class Init {
-private:
-	bool bAllocConsole = true;
-
 public:
-	// setup everything and place hooks here
+	// setup everything
 	static ulong __stdcall OnInject(void* p);
+
+	// unload everything
+	static void OnUnload(HINSTANCE hInstance);
 };
 
 extern Init g_Init;

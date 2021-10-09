@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "hooklib.h"
 
+HookLib g_HookLib{ };
+
 // The VEHHandler, it will change EIP accordingly to the hooked function we added
 LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
     DWORD dwAddr = -1;
@@ -24,8 +26,6 @@ LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
-
-HookLib g_HookLib{ };
 
 // This function will break all the pointers to trigger an excpetion and call the VEHHandler
 BOOL HookLib::DestroyPointers() {

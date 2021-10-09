@@ -116,9 +116,10 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)pch;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderOutputFile />
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,6 +138,8 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)pch;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderOutputFile />
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -187,6 +190,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="..\sdk\manager\interface\interface.cpp" />
+    <ClCompile Include="..\sdk\manager\netvars\netvars.cpp" />
     <ClCompile Include="..\utilities\hooklib\hooklib.cpp" />
     <ClCompile Include="..\utilities\math\math.cpp" />
     <ClCompile Include="..\utilities\structures\vec2d\vec2d.cpp" />
@@ -198,12 +203,20 @@
     <ClInclude Include="..\core\init\init.h" />
     <ClInclude Include="..\includes.h" />
     <ClInclude Include="..\pch\pch.h" />
+    <ClInclude Include="..\sdk\classes\entity.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IBaseClientDLL.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientEntityList.h" />
+    <ClInclude Include="..\sdk\manager\interface\interface.h" />
+    <ClInclude Include="..\sdk\manager\netvars\netvars.h" />
     <ClInclude Include="..\utilities\hooklib\hooklib.h" />
     <ClInclude Include="..\utilities\math\math.h" />
+    <ClInclude Include="..\utilities\structures\color\color.h" />
     <ClInclude Include="..\utilities\structures\vec2d\vec2d.h" />
     <ClInclude Include="..\utilities\structures\vec3d\vec3d.h" />
     <ClInclude Include="..\utilities\tools\tools.h" />
-    <ClInclude Include="..\utilities\tools\xor.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "includes.h"
 
+// constructor
 Vec3D::Vec3D(const Vec3D& vec) {
     x = vec.x;
     y = vec.y;
@@ -8,7 +9,6 @@ Vec3D::Vec3D(const Vec3D& vec) {
 }
 
 //addition
-
 Vec3D Vec3D ::operator+(const Vec3D& vec) {
     return Vec3D(x + vec.x, y + vec.y, z + vec.z);
 }
@@ -19,6 +19,7 @@ Vec3D& Vec3D ::operator+=(const Vec3D& vec) {
     z += vec.z;
     return *this;
 }
+
 //substraction//
 Vec3D Vec3D ::operator-(const Vec3D& vec) {
     return Vec3D(x - vec.x, y - vec.y, z - vec.z);
@@ -32,12 +33,9 @@ Vec3D& Vec3D::operator-=(const Vec3D& vec) {
 }
 
 //scalar multiplication
-
 Vec3D Vec3D::operator*(float value) {
     return Vec3D(x * value, y * value, z * value);
 }
-
-
 
 Vec3D& Vec3D::operator*=(float value) {
     x *= value;
@@ -57,7 +55,6 @@ Vec3D& Vec3D ::operator/=(float value) {
     z /= value;
     return *this;
 }
-
 
 Vec3D& Vec3D::operator=(const Vec3D& vec) {
     x = vec.x;
@@ -91,6 +88,18 @@ float Vec3D::Square() {
 Vec3D Vec3D::Normalization() {
     *this /= Magnitude();
     return *this;
+}
+
+Vec3D Vec3D::Normalized(const Vec3D& vec) {
+    g_Math.NormalizeIntoRange(vec.x, 89.f, -89.f);
+    g_Math.NormalizeIntoRange(vec.y, 180.f, -180.f);
+    // dont normalize z axis
+}
+
+void Vec3D::Normalize() {
+    g_Math.NormalizeIntoRange(this->x, 89.f, -89.f);
+    g_Math.NormalizeIntoRange(this->y, 180.f, -180.f);
+    // dont normalize z axis
 }
 
 float Vec3D::Distance(const Vec3D& vec) {

@@ -30,6 +30,8 @@ public:
     Vec3D CrossProduct(const Vec3D& vec);
     float Magnitude();
     Vec3D Normalization();
+    Vec3D Normalized(const Vec3D& vec);
+    void Normalize();
     float Square();
     float Distance(const Vec3D& vec);
 };
