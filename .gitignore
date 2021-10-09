@@ -48,3 +48,6 @@ output/Release
 *.txt
 *.ilk
 *.idb
+*.json
+*.ifc
+*.command

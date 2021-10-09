@@ -9,7 +9,6 @@ struct IHookStatus {
 	const char* name;
 };
 
-
 //this class is the interface for the g_HookLib class
 class HookManager {
 private:
@@ -22,7 +21,11 @@ public:
 	bool InitAllHooks();
 	bool ReleaseAll();
 
-	// debug functions
+#pragma region TrampHook
+	VOID Patch(char* dst, char* src, short len);
+#pragma endregion These are calls to the tramphook function inside the hooklib
+
+	// debug functions, only works if hook has been placed via VEH
 	IHookStatus GetHookInfo(const char* sName);
 	void LogHookStatus(IHookStatus ihs);
 };

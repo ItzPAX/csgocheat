@@ -73,6 +73,12 @@
     <Filter Include="utilities\structs\color">
       <UniqueIdentifier>{ae6e64c1-2f9b-4c44-95d3-927c6a14cdbb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="core\hooks\directx">
+      <UniqueIdentifier>{8dab4563-17ff-4c4b-aea7-5196e8781582}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\render">
+      <UniqueIdentifier>{051e0ffe-6f62-4d07-a663-8e4277e28939}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dllentry.cpp" />
@@ -105,6 +111,9 @@
     </ClCompile>
     <ClCompile Include="..\sdk\manager\netvars\netvars.cpp">
       <Filter>sdk\manager\netvars</Filter>
+    </ClCompile>
+    <ClCompile Include="..\core\features\source\directx.cpp">
+      <Filter>core\features\source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -150,6 +159,15 @@
     </ClInclude>
     <ClInclude Include="..\utilities\structures\color\color.h">
       <Filter>utilities\structs\color</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\header\directx.h">
+      <Filter>core\features\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\hooks\directx\endscene.h">
+      <Filter>core\hooks\directx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\render\render.h">
+      <Filter>utilities\render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

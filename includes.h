@@ -18,6 +18,7 @@ using uchar = unsigned char;
 #include "sdk/manager/interface/interface.h"
 #include "sdk/manager/netvars/netvars.h"
 #include "utilities/structures/color/color.h"
+#include "utilities/render/render.h"
 
 // sdk
 #include "sdk/manager/interface/interface.h"

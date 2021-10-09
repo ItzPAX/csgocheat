@@ -83,9 +83,10 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)output\$(Configuration)\</OutDir>
     <TargetName>csgocheat</TargetName>
-    <IncludePath>$(SolutionDir)includes.h;$(IncludePath)</IncludePath>
-    <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
+    <IncludePath>$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
     <IntDir>output\$(Configuration)\</IntDir>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -183,6 +184,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\core\features\source\directx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\core\hooks\hooks.cpp" />
     <ClCompile Include="..\core\init\init.cpp" />
     <ClCompile Include="..\dllentry.cpp" />
@@ -199,6 +203,8 @@
     <ClCompile Include="..\utilities\tools\tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\core\features\header\directx.h" />
+    <ClInclude Include="..\core\hooks\directx\endscene.h" />
     <ClInclude Include="..\core\hooks\hooks.h" />
     <ClInclude Include="..\core\init\init.h" />
     <ClInclude Include="..\includes.h" />
@@ -210,6 +216,7 @@
     <ClInclude Include="..\sdk\manager\netvars\netvars.h" />
     <ClInclude Include="..\utilities\hooklib\hooklib.h" />
     <ClInclude Include="..\utilities\math\math.h" />
+    <ClInclude Include="..\utilities\render\render.h" />
     <ClInclude Include="..\utilities\structures\color\color.h" />
     <ClInclude Include="..\utilities\structures\vec2d\vec2d.h" />
     <ClInclude Include="..\utilities\structures\vec3d\vec3d.h" />
