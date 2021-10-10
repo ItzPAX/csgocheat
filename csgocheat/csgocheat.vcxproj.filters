@@ -19,29 +19,8 @@
     <Filter Include="sdk">
       <UniqueIdentifier>{ec61663e-ed81-4e32-be1b-b8c8f0c9cc35}</UniqueIdentifier>
     </Filter>
-    <Filter Include="utilities">
-      <UniqueIdentifier>{5a2021c0-2957-4d14-9d4e-55440a303308}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="utilities\hooklib">
-      <UniqueIdentifier>{11ff3034-4ade-4082-b447-8eec5c3430bc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="utilities\math">
-      <UniqueIdentifier>{e83a3804-467e-403f-8518-aeadcad44b00}</UniqueIdentifier>
-    </Filter>
     <Filter Include="core\init">
       <UniqueIdentifier>{28740dff-b4af-4f39-96c7-85fb2202c1a6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="utilities\structs">
-      <UniqueIdentifier>{bf06d8df-707d-46bf-9042-f1b561884ab3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="utilities\structs\vec3d">
-      <UniqueIdentifier>{6b82f51d-da96-4eda-af6a-d39a40584acf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="utilities\structs\vec2d">
-      <UniqueIdentifier>{57a13869-00ec-463e-b74f-2f66f3aa4861}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="utilities\tools">
-      <UniqueIdentifier>{f7558737-6a75-4628-a179-45ee6d3543cd}</UniqueIdentifier>
     </Filter>
     <Filter Include="pch">
       <UniqueIdentifier>{0b39cea8-a73a-4469-b436-e3b30d97c5f7}</UniqueIdentifier>
@@ -70,14 +49,38 @@
     <Filter Include="sdk\classes">
       <UniqueIdentifier>{356fa429-6007-438c-be69-70595e5d1d71}</UniqueIdentifier>
     </Filter>
-    <Filter Include="utilities\structs\color">
-      <UniqueIdentifier>{ae6e64c1-2f9b-4c44-95d3-927c6a14cdbb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="core\hooks\directx">
       <UniqueIdentifier>{8dab4563-17ff-4c4b-aea7-5196e8781582}</UniqueIdentifier>
     </Filter>
+    <Filter Include="utilities">
+      <UniqueIdentifier>{578e6fde-268c-4797-8dfc-229704cecfd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\math">
+      <UniqueIdentifier>{46fe6934-d2d9-44f3-9778-e79a14629f4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\hooklib">
+      <UniqueIdentifier>{b93189a2-0cd0-4699-8a55-01e43e4c693e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\structs">
+      <UniqueIdentifier>{45505c90-6e12-4c65-8bcb-19fa62cedbb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\tools">
+      <UniqueIdentifier>{8a7b6eeb-294b-4448-8212-7e439324a5fd}</UniqueIdentifier>
+    </Filter>
     <Filter Include="utilities\render">
-      <UniqueIdentifier>{051e0ffe-6f62-4d07-a663-8e4277e28939}</UniqueIdentifier>
+      <UniqueIdentifier>{87e1b867-fcd1-49a8-b31e-038d75c6573f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\structs\vec2d">
+      <UniqueIdentifier>{176cd97c-6c95-448c-b5ef-082e7611f31c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\structs\vec3d">
+      <UniqueIdentifier>{83168744-61cd-4af2-a6fb-6dc775e62a90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\structs\color">
+      <UniqueIdentifier>{17903e89-4843-4676-a147-da36c48eaa90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\structs\vec4d">
+      <UniqueIdentifier>{c100bfc0-b0d8-4846-acc5-c1fdcb8a0869}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -85,23 +88,8 @@
     <ClCompile Include="..\core\init\init.cpp">
       <Filter>core\init</Filter>
     </ClCompile>
-    <ClCompile Include="..\utilities\math\math.cpp">
-      <Filter>utilities\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\utilities\structures\vec2d\vec2d.cpp">
-      <Filter>utilities\structs\vec2d</Filter>
-    </ClCompile>
-    <ClCompile Include="..\utilities\structures\vec3d\vec3d.cpp">
-      <Filter>utilities\structs\vec3d</Filter>
-    </ClCompile>
-    <ClCompile Include="..\utilities\hooklib\hooklib.cpp">
-      <Filter>utilities\hooklib</Filter>
-    </ClCompile>
     <ClCompile Include="..\core\hooks\hooks.cpp">
       <Filter>core\hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\utilities\tools\tools.cpp">
-      <Filter>utilities\tools</Filter>
     </ClCompile>
     <ClCompile Include="..\pch\pch.cpp">
       <Filter>pch</Filter>
@@ -112,8 +100,23 @@
     <ClCompile Include="..\sdk\manager\netvars\netvars.cpp">
       <Filter>sdk\manager\netvars</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\features\source\directx.cpp">
-      <Filter>core\features\source</Filter>
+    <ClCompile Include="..\core\hooks\directx\directx.cpp">
+      <Filter>core\hooks\directx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utilities\math\math.cpp">
+      <Filter>utilities\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utilities\hooklib\hooklib.cpp">
+      <Filter>utilities\hooklib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utilities\tools\tools.cpp">
+      <Filter>utilities\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utilities\structures\vec3d\vec3d.cpp">
+      <Filter>utilities\structs\vec3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utilities\structures\vec2d\vec2d.cpp">
+      <Filter>utilities\structs\vec2d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,23 +124,8 @@
     <ClInclude Include="..\core\init\init.h">
       <Filter>core\init</Filter>
     </ClInclude>
-    <ClInclude Include="..\utilities\math\math.h">
-      <Filter>utilities\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\utilities\structures\vec2d\vec2d.h">
-      <Filter>utilities\structs\vec2d</Filter>
-    </ClInclude>
-    <ClInclude Include="..\utilities\structures\vec3d\vec3d.h">
-      <Filter>utilities\structs\vec3d</Filter>
-    </ClInclude>
-    <ClInclude Include="..\utilities\hooklib\hooklib.h">
-      <Filter>utilities\hooklib</Filter>
-    </ClInclude>
     <ClInclude Include="..\core\hooks\hooks.h">
       <Filter>core\hooks</Filter>
-    </ClInclude>
-    <ClInclude Include="..\utilities\tools\tools.h">
-      <Filter>utilities\tools</Filter>
     </ClInclude>
     <ClInclude Include="..\pch\pch.h">
       <Filter>pch</Filter>
@@ -157,17 +145,38 @@
     <ClInclude Include="..\sdk\classes\entity.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\utilities\structures\color\color.h">
-      <Filter>utilities\structs\color</Filter>
-    </ClInclude>
-    <ClInclude Include="..\core\features\header\directx.h">
-      <Filter>core\features\header</Filter>
-    </ClInclude>
     <ClInclude Include="..\core\hooks\directx\endscene.h">
       <Filter>core\hooks\directx</Filter>
     </ClInclude>
+    <ClInclude Include="..\core\hooks\directx\directx.h">
+      <Filter>core\hooks\directx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\math\math.h">
+      <Filter>utilities\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\hooklib\hooklib.h">
+      <Filter>utilities\hooklib</Filter>
+    </ClInclude>
     <ClInclude Include="..\utilities\render\render.h">
       <Filter>utilities\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\tools\tools.h">
+      <Filter>utilities\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\structures\color\color.h">
+      <Filter>utilities\structs\color</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\structures\vec3d\vec3d.h">
+      <Filter>utilities\structs\vec3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\structures\vec2d\vec2d.h">
+      <Filter>utilities\structs\vec2d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\structures\vec4d\vec4d.h">
+      <Filter>utilities\structs\vec4d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IVEngineClient.h">
+      <Filter>sdk\manager\interface\classes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

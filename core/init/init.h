@@ -2,6 +2,10 @@
 
 class Init {
 public:
+	Player* pLocal;
+	DWORD dwViewMatrixOffset;
+
+public:
 	// setup everything
 	static ulong __stdcall InitAll(void* p);
 

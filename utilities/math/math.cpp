@@ -30,3 +30,8 @@ float Math::ScaleNumber(float flVal, float flValMax, float flValMin, float flNew
     float flValPrc = (flValToScale - flValMin) / (flValMax - flValMin);
     return flNewMin + flValPrc * (flNewMax - flNewMin);
 }
+
+void Math::WorldToScreen(Vec3D world, Vec2D& screen) {
+    Vec4D vClipCoords;
+
+}

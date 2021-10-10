@@ -28,6 +28,7 @@ void* Interface::GetInterface(const char* dllname, const char* interfacename) {
 bool Interface::Init() {
 	// grab all interfaces here
 	pClientEntityList = (IClientEntityList*)GetInterface("client.dll", "VClientEntityList003");
-	pBaseClientDll = (IBaseClientDLL*)GetInterface("client.dll", "VClient018");
+	pClient = (IBaseClientDLL*)GetInterface("client.dll", "VClient018");
+	pEngine = (IVEngineClient013*)GetInterface("engine.dll", "VEngineClient014");
 	return true;
 }

@@ -129,7 +129,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -184,9 +184,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\core\features\source\directx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="..\core\hooks\directx\directx.cpp" />
     <ClCompile Include="..\core\hooks\hooks.cpp" />
     <ClCompile Include="..\core\init\init.cpp" />
     <ClCompile Include="..\dllentry.cpp" />
@@ -203,7 +201,7 @@
     <ClCompile Include="..\utilities\tools\tools.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\core\features\header\directx.h" />
+    <ClInclude Include="..\core\hooks\directx\directx.h" />
     <ClInclude Include="..\core\hooks\directx\endscene.h" />
     <ClInclude Include="..\core\hooks\hooks.h" />
     <ClInclude Include="..\core\init\init.h" />
@@ -212,6 +210,7 @@
     <ClInclude Include="..\sdk\classes\entity.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IBaseClientDLL.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IClientEntityList.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IVEngineClient.h" />
     <ClInclude Include="..\sdk\manager\interface\interface.h" />
     <ClInclude Include="..\sdk\manager\netvars\netvars.h" />
     <ClInclude Include="..\utilities\hooklib\hooklib.h" />
@@ -220,6 +219,7 @@
     <ClInclude Include="..\utilities\structures\color\color.h" />
     <ClInclude Include="..\utilities\structures\vec2d\vec2d.h" />
     <ClInclude Include="..\utilities\structures\vec3d\vec3d.h" />
+    <ClInclude Include="..\utilities\structures\vec4d\vec4d.h" />
     <ClInclude Include="..\utilities\tools\tools.h" />
   </ItemGroup>
   <ItemGroup>

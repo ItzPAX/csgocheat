@@ -1,6 +1,7 @@
 #pragma once
 #include "classes/IClientEntityList.h"
 #include "classes/IBaseClientDLL.h"
+#include "classes/IVEngineClient.h"
 
 class Interface {
 private:
@@ -8,7 +9,8 @@ private:
 
 public:
 	IClientEntityList* pClientEntityList;
-	IBaseClientDLL* pBaseClientDll;
+	IBaseClientDLL* pClient;
+	IVEngineClient013* pEngine;
 
 public:
 	void* GetInterface(const char* dllname, const char* interfacename);

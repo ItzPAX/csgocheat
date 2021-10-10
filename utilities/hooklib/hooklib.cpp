@@ -4,6 +4,7 @@
 HookLib g_HookLib{ };
 
 // The VEHHandler, it will change EIP accordingly to the hooked function we added
+#pragma region VEHHandler
 LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
     DWORD dwAddr = -1;
     PVOID pExceptAddr = pExceptionInfo->ExceptionRecord->ExceptionAddress;
@@ -11,7 +12,7 @@ LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
     // Find the address that triggered the error
     for (int i = 0; i < g_HookLib.GetCounter(); i++) {
         if ((PVOID)g_HookLib.GetPointerDestructor(i) == pExceptAddr) {
-            dwAddr = (DWORD)g_HookLib.GetHookFnc(i);
+            dwAddr = (DWORD)g_HookLib.GetHkFnc(i);
             break;
         }
     }
@@ -25,22 +26,25 @@ LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
     // if we arrive here, there was no excpetion at a hook, so we let the normal handler deal with it
     return EXCEPTION_CONTINUE_SEARCH;
 }
+#pragma endregion
 
-
+#pragma region VEHHook
 // This function will break all the pointers to trigger an excpetion and call the VEHHandler
 BOOL HookLib::DestroyPointers() {
     for (int i = 0; i < iCounter; i++) {
         DWORD dwOProc;
-        VirtualProtect((LPVOID)(pBaseFnc.at(iCounter)), sizeof((pBaseFnc.at(iCounter))), PAGE_EXECUTE_READWRITE, &dwOProc); // override protection
-        *((uintptr_t*)pBaseFnc.at(iCounter)) = (uintptr_t)pPointerDestructor.at(iCounter); // break pointer
-        VirtualProtect((LPVOID)(pBaseFnc.at(iCounter)), sizeof((pBaseFnc.at(iCounter))), dwOProc, &dwOProc); // override to old protection
+        VirtualProtect((LPVOID)(pBaseFnc.at(i)), sizeof((pBaseFnc.at(i))), PAGE_EXECUTE_READWRITE, &dwOProc); // override protection
+        *((uintptr_t*)pBaseFnc.at(i)) = (uintptr_t)pPointerDestructor.at(i); // break pointer
+        VirtualProtect((LPVOID)(pBaseFnc.at(i)), sizeof((pBaseFnc.at(i))), dwOProc, &dwOProc); // override to old protection
     }
 
     // if we arrive here all hooks have successfully been placed
     return true;
 }
 
-LPVOID HookLib::AddHook(PVOID pHkFunc, PVOID pVTable, UINT16 iIndex, const char* sName) {
+
+
+LPVOID HookLib::AddHook(PVOID pHkFunc, PVOID pVTable, INT16 iIndex, const char* sName) {
     // push back new hook values
     pName.push_back(sName);
     pVTableAddr = pVTable;
@@ -51,19 +55,19 @@ LPVOID HookLib::AddHook(PVOID pHkFunc, PVOID pVTable, UINT16 iIndex, const char*
     (nIndex.at(iCounter) > 0) ? pPointerDestructor.push_back(*((uintptr_t*)pVTableAddr) - 1) : pPointerDestructor.push_back(*((uintptr_t*)pVTableAddr) + 1);
 
     // get original function address
-    uintptr_t pRetVal = g_HookLib.pOrigFncAddr.at(iCounter);
+    uintptr_t pRetVal = pOrigFncAddr.at(iCounter);
 
     // increment hook counter
-    g_HookLib.iCounter++;
+    iCounter++;
     return (LPVOID)pRetVal;
 }
 
 BOOL HookLib::InitHooks() {
-    if (!g_HookLib.pVEHHandle)
+    if (!bVehInit)
         g_HookLib.pVEHHandle = AddVectoredExceptionHandler(true, (PVECTORED_EXCEPTION_HANDLER)VEHHandler);
 
     // we didnt manage to register a handler
-    if (!g_HookLib.pVEHHandle)
+    if (!pVEHHandle)
         return false;
 
     // Something went wrong when trying to trigger the exception
@@ -76,7 +80,9 @@ BOOL HookLib::InitHooks() {
 VOID HookLib::ReleaseAll() {
     return VOID();
 }
+#pragma endregion
 
+#pragma region TrampHook
 VOID HookLib::Patch(char* dst, char* src, short len) {
     DWORD oProc;
     VirtualProtect(dst, len, PAGE_EXECUTE_READWRITE, &oProc);
@@ -127,3 +133,4 @@ HookStatus HookLib::GetHookInfo(const char* sName) {
 
     return HookStatus();
 }
+#pragma endregion

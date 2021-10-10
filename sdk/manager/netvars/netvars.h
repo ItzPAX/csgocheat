@@ -68,7 +68,7 @@ public:
 
 template<typename T, typename U>
 inline T NetVars::GetNetvar(const char* tablename, const char* netvarname, U base) {
-	ClientClass* clientclass = g_Interface.pBaseClientDll->GetAllClasses();
+	ClientClass* clientclass = g_Interface.pClient->GetAllClasses();
 	auto offset = GetNetvarOffset(tablename, netvarname, clientclass);
 
 	T* ret = (T*)(offset + base);

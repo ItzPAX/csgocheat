@@ -13,6 +13,8 @@ public:
 
 	float NormalizeIntoRange(float flVal, float flMax, float flMin);
 	float ScaleNumber(float flVal, float flValMax, float flValMin, float flNewMax, float flNewMin);
+
+	void WorldToScreen(Vec3D world, Vec2D& screen);
 };
 
 extern Math g_Math;

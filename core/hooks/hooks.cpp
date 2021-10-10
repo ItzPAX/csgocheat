@@ -2,7 +2,6 @@
 #include "includes.h"
 #include "utilities/hooklib/hooklib.h"
 #include "directx/endscene.h"
-#include "core/features/header/directx.h"
 
 HookManager g_HookManager{ };
 
@@ -26,7 +25,6 @@ bool HookManager::AddAllHooks() {
 	if (g_DirectX.GetD3D9Device(EndScene::d3d9Device, sizeof(EndScene::d3d9Device))) {
 		memcpy(EndScene::EndSceneBytes, (char*)EndScene::d3d9Device[EndScene::iIndex], 7);
 		EndScene::oEndScene = (EndScene::tEndScene)g_HookLib.TrampHook((char*)EndScene::d3d9Device[EndScene::iIndex], (char*)EndScene::hkEndScene, 7);
-		std::cout << "[ RAYBOT ] Initialized Drawing Engine\n";
 	}
 
 	g_HookManager.bHooksAdded = true;
@@ -35,8 +33,8 @@ bool HookManager::AddAllHooks() {
 }
 
 bool HookManager::InitAllHooks() {
-	// we have not yet successfully called AddAllHooks, or have hooks queued
-	if (!g_HookManager.bHooksAdded || g_HookManager.iCounter <= 0)
+	// we have not yet successfully called AddAllHooks
+	if (!g_HookManager.bHooksAdded)
 		return false;
 
 	return g_HookLib.InitHooks();

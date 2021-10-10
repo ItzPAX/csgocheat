@@ -17,26 +17,27 @@ public:
 class HookLib {
     // vars
 private:
-    std::vector<const char*>  pName;
-    std::vector<PVOID>        pHkFnc;
-    std::vector<uintptr_t>    pBaseFnc;
-    std::vector<uintptr_t>    pPointerDestructor;
-    std::vector<uintptr_t>    pOrigFncAddr;
-    std::vector<UINT16>        nIndex;
+    std::vector<const char*> pName;
+    std::vector<PVOID>       pHkFnc;
+    std::vector<uintptr_t>   pBaseFnc;
+    std::vector<uintptr_t>   pPointerDestructor;
+    std::vector<uintptr_t>   pOrigFncAddr;
+    std::vector<INT16>       nIndex;
     PVOID                    pVEHHandle;
     PVOID                    pVTableAddr;
     INT                      iCounter;
+    BOOL                     bVehInit;
 
     // private functions
 private:
     BOOL DestroyPointers();
 
 public:
-    HookLib() { iCounter = 0; pVEHHandle = nullptr; pVTableAddr = nullptr; } // constructor
+    HookLib() { iCounter = 0; bVehInit = false; } // constructor
 
     // hooks function and returns a pointer to the original function, only works on virtual function pointers
 #pragma region VEHHook
-    LPVOID AddHook(PVOID pHkFunc, PVOID pVTable, UINT16 iIndex, const char* sName = "");
+    LPVOID AddHook(PVOID pHkFunc, PVOID pVTable, INT16 iIndex, const char* sName = "");
     BOOL InitHooks();
     VOID ReleaseAll();
 #pragma endregion Hook using Pointer Destruction
@@ -50,7 +51,7 @@ public:
 
 #pragma region HandlerCalls
     INT GetCounter() { return iCounter; }     // get icounter for the handler
-    PVOID GetHookFnc(int index) { return pHkFnc.at(index); }    // get hooked function addr at index i for the handler
+    PVOID GetHkFnc(int index) { return pHkFnc.at(index); }    // get hooked function addr at index i for the handler
     uintptr_t GetPointerDestructor(int index) { return pPointerDestructor.at(index); } // get destructed pointer at index i for the handler
 #pragma endregion VEHHandler will call these
 

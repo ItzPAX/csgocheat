@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "../header/directx.h"
+#include "includes.h"
 
 BOOL CALLBACK EnumWind(HWND handle, LPARAM lp) {
 	DWORD pProcId;
