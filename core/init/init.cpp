@@ -26,18 +26,6 @@ ulong __stdcall Init::InitAll(void* p) {
 		return 0;
 	std::cout << "[ RAYBOT ] Successfully Initialized Hooks\n";
 
-	// set localplayer
-	g_Init.pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
-
-	while (true) {
-		Player* pPlayer = (Player*)g_Interface.pClientEntityList->GetClientEntity(2);
-
-		if (pPlayer)
-			std::cout << "Health Player 2: " << pPlayer->iHealth() << '\n';
-
-		Sleep(50);
-	}
-
 	return 1;
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "../utilities/structures/vec3d/vec3d.h"
 
-class IVEngineClient013 {
+class IVEngineClient {
 public:
 	// Find the model's surfaces that intersect the given sphere.
 	// Returns the number of surfaces filled in.

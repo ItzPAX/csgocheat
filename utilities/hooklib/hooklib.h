@@ -2,6 +2,9 @@
 
 #include <Windows.h>
 #include <vector>
+#include <iostream>
+
+#define NOT_FOUND -1
 
 // init our handler outside of class
 LONG WINAPI VEHHandler(EXCEPTION_POINTERS* pExceptionInfo);
@@ -30,33 +33,42 @@ private:
 
     // private functions
 private:
-    BOOL DestroyPointers();
+    // if VirtualProtect was hooked via a usermode hook, this will override it
+    BOOL OverrideVirtualProtect();
+    BOOL DestroyPointers(int index = NOT_FOUND);
 
 public:
-    HookLib() { iCounter = 0; bVehInit = false; } // constructor
+    HookLib() { iCounter = 0; bVehInit = false; pVEHHandle = NULL; pVTableAddr = NULL; } // constructor
 
-    // hooks function and returns a pointer to the original function, only works on virtual function pointers
 #pragma region VEHHook
+    // hooks function and returns a pointer to the original function, only works on virtual function pointers
     LPVOID AddHook(PVOID pHkFunc, PVOID pVTable, INT16 iIndex, const char* sName = "");
-    BOOL InitHooks();
-    VOID ReleaseAll();
+
+    // enable all added hooks
+    BOOL EnableAllHooks();
+    // enable hook either by given name or index
+    BOOL EnableHook(const char* sName, int ind = NOT_FOUND);
+
+    // disable all added hooks
+    VOID DisableAllHooks();
+    // disable hook either by given name or index
+    VOID DisableHook(const char* sName, int ind = NOT_FOUND);
 #pragma endregion Hook using Pointer Destruction
-
-    // hooks function and returns pointer to the original function, works on all functions
-#pragma region TrampHook
-    VOID Patch(char* dst, char* src, short len);
-    BOOL Hook(char* src, char* dst, short len);
-    char* TrampHook(char* src, char* dst, short len);
-#pragma endregion Hook using inline patching
-
 #pragma region HandlerCalls
     INT GetCounter() { return iCounter; }     // get icounter for the handler
     PVOID GetHkFnc(int index) { return pHkFnc.at(index); }    // get hooked function addr at index i for the handler
     uintptr_t GetPointerDestructor(int index) { return pPointerDestructor.at(index); } // get destructed pointer at index i for the handler
 #pragma endregion VEHHandler will call these
 
+#pragma region TrampHook
+    // hooks function and returns pointer to the original function, works on all functions
+    VOID Patch(char* dst, char* src, short len);
+    BOOL Hook(char* src, char* dst, short len);
+    char* TrampHook(char* src, char* dst, short len);
+#pragma endregion Hook using inline patching
+
     // functions to debug, only works if hook placed via VEH
-    HookStatus GetHookInfo(const char* sName);
+    HookStatus GetHookInfo(const char* sName, int ind = NOT_FOUND);
 };
 
 extern HookLib g_HookLib;

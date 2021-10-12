@@ -2,6 +2,7 @@
 #include "includes.h"
 #include "utilities/hooklib/hooklib.h"
 #include "directx/endscene.h"
+#include "core/hooks/directx/directx.h"
 
 HookManager g_HookManager{ };
 
@@ -37,7 +38,7 @@ bool HookManager::InitAllHooks() {
 	if (!g_HookManager.bHooksAdded)
 		return false;
 
-	return g_HookLib.InitHooks();
+	return g_HookLib.EnableAllHooks();
 }
 
 bool HookManager::ReleaseAll() {
@@ -49,7 +50,7 @@ bool HookManager::ReleaseAll() {
 		return false;
 
 	// we have hooks to release, lets call the function
-	g_HookLib.ReleaseAll();
+	g_HookLib.DisableAllHooks();
 	return true;
 }
 
@@ -88,11 +89,11 @@ void HookManager::LogHookStatus(IHookStatus ihs) {
 
 #pragma region HkFunctions
 HRESULT __stdcall EndScene::hkEndScene(LPDIRECT3DDEVICE9 o_pDevice) {
-	if (!pDevice) {
-		pDevice = o_pDevice;
+	if (!g_DirectX.pDevice) {
+		g_DirectX.pDevice = o_pDevice;
 	}
 
-	cheatEndScene(pDevice);
-	return oEndScene(pDevice);
+	cheatEndScene();
+	return oEndScene(g_DirectX.pDevice);
 }
 #pragma endregion These Functions call the real functions in different cpp files withing the hooks dir

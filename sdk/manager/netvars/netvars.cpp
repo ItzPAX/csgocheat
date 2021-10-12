@@ -3,14 +3,14 @@
 
 NetVars g_NetVars;
 
-intptr_t NetVars::GetOffset(RecvTable* table, const char* tablename, const char* netvarname) {
+uintptr_t NetVars::GetOffset(RecvTable* table, const char* tablename, const char* netvarname) {
 	for (int i = 0; i < table->m_nProps; i++) {
 		RecvProp prop = table->m_pProps[i];
 
 		if (!_stricmp(prop.m_pVarName, netvarname)) {
 			return prop.m_Offset;
 		}
-
+		
 		if (prop.m_pDataTable) {
 			intptr_t offset = GetOffset(prop.m_pDataTable, tablename, netvarname);
 
@@ -23,11 +23,11 @@ intptr_t NetVars::GetOffset(RecvTable* table, const char* tablename, const char*
 	return 0;
 }
 
-intptr_t NetVars::GetNetvarOffset(const char* tablename, const char* netvarname, ClientClass* clientclass) {
+uintptr_t NetVars::GetNetvarOffset(const char* tablename, const char* netvarname, ClientClass* clientclass) {
 	ClientClass* currNode = clientclass;
 
 	for (auto currNode = clientclass; currNode; currNode = currNode->m_pNext) {
-		if (!_strcmpi(tablename, currNode->m_pRecvTable->m_pNetTableName)) {
+		if (!_stricmp(tablename, currNode->m_pRecvTable->m_pNetTableName)) {
 			return GetOffset(currNode->m_pRecvTable, tablename, netvarname);
 		}
 	}

@@ -25,4 +25,7 @@ using uchar = unsigned char;
 #include "sdk/manager/interface/interface.h"
 #include "sdk/manager/netvars/netvars.h"
 #include "utilities/structures/color/color.h"
-#include "core/hooks/directx/directx.h"
+
+namespace Game {
+	inline Player* pLocal;
+}

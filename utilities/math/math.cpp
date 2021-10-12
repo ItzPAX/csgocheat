@@ -31,7 +31,7 @@ float Math::ScaleNumber(float flVal, float flValMax, float flValMin, float flNew
     return flNewMin + flValPrc * (flNewMax - flNewMin);
 }
 
-void Math::WorldToScreen(Vec3D world, Vec2D& screen) {
-    Vec4D vClipCoords;
-
+bool Math::WorldToScreen(Vec3D world, Vec3D& screen) {
+    // interfaces best
+    return g_Interface.pDebugOverlay->ScreenPosition(world, screen) != 1;
 }

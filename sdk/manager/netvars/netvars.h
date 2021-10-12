@@ -59,8 +59,8 @@ public:
 
 class NetVars {
 private:
-	intptr_t GetOffset(RecvTable* table, const char* tablename, const char* netvarname);
-	intptr_t GetNetvarOffset(const char* tablename, const char* netvarname, ClientClass* clientclass); // wrapper for GetOffsetFunction
+	uintptr_t GetOffset(RecvTable* table, const char* tablename, const char* netvarname);
+	uintptr_t GetNetvarOffset(const char* tablename, const char* netvarname, ClientClass* clientclass); // wrapper for GetOffsetFunction
 public:
 	template<typename T, typename U>
 	T GetNetvar(const char* tablename, const char* netvarname, U base); // function to call to get netvar
@@ -69,10 +69,9 @@ public:
 template<typename T, typename U>
 inline T NetVars::GetNetvar(const char* tablename, const char* netvarname, U base) {
 	ClientClass* clientclass = g_Interface.pClient->GetAllClasses();
-	auto offset = GetNetvarOffset(tablename, netvarname, clientclass);
+	uintptr_t offset = GetNetvarOffset(tablename, netvarname, clientclass);
 
-	T* ret = (T*)(offset + base);
-	return *ret;
+	return *reinterpret_cast<T*>( uintptr_t(base) + offset);
 }
 
 extern NetVars g_NetVars;

@@ -178,6 +178,9 @@
     <ClInclude Include="..\sdk\manager\interface\classes\IVEngineClient.h">
       <Filter>sdk\manager\interface\classes</Filter>
     </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\DebugOverlay.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />

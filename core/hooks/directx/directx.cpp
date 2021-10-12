@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "includes.h"
+#include "directx.h"
+
+DirectX g_DirectX{ };
 
 BOOL CALLBACK EnumWind(HWND handle, LPARAM lp) {
 	DWORD pProcId;
@@ -8,11 +11,9 @@ BOOL CALLBACK EnumWind(HWND handle, LPARAM lp) {
 	if (GetCurrentProcessId() != pProcId)
 		return true;
 
-	window = handle;
+	g_DirectX.window = handle;
 	return false;
 }
-
-DirectX g_DirectX{ };
 
 HWND DirectX::GetProcessWindow() {
 	window = NULL;
@@ -26,27 +27,9 @@ HWND DirectX::GetProcessWindow() {
 	QUERY_USER_NOTIFICATION_STATE pquns;
 	SHQueryUserNotificationState(&pquns);
 
-	if (!IsWindowFullscreen(window)) {
-		iWindowHeight -= 29;
-		iWindowWidth -= 5;
-	}
+	g_Interface.pEngine->GetScreenSize(iWindowWidth, iWindowHeight);
 
 	return window;
-}
-
-bool DirectX::IsWindowFullscreen(HWND windowHandle) {
-	MONITORINFO monitorInfo = { 0 };
-	monitorInfo.cbSize = sizeof(MONITORINFO);
-	GetMonitorInfo(MonitorFromWindow(windowHandle, MONITOR_DEFAULTTOPRIMARY), &monitorInfo);
-
-	RECT windowRect;
-	GetWindowRect(windowHandle, &windowRect);
-
-	return windowRect.left == monitorInfo.rcMonitor.left
-		&& windowRect.right == monitorInfo.rcMonitor.right
-		&& windowRect.top == monitorInfo.rcMonitor.top
-		&& windowRect.bottom == monitorInfo.rcMonitor.bottom;
-
 }
 
 bool DirectX::GetD3D9Device(void** pTable, size_t size) {

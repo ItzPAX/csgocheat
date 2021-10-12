@@ -2,6 +2,7 @@
 #include "classes/IClientEntityList.h"
 #include "classes/IBaseClientDLL.h"
 #include "classes/IVEngineClient.h"
+#include "classes/DebugOverlay.h"
 
 class Interface {
 private:
@@ -10,7 +11,8 @@ private:
 public:
 	IClientEntityList* pClientEntityList;
 	IBaseClientDLL* pClient;
-	IVEngineClient013* pEngine;
+	IVEngineClient* pEngine;
+	IVDebugOverlay* pDebugOverlay;
 
 public:
 	void* GetInterface(const char* dllname, const char* interfacename);

@@ -7,6 +7,9 @@
 #define RAD2DEG(x) x * 180.f/M_PI
 
 class Math {
+private:
+	inline static float flViewMatrix[4][4];
+
 public:
 	float Clamp(float tNum, float tNumMax, float tNumMin);
 	void Clamp(float* tNum, float tNumMax, float tNumMin);
@@ -14,7 +17,7 @@ public:
 	float NormalizeIntoRange(float flVal, float flMax, float flMin);
 	float ScaleNumber(float flVal, float flValMax, float flValMin, float flNewMax, float flNewMin);
 
-	void WorldToScreen(Vec3D world, Vec2D& screen);
+	bool WorldToScreen(Vec3D world, Vec3D& screen);
 };
 
 extern Math g_Math;

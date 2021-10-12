@@ -4,9 +4,6 @@
 
 class Entity {
 private:
-	// netvar shits
-	int m_iTeamNum = g_NetVars.GetNetvar<int>("DT_CSPlayer", "m_iTeamNum", this);
-	Vec3D m_vecOrigin = g_NetVars.GetNetvar<Vec3D>("DT_BasePlayer", "m_vecOrigin", this);
 
 public:
 	void* pNetworkable() { return reinterpret_cast<void*>(uintptr_t(this) + 0x8); }
@@ -14,17 +11,14 @@ public:
 
 	bool bIsValid() { return this != nullptr && this->pNetworkable(); };
 
-	Vec3D vecOrigin() { return m_vecOrigin; }
-	int iTeamNum() { return m_iTeamNum; };
+	Vec3D vecOrigin() { return g_NetVars.GetNetvar<Vec3D>("DT_BasePlayer", "m_vecOrigin", this); }
+	int iTeamNum() { return g_NetVars.GetNetvar<int>("DT_CSPlayer", "m_iTeamNum", this); };
 };
 
 class Player : public Entity {
 private:
-	// netvar shits
-	int m_iHealth = g_NetVars.GetNetvar<int>("DT_BasePlayer", "m_iHealth", this);
-	Vec3D m_vEyeAngles = g_NetVars.GetNetvar<Vec3D>("DT_CSPlayer", "m_angEyeAngles", this);
 
 public:
-	int iHealth() { return m_iHealth; };
-	Vec3D vEyeAngles() { return m_vEyeAngles; }
+	int iHealth() { return g_NetVars.GetNetvar<int>("DT_BasePlayer", "m_iHealth", this); }
+	Vec3D vEyeAngles() { return g_NetVars.GetNetvar<Vec3D>("DT_CSPlayer", "m_angEyeAngles", this); }
 };

@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "hooklib.h"
 
 HookLib g_HookLib{ };
@@ -6,7 +5,7 @@ HookLib g_HookLib{ };
 // The VEHHandler, it will change EIP accordingly to the hooked function we added
 #pragma region VEHHandler
 LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
-    DWORD dwAddr = -1;
+    DWORD dwAddr = NOT_FOUND;
     PVOID pExceptAddr = pExceptionInfo->ExceptionRecord->ExceptionAddress;
 
     // Find the address that triggered the error
@@ -29,20 +28,44 @@ LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
 #pragma endregion
 
 #pragma region VEHHook
+BOOL HookLib::OverrideVirtualProtect() {
+    // bytes of original virtualprotect function
+    BYTE origBytes[] = { 0x8B, 0xFF, 0x55, 0x8B, 0xEC };
+    DWORD oProc;
+
+    // override volvo shit hook with original bytes
+    VirtualProtect(VirtualProtect, 5, PAGE_EXECUTE_WRITECOPY, &oProc);
+    memcpy(VirtualProtect, origBytes, 5);
+    VirtualProtect(VirtualProtect, 5, oProc, &oProc);
+
+    return true;
+}
+
 // This function will break all the pointers to trigger an excpetion and call the VEHHandler
-BOOL HookLib::DestroyPointers() {
-    for (int i = 0; i < iCounter; i++) {
+BOOL HookLib::DestroyPointers(int index) {
+    // override potentially placed virtual protect hooks
+    if (!OverrideVirtualProtect())
+        return false;
+
+    if (index == NOT_FOUND) {
+        for (int i = 0; i < iCounter; i++) {
+            DWORD dwOProc;
+            VirtualProtect((LPVOID)(pBaseFnc.at(i)), sizeof((pBaseFnc.at(i))), PAGE_EXECUTE_READWRITE, &dwOProc); // override protection
+            *((uintptr_t*)pBaseFnc.at(i)) = (uintptr_t)pPointerDestructor.at(i); // break pointer
+            VirtualProtect((LPVOID)(pBaseFnc.at(i)), sizeof((pBaseFnc.at(i))), dwOProc, &dwOProc); // override to old protection
+        }
+    }
+
+    else {
         DWORD dwOProc;
-        VirtualProtect((LPVOID)(pBaseFnc.at(i)), sizeof((pBaseFnc.at(i))), PAGE_EXECUTE_READWRITE, &dwOProc); // override protection
-        *((uintptr_t*)pBaseFnc.at(i)) = (uintptr_t)pPointerDestructor.at(i); // break pointer
-        VirtualProtect((LPVOID)(pBaseFnc.at(i)), sizeof((pBaseFnc.at(i))), dwOProc, &dwOProc); // override to old protection
+        VirtualProtect((LPVOID)(pBaseFnc.at(index)), sizeof((pBaseFnc.at(index))), PAGE_EXECUTE_READWRITE, &dwOProc); // override protection
+        *((uintptr_t*)pBaseFnc.at(index)) = (uintptr_t)pPointerDestructor.at(index); // break pointer
+        VirtualProtect((LPVOID)(pBaseFnc.at(index)), sizeof((pBaseFnc.at(index))), dwOProc, &dwOProc); // override to old protection
     }
 
     // if we arrive here all hooks have successfully been placed
     return true;
 }
-
-
 
 LPVOID HookLib::AddHook(PVOID pHkFunc, PVOID pVTable, INT16 iIndex, const char* sName) {
     // push back new hook values
@@ -62,7 +85,7 @@ LPVOID HookLib::AddHook(PVOID pHkFunc, PVOID pVTable, INT16 iIndex, const char* 
     return (LPVOID)pRetVal;
 }
 
-BOOL HookLib::InitHooks() {
+BOOL HookLib::EnableAllHooks() {
     if (!bVehInit)
         g_HookLib.pVEHHandle = AddVectoredExceptionHandler(true, (PVECTORED_EXCEPTION_HANDLER)VEHHandler);
 
@@ -77,8 +100,72 @@ BOOL HookLib::InitHooks() {
     return true;
 }
 
-VOID HookLib::ReleaseAll() {
-    return VOID();
+BOOL HookLib::EnableHook(const char* sName, int ind) {
+    int index = NOT_FOUND;
+
+    for (int i = 0; i < iCounter; i++) {
+        if (pName[i] == sName) {
+            index = i;
+        }
+    }
+
+    // check if given ind is in bounds and only assign if we didnt find a matching name
+    bool bIndIsOk = ind < iCounter&& ind != NOT_FOUND;
+    if (bIndIsOk && index == NOT_FOUND)
+        index = ind;
+
+    // add the handler
+    if (!bVehInit)
+        g_HookLib.pVEHHandle = AddVectoredExceptionHandler(true, (PVECTORED_EXCEPTION_HANDLER)VEHHandler);
+
+    // we didnt manage to register a handler
+    if (!pVEHHandle)
+        return false;
+
+    // Something went wrong when trying to trigger the exception
+    if (index == NOT_FOUND || !DestroyPointers(index))
+        return false;
+
+    return true;
+}
+
+VOID HookLib::DisableHook(const char* sName, int ind) {
+    int index = NOT_FOUND;
+
+    // find index based on name
+    for (int i = 0; i < iCounter; i++) {
+        if (pName[i] == sName) {
+            index = i;
+        }
+    }
+
+    // check if given ind is in bounds and only assign if we didnt find a matching name
+    bool bIndIsOk = ind < iCounter&& ind != NOT_FOUND;
+    if (bIndIsOk && index == NOT_FOUND)
+        index = ind;
+
+    // name and/or index not found
+    if (index == NOT_FOUND)
+        return;
+
+    // unhook
+    DWORD dwOProc;
+    VirtualProtect((LPVOID)(pBaseFnc.at(index)), sizeof((pBaseFnc.at(index))), PAGE_EXECUTE_READWRITE, &dwOProc); // override protection
+    *((uintptr_t*)pBaseFnc.at(index)) = (uintptr_t)pOrigFncAddr.at(index); // restore pointer
+    VirtualProtect((LPVOID)(pBaseFnc.at(index)), sizeof((pBaseFnc.at(index))), dwOProc, &dwOProc); // override to old protection
+}
+
+VOID HookLib::DisableAllHooks() {
+    for (int i = 0; i < iCounter; i++) {
+        DWORD dwOProc;
+        VirtualProtect((LPVOID)(pBaseFnc.at(i)), sizeof((pBaseFnc.at(i))), PAGE_EXECUTE_READWRITE, &dwOProc); // override protection
+        *((uintptr_t*)pBaseFnc.at(i)) = (uintptr_t)pOrigFncAddr.at(i); // restore pointer
+        VirtualProtect((LPVOID)(pBaseFnc.at(i)), sizeof((pBaseFnc.at(i))), dwOProc, &dwOProc); // override to old protection
+    }
+
+    // remove vectored exceptionhandler
+    RemoveVectoredExceptionHandler(pVEHHandle);
+    pVEHHandle = NULL;
 }
 #pragma endregion
 
@@ -108,6 +195,9 @@ char* HookLib::TrampHook(char* src, char* dst, short len) {
     if (len < 5) return 0;
 
     char* gateway = (char*)VirtualAlloc(0, len + 5, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    if (!gateway)
+        return nullptr;
+
     memcpy(gateway, src, len);
     uintptr_t jumpAddy = (uintptr_t)(src - gateway - 5);
     *(gateway + len) = (char)0xE9;
@@ -117,20 +207,29 @@ char* HookLib::TrampHook(char* src, char* dst, short len) {
     }
     return nullptr;
 }
+#pragma endregion
 
-HookStatus HookLib::GetHookInfo(const char* sName) {
+HookStatus HookLib::GetHookInfo(const char* sName, int ind) {
     // loop through hooks and search for name match
-    for (int i = 0; i < iCounter; i++) {
-        if (pName.at(i) == sName) {
-            HookStatus hs;
-            hs.iIndex = i;
-            hs.pBaseFnc = pBaseFnc.at(i);
-            hs.pHkAddr = pHkFnc.at(i);
+    int index = NOT_FOUND;
 
-            return hs;
-        }
+    for (int i = 0; i < iCounter; i++) {
+        if (pName.at(i) == sName)
+            index = i;
+    }
+
+    if (index == NOT_FOUND) {
+        index = ind;
+    }
+
+    if (index != NOT_FOUND) {
+        HookStatus hs;
+        hs.iIndex = index;
+        hs.pBaseFnc = pBaseFnc.at(index);
+        hs.pHkAddr = pHkFnc.at(index);
+
+        return hs;
     }
 
     return HookStatus();
 }
-#pragma endregion
