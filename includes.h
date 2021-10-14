@@ -16,7 +16,6 @@ using uchar = unsigned char;
 // includes
 #include "utilities/render/render.h"
 #include "core/init/init.h"
-#include "utilities/structures/vec4d/vec4d.h"
 #include "utilities/structures/vec3d/vec3d.h"
 #include "utilities/structures/vec2d/vec2d.h"
 #include "utilities/math/math.h"
@@ -25,7 +24,10 @@ using uchar = unsigned char;
 #include "sdk/manager/interface/interface.h"
 #include "sdk/manager/netvars/netvars.h"
 #include "utilities/structures/color/color.h"
+#include "utilities/structures/vec4d/vec4d.h"
 
 namespace Game {
 	inline Player* pLocal;
+	inline int iScreenX;
+	inline int iScreenY;
 }

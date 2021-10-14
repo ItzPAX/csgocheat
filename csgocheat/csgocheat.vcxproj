@@ -184,7 +184,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\core\hooks\directx\directx.cpp" />
     <ClCompile Include="..\core\hooks\hooks.cpp" />
     <ClCompile Include="..\core\init\init.cpp" />
     <ClCompile Include="..\dllentry.cpp" />
@@ -203,9 +202,8 @@
     <ClCompile Include="..\utilities\tools\tools.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\core\hooks\directx\directx.h" />
-    <ClInclude Include="..\core\hooks\directx\endscene.h" />
     <ClInclude Include="..\core\hooks\hooks.h" />
+    <ClInclude Include="..\core\hooks\paint\paint.h" />
     <ClInclude Include="..\core\init\init.h" />
     <ClInclude Include="..\includes.h" />
     <ClInclude Include="..\pch\pch.h" />
@@ -213,6 +211,8 @@
     <ClInclude Include="..\sdk\manager\interface\classes\DebugOverlay.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IBaseClientDLL.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IClientEntityList.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IPanel.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\ISurface.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IVEngineClient.h" />
     <ClInclude Include="..\sdk\manager\interface\interface.h" />
     <ClInclude Include="..\sdk\manager\netvars\netvars.h" />

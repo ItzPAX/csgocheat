@@ -1,32 +1,24 @@
 #include "pch.h"
 #include "includes.h"
 #include "utilities/hooklib/hooklib.h"
-#include "directx/endscene.h"
-#include "core/hooks/directx/directx.h"
+#include "paint/paint.h"
 
 HookManager g_HookManager{ };
 
 #pragma region HookDefs
-namespace EndScene {
-	using tEndScene = HRESULT(__stdcall*)(LPDIRECT3DDEVICE9 pDevice);
-	inline tEndScene oEndScene = nullptr;
+namespace PaintTraverse {
+	using tPaintTraverse = void(__thiscall*)(IPanel*, unsigned int, bool, bool);
+	tPaintTraverse oPaintTraverse = nullptr;
 
-	inline BYTE EndSceneBytes[7]; // stolen bytes
-	inline void* d3d9Device[119]; // vtable
-	inline int iIndex = 42; // index of endscene
-
-	__forceinline HRESULT __stdcall hkEndScene(LPDIRECT3DDEVICE9 o_pDevice);
+	inline int iIndex = 41;
+	__forceinline void __stdcall hkPaintTraverse(unsigned int panel, bool forcerepaint, bool allowforce);
 }
 #pragma endregion
 
 bool HookManager::AddAllHooks() {
 	//grab original function address and add hook to the queue
+	PaintTraverse::oPaintTraverse = (PaintTraverse::tPaintTraverse)g_HookLib.AddHook(PaintTraverse::hkPaintTraverse, g_Interface.pPanel, PaintTraverse::iIndex, "PaintTraverse");
 
-	// hook EndScene via Trampoline not VEH
-	if (g_DirectX.GetD3D9Device(EndScene::d3d9Device, sizeof(EndScene::d3d9Device))) {
-		memcpy(EndScene::EndSceneBytes, (char*)EndScene::d3d9Device[EndScene::iIndex], 7);
-		EndScene::oEndScene = (EndScene::tEndScene)g_HookLib.TrampHook((char*)EndScene::d3d9Device[EndScene::iIndex], (char*)EndScene::hkEndScene, 7);
-	}
 
 	g_HookManager.bHooksAdded = true;
 	g_HookManager.iCounter = g_HookLib.GetCounter();
@@ -42,9 +34,6 @@ bool HookManager::InitAllHooks() {
 }
 
 bool HookManager::ReleaseAll() {
-	// release every tramphook manually
-	Patch((char*)EndScene::d3d9Device[EndScene::iIndex], (char*)EndScene::EndSceneBytes, 7);
-
 	// check if there are any hooks to release
 	if (g_HookManager.iCounter <= 0)
 		return false;
@@ -88,12 +77,9 @@ void HookManager::LogHookStatus(IHookStatus ihs) {
 }
 
 #pragma region HkFunctions
-HRESULT __stdcall EndScene::hkEndScene(LPDIRECT3DDEVICE9 o_pDevice) {
-	if (!g_DirectX.pDevice) {
-		g_DirectX.pDevice = o_pDevice;
-	}
-
-	cheatEndScene();
-	return oEndScene(g_DirectX.pDevice);
+void __stdcall PaintTraverse::hkPaintTraverse(unsigned int panel, bool forcerepaint, bool allowforce) {
+	g_Interface.pEngine->GetScreenSize(Game::iScreenX, Game::iScreenY);
+	cPaintTraverse(); // real function, this is where the magic happens
+	oPaintTraverse(g_Interface.pPanel, panel, forcerepaint, allowforce);
 }
 #pragma endregion These Functions call the real functions in different cpp files withing the hooks dir

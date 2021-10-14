@@ -3,6 +3,8 @@
 #include "classes/IBaseClientDLL.h"
 #include "classes/IVEngineClient.h"
 #include "classes/DebugOverlay.h"
+#include "classes/IPanel.h"
+#include "classes/ISurface.h"
 
 class Interface {
 private:
@@ -13,6 +15,8 @@ public:
 	IBaseClientDLL* pClient;
 	IVEngineClient* pEngine;
 	IVDebugOverlay* pDebugOverlay;
+	IPanel* pPanel;
+	ISurface* pSurface;
 
 public:
 	void* GetInterface(const char* dllname, const char* interfacename);

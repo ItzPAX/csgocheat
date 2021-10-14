@@ -1,5 +1,6 @@
 #pragma once
 #include "../utilities/structures/vec3d/vec3d.h"
+#include "includes.h"
 
 class IVEngineClient {
 public:
@@ -116,7 +117,7 @@ public:
 	virtual const char* GetGameDirectory(void) = 0;
 
 	// Get access to the world to screen transformation matrix
-	virtual const void* WorldToScreenMatrix() = 0;
+	virtual struct ViewMatrix& WorldToScreenMatrix() = 0;
 
 	// Get the matrix to move a point from world space into view space
 	// (translate and rotate so the camera is at the origin looking down X).

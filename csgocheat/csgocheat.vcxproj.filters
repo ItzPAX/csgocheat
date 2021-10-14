@@ -49,9 +49,6 @@
     <Filter Include="sdk\classes">
       <UniqueIdentifier>{356fa429-6007-438c-be69-70595e5d1d71}</UniqueIdentifier>
     </Filter>
-    <Filter Include="core\hooks\directx">
-      <UniqueIdentifier>{8dab4563-17ff-4c4b-aea7-5196e8781582}</UniqueIdentifier>
-    </Filter>
     <Filter Include="utilities">
       <UniqueIdentifier>{578e6fde-268c-4797-8dfc-229704cecfd3}</UniqueIdentifier>
     </Filter>
@@ -80,7 +77,10 @@
       <UniqueIdentifier>{17903e89-4843-4676-a147-da36c48eaa90}</UniqueIdentifier>
     </Filter>
     <Filter Include="utilities\structs\vec4d">
-      <UniqueIdentifier>{c100bfc0-b0d8-4846-acc5-c1fdcb8a0869}</UniqueIdentifier>
+      <UniqueIdentifier>{73fb5556-2a76-4ac8-b990-9b2d6c016ab6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\hooks\paint">
+      <UniqueIdentifier>{6c0b6f0b-7c6c-44f3-8050-f3fb11ddc5c3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -99,9 +99,6 @@
     </ClCompile>
     <ClCompile Include="..\sdk\manager\netvars\netvars.cpp">
       <Filter>sdk\manager\netvars</Filter>
-    </ClCompile>
-    <ClCompile Include="..\core\hooks\directx\directx.cpp">
-      <Filter>core\hooks\directx</Filter>
     </ClCompile>
     <ClCompile Include="..\utilities\math\math.cpp">
       <Filter>utilities\math</Filter>
@@ -145,12 +142,6 @@
     <ClInclude Include="..\sdk\classes\entity.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\hooks\directx\endscene.h">
-      <Filter>core\hooks\directx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\core\hooks\directx\directx.h">
-      <Filter>core\hooks\directx</Filter>
-    </ClInclude>
     <ClInclude Include="..\utilities\math\math.h">
       <Filter>utilities\math</Filter>
     </ClInclude>
@@ -172,13 +163,22 @@
     <ClInclude Include="..\utilities\structures\vec2d\vec2d.h">
       <Filter>utilities\structs\vec2d</Filter>
     </ClInclude>
-    <ClInclude Include="..\utilities\structures\vec4d\vec4d.h">
-      <Filter>utilities\structs\vec4d</Filter>
-    </ClInclude>
     <ClInclude Include="..\sdk\manager\interface\classes\IVEngineClient.h">
       <Filter>sdk\manager\interface\classes</Filter>
     </ClInclude>
     <ClInclude Include="..\sdk\manager\interface\classes\DebugOverlay.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\structures\vec4d\vec4d.h">
+      <Filter>utilities\structs\vec4d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IPanel.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\hooks\paint\paint.h">
+      <Filter>core\hooks\paint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\ISurface.h">
       <Filter>sdk\manager\interface\classes</Filter>
     </ClInclude>
   </ItemGroup>

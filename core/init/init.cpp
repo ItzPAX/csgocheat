@@ -4,12 +4,12 @@
 Init g_Init{ };
 
 ulong __stdcall Init::InitAll(void* p) {
-	// injection started, allocate a console
-	AllocConsole(); FILE* f; freopen_s(&f, "CONOUT$", "w", stdout);
-
 	// wait for serverbrowser dll
 	while (!GetModuleHandleA("serverbrowser.dll"))
 		Sleep(200);
+
+	// injection started, allocate a console
+	AllocConsole(); FILE* f; freopen_s(&f, "CONOUT$", "w", stdout);
 
 	// find all interfaces
 	if (!g_Interface.Init())

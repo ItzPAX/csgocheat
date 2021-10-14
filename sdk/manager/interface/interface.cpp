@@ -20,5 +20,7 @@ bool Interface::Init() {
 	pClient = (IBaseClientDLL*)GetInterface("client.dll", "VClient018");
 	pEngine = (IVEngineClient*)GetInterface("engine.dll", "VEngineClient014");
 	pDebugOverlay = (IVDebugOverlay*)GetInterface("engine.dll", "VDebugOverlay004");
+	pPanel = (IPanel*)GetInterface("vgui2.dll", "VGUI_Panel009");
+	pSurface = (ISurface*)GetInterface("vguimatsurface.dll", "VGUI_Surface031");
 	return true;
 }
