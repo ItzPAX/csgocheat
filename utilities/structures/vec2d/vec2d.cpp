@@ -83,12 +83,12 @@ Vec2D Vec2D::Normalization() {
     return *this;
 }
 
-Vec2D Vec2D::Normalized(const Vec2D& vec) {
+void Vec2D::Normalized(const Vec2D& vec) {
     g_Math.NormalizeIntoRange(vec.x, 89.f, -89.f);
     g_Math.NormalizeIntoRange(vec.y, 180.f, -180.f);
 }
 
-void Vec2D::Normalize() {
+Vec2D Vec2D::Normalize() {
     g_Math.NormalizeIntoRange(this->x, 89.f, -89.f);
     g_Math.NormalizeIntoRange(this->y, 180.f, -180.f);
 }

@@ -1,23 +1,58 @@
 #include "pch.h"
 #include "includes.h"
 #include "utilities/hooklib/hooklib.h"
-#include "paint/paint.h"
+#include "directx/endscene.h"
+#include "clientmode/clientmode.h"
 
 HookManager g_HookManager{ };
 
 #pragma region HookDefs
-namespace PaintTraverse {
-	using tPaintTraverse = void(__thiscall*)(IPanel*, unsigned int, bool, bool);
-	tPaintTraverse oPaintTraverse = nullptr;
+namespace WndProc {
+	using tWndProc = LRESULT(__stdcall*)(HWND, UINT, WPARAM, LPARAM);
+	tWndProc oWndProc = nullptr;
 
-	inline int iIndex = 41;
-	__forceinline void __stdcall hkPaintTraverse(unsigned int panel, bool forcerepaint, bool allowforce);
+	bool bInputReceived = false;
+
+	__forceinline LRESULT __stdcall hkWndProc(const HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+}
+
+namespace CreateMove {
+	using tCreateMove = bool(__stdcall*)(float, CUserCmd*);
+	tCreateMove oCreateMove = nullptr;
+	inline int iIndex = 24;
+	__forceinline bool __stdcall hkCreateMove(float flInputSampleTime, CUserCmd* cmd);
+}
+
+namespace EndScene {
+	using tEndScene = HRESULT(__stdcall*)(LPDIRECT3DDEVICE9);
+	tEndScene oEndScene = nullptr;
+
+	inline static bool bDraw = false;
+	inline int iIndex = 42;
+	void* pD3D9Device[119];
+	BYTE pEndSceneBytes[7]{ 0 };
+	
+	__forceinline void __stdcall hkEndScene(LPDIRECT3DDEVICE9 o_pDevice);
 }
 #pragma endregion
 
 bool HookManager::AddAllHooks() {
-	//grab original function address and add hook to the queue
-	PaintTraverse::oPaintTraverse = (PaintTraverse::tPaintTraverse)g_HookLib.AddHook(PaintTraverse::hkPaintTraverse, g_Interface.pPanel, PaintTraverse::iIndex, "PaintTraverse");
+	// override hook placed by vac in VirtualProtect
+	if (!g_HookLib.OverrideVirtualProtect())
+		return false;
+
+	 // hook directx, maybe also hook reset in the future
+	if (g_DirectX.GetD3D9Device(EndScene::pD3D9Device, sizeof(EndScene::pD3D9Device))) {
+		memcpy(EndScene::pEndSceneBytes, (char*)EndScene::pD3D9Device[EndScene::iIndex], 7);
+		EndScene::oEndScene = (EndScene::tEndScene)g_HookLib.TrampHook((char*)EndScene::pD3D9Device[EndScene::iIndex], (char*)EndScene::hkEndScene, 7);
+	}
+
+	// hook windows functions
+	WndProc::oWndProc = (WndProc::tWndProc)SetWindowLong(g_DirectX.window, GWL_WNDPROC, (LONG)WndProc::hkWndProc);
+
+	// grab original function address and add hook to the queue
+	CreateMove::oCreateMove = (CreateMove::tCreateMove)g_HookLib.AddHook(CreateMove::hkCreateMove, g_Interface.pClientMode, CreateMove::iIndex, "CreateMove");
+
 
 
 	g_HookManager.bHooksAdded = true;
@@ -37,6 +72,9 @@ bool HookManager::ReleaseAll() {
 	// check if there are any hooks to release
 	if (g_HookManager.iCounter <= 0)
 		return false;
+
+	// manually remove the trampoline hook
+	g_HookLib.Patch((char*)EndScene::pD3D9Device[42], (char*)EndScene::pEndSceneBytes, 7);
 
 	// we have hooks to release, lets call the function
 	g_HookLib.DisableAllHooks();
@@ -61,8 +99,6 @@ IHookStatus HookManager::GetHookInfo(const char* sName) {
 	return ihs;
 }
 
-VOID HookManager::Patch(char* dst, char* src, short len) { g_HookLib.Patch(dst, src, len); }
-
 void HookManager::LogHookStatus(IHookStatus ihs) {
 	if (ihs.name == "")
 		return;
@@ -77,9 +113,44 @@ void HookManager::LogHookStatus(IHookStatus ihs) {
 }
 
 #pragma region HkFunctions
-void __stdcall PaintTraverse::hkPaintTraverse(unsigned int panel, bool forcerepaint, bool allowforce) {
-	g_Interface.pEngine->GetScreenSize(Game::iScreenX, Game::iScreenY);
-	cPaintTraverse(); // real function, this is where the magic happens
-	oPaintTraverse(g_Interface.pPanel, panel, forcerepaint, allowforce);
+LRESULT __stdcall WndProc::hkWndProc(const HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+
+	if (!WndProc::bInputReceived && GetAsyncKeyState(VK_INSERT) & 0x01) {
+		bInputReceived = true;
+		g_Menu.bToggled = !g_Menu.bToggled;
+		// ghetto fix but idc :)
+		g_Menu.bToggled ? g_Interface.pConsole->Activate() : g_Interface.pConsole->Hide();
+	}
+
+	if (WndProc::bInputReceived && GetAsyncKeyState(VK_INSERT) & 0x8000)
+		bInputReceived = false;
+
+	if (g_Menu.bToggled) { // menu opened give input to imgui
+		ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam);
+		return true;
+	}
+
+	// menu closed restore normal input
+	CallWindowProc(WndProc::oWndProc, hwnd, uMsg, wParam, lParam);
+	return true;
+}
+
+bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {
+	cCreateMove(flInputSampleTime, cmd); // relay function
+
+	return CreateMove::oCreateMove(flInputSampleTime, cmd);
+}
+
+void __stdcall EndScene::hkEndScene(LPDIRECT3DDEVICE9 o_pDevice) {
+	if (!g_DirectX.pDevice)
+		g_DirectX.pDevice = o_pDevice;
+
+	if (Game::pLocal && EndScene::bDraw)
+		cEndScene(); // relay function
+
+	cMenu(); // menu shit
+
+	EndScene::bDraw = !EndScene::bDraw;
+	EndScene::oEndScene(g_DirectX.pDevice);
 }
 #pragma endregion These Functions call the real functions in different cpp files withing the hooks dir

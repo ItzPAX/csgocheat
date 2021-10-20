@@ -7,7 +7,8 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
 	case DLL_PROCESS_ATTACH: {
 		// Create thread and init our cheat
 		HANDLE hThread = CreateThread(nullptr, NULL, Init::InitAll, hinstDLL, NULL, nullptr);
-		if (hThread) CloseHandle(hThread);
+		if (!hThread)
+			return 0;
 		break;
 	}
 

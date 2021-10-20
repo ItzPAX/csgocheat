@@ -28,8 +28,8 @@ public:
     Vec2D CrossProduct(const Vec2D& vec);
     float Magnitude();
     Vec2D Normalization();
-    Vec2D Normalized(const Vec2D& vec); // this is pretty much useless, unless you want to do your aa using a 2d vec
-    void Normalize(); // this is pretty much useless, unless you want to do your aa using a 2d vec
+    void Normalized(const Vec2D& vec); // this is pretty much useless, unless you want to do your aa using a 2d vec
+    Vec2D Normalize(); // this is pretty much useless, unless you want to do your aa using a 2d vec
     float Square();
     float Distance(const Vec2D& vec);
 };

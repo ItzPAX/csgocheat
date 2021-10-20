@@ -5,3 +5,4 @@ TODO:
 tool class
 Signature scanner hinzufügen
 Wie wird XOR Compile time encryption gemacht?
+EndScene ESP Optimieren, ThreadSafe CriticalSection angucken

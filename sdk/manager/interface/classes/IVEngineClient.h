@@ -2,6 +2,26 @@
 #include "../utilities/structures/vec3d/vec3d.h"
 #include "includes.h"
 
+struct PlayerInfo {
+	int64_t _pad0;
+	union {
+		int64_t xuid;
+		struct {
+			int xuidlow;
+			int xuidhigh;
+		};
+	};
+	char name[128];
+	int userid;
+	char guid[33];
+	unsigned int friendsid;
+	char friendsname[128];
+	bool fakeplayer;
+	bool ishltv;
+	unsigned int customfiles[4];
+	unsigned char filesdownloaded;
+};
+
 class IVEngineClient {
 public:
 	// Find the model's surfaces that intersect the given sphere.
@@ -38,7 +58,7 @@ public:
 	virtual void				ClientCmd(const char* szCmdString) = 0;
 
 	// Fill in the player info structure for the specified player index (name, model, etc.)
-	virtual bool				GetPlayerInfo(int ent_num, void* pinfo) = 0;
+	virtual bool				GetPlayerInfo(int ent_num, PlayerInfo* pinfo) = 0;
 
 	// Retrieve the player entity number for a specified userID
 	virtual int					GetPlayerForUserID(int userID) = 0;

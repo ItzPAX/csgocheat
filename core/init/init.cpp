@@ -12,6 +12,7 @@ ulong __stdcall Init::InitAll(void* p) {
 	AllocConsole(); FILE* f; freopen_s(&f, "CONOUT$", "w", stdout);
 
 	// find all interfaces
+	std::cout << "[ RAYBOT ] Bruteforcing Interfaces...\n";
 	if (!g_Interface.Init())
 		return 0;
 	std::cout << "[ RAYBOT ] Successfully Initialized Interfaces\n";
@@ -25,6 +26,10 @@ ulong __stdcall Init::InitAll(void* p) {
 	if (!g_HookManager.InitAllHooks())
 		return 0;
 	std::cout << "[ RAYBOT ] Successfully Initialized Hooks\n";
+
+	if (!g_Render.InitRenderer())
+		return 0;
+	std::cout << "[ RAYBOT ] Successfully Initialized Renderer\n";
 
 	return 1;
 }

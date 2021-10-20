@@ -16,4 +16,5 @@ public:
 	static Color Blue(uchar a = 255) { return Color(0, 0, 255, a); }
 	static Color Red(uchar a = 255) { return Color(255, 0, 0, a); }
 	static Color Green(uchar a = 255) { return Color(0, 255, 0, a); }
+	static Color None() { return Color(0, 0, 0, 0); }
 };

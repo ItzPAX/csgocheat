@@ -33,12 +33,13 @@ private:
 
     // private functions
 private:
-    // if VirtualProtect was hooked via a usermode hook, this will override it
-    BOOL OverrideVirtualProtect();
     BOOL DestroyPointers(int index = NOT_FOUND);
 
 public:
     HookLib() { iCounter = 0; bVehInit = false; pVEHHandle = NULL; pVTableAddr = NULL; } // constructor
+
+    // if VirtualProtect was hooked via a usermode hook, this will override it
+    BOOL OverrideVirtualProtect();
 
 #pragma region VEHHook
     // hooks function and returns a pointer to the original function, only works on virtual function pointers

@@ -75,9 +75,10 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)output\$(Configuration)\</OutDir>
     <TargetName>csgocheat</TargetName>
-    <IncludePath>$(IncludePath)</IncludePath>
+    <IncludePath>$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
     <IntDir>output\$(Configuration)\</IntDir>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -133,7 +134,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -184,8 +185,32 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\core\features\source\visuals.cpp" />
+    <ClCompile Include="..\core\hooks\directx\directx.cpp" />
     <ClCompile Include="..\core\hooks\hooks.cpp" />
+    <ClCompile Include="..\core\imgui\imgui.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\core\imgui\imgui_demo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\core\imgui\imgui_draw.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\core\imgui\imgui_impl_dx9.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\core\imgui\imgui_impl_win32.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\core\imgui\imgui_tables.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\core\imgui\imgui_widgets.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\core\init\init.cpp" />
+    <ClCompile Include="..\core\menu\menu.cpp" />
     <ClCompile Include="..\dllentry.cpp" />
     <ClCompile Include="..\pch\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -197,22 +222,42 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\utilities\math\math.cpp" />
+    <ClCompile Include="..\utilities\render\render.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\utilities\structures\vec2d\vec2d.cpp" />
     <ClCompile Include="..\utilities\structures\vec3d\vec3d.cpp" />
     <ClCompile Include="..\utilities\tools\tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\core\features\header\visuals.h" />
+    <ClInclude Include="..\core\hooks\clientmode\clientmode.h" />
+    <ClInclude Include="..\core\hooks\directx\directx.h" />
+    <ClInclude Include="..\core\hooks\directx\endscene.h" />
     <ClInclude Include="..\core\hooks\hooks.h" />
-    <ClInclude Include="..\core\hooks\paint\paint.h" />
+    <ClInclude Include="..\core\imgui\imconfig.h" />
+    <ClInclude Include="..\core\imgui\imgui.h" />
+    <ClInclude Include="..\core\imgui\imgui_impl_dx9.h" />
+    <ClInclude Include="..\core\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="..\core\imgui\imgui_internal.h" />
+    <ClInclude Include="..\core\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\core\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\core\imgui\imstb_truetype.h" />
     <ClInclude Include="..\core\init\init.h" />
+    <ClInclude Include="..\core\menu\menu.h" />
     <ClInclude Include="..\includes.h" />
     <ClInclude Include="..\pch\pch.h" />
+    <ClInclude Include="..\sdk\classes\cusercmd.h" />
     <ClInclude Include="..\sdk\classes\entity.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\CGlobalVars.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\DebugOverlay.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IBaseClientDLL.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IClientEntityList.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientMode.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientRenderable.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IGameConsole.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IInputSystem.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IPanel.h" />
-    <ClInclude Include="..\sdk\manager\interface\classes\ISurface.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IVEngineClient.h" />
     <ClInclude Include="..\sdk\manager\interface\interface.h" />
     <ClInclude Include="..\sdk\manager\netvars\netvars.h" />
@@ -223,6 +268,7 @@
     <ClInclude Include="..\utilities\structures\vec2d\vec2d.h" />
     <ClInclude Include="..\utilities\structures\vec3d\vec3d.h" />
     <ClInclude Include="..\utilities\structures\vec4d\vec4d.h" />
+    <ClInclude Include="..\utilities\structures\viewmatrix\matrix.h" />
     <ClInclude Include="..\utilities\tools\tools.h" />
   </ItemGroup>
   <ItemGroup>

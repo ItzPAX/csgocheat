@@ -1,15 +1,23 @@
 #pragma once
-#include "pch.h"
-#include "includes.h"
+#include "core/hooks/directx/directx.h"
+#include "utilities/structures/vec2d/vec2d.h"
 
-namespace Render {
-	__forceinline void DrawFilledRect(int x, int y, int w, int h, Color col) {
-		g_Interface.pSurface->SetDrawingColor(col.r, col.g, col.b, col.a);
-		g_Interface.pSurface->DrawFilledRectangle(x, y, w, h);
-	}
+class Render {
+private:
+	ID3DXLine* g_pLine;
 
-	__forceinline void DrawLine(int x1, int y1, int x2, int y2, Color col) {
-		g_Interface.pSurface->SetDrawingColor(col.r, col.g, col.b, col.a);
-		g_Interface.pSurface->DrawLine(x1, y1, x2, y2);
-	}
-}
+public:
+	inline static LPD3DXFONT pEspFont;
+
+public:
+	static bool InitRenderer();
+	static void DrawFilledRect(int x, int y, int w, int h, Color _col);
+	static void DrawLine(int x1, int y1, int x2, int y2, int width, Color _col);
+	static void DrawLine(Vec2D src, Vec2D dst, int width, Color _col);	// overload to use vectors
+	static void DrawOutlinedRect(int x, int y, int w, int h, Color _col);
+	static void Text(LPD3DXFONT font, const char* text, float x, float y, int scale, Color _col);
+	static Vec2D TextSize(LPD3DXFONT font, const char* text);
+	static void TextSize(LPD3DXFONT font, const char* text, Vec2D& vec);
+};
+
+extern Render g_Render;

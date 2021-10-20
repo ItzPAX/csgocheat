@@ -43,10 +43,6 @@ BOOL HookLib::OverrideVirtualProtect() {
 
 // This function will break all the pointers to trigger an excpetion and call the VEHHandler
 BOOL HookLib::DestroyPointers(int index) {
-    // override potentially placed virtual protect hooks
-    if (!OverrideVirtualProtect())
-        return false;
-
     if (index == NOT_FOUND) {
         for (int i = 0; i < iCounter; i++) {
             DWORD dwOProc;
