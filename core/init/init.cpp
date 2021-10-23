@@ -17,6 +17,11 @@ ulong __stdcall Init::InitAll(void* p) {
 		return 0;
 	std::cout << "[ RAYBOT ] Successfully Initialized Interfaces\n";
 
+	// init materials for chams
+	if (!g_Chams.InitMaterials())
+		return 0;
+	std::cout << "[ RAYBOT ] Successfully Initialized Materials\n";
+
 	// then we add all of our hooks
 	if (!g_HookManager.AddAllHooks())
 		return 0;
@@ -27,6 +32,7 @@ ulong __stdcall Init::InitAll(void* p) {
 		return 0;
 	std::cout << "[ RAYBOT ] Successfully Initialized Hooks\n";
 
+	// init d3dx line
 	if (!g_Render.InitRenderer())
 		return 0;
 	std::cout << "[ RAYBOT ] Successfully Initialized Renderer\n";

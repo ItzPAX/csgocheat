@@ -4,8 +4,8 @@
 
 void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	// set cmd to be globally accessible
-	Game::pCmd = cmd;
+	Game::g_pCmd = cmd;
 
 	// do shit here
-	Game::pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
+	Game::g_pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
 }

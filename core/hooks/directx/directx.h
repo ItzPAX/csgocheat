@@ -3,9 +3,10 @@
 
 class DirectX {
 public:
-	HWND window;
+	inline static bool bDrawing = true;
 	inline static LPDIRECT3DDEVICE9 pDevice = nullptr;
 	int iWindowHeight = 0, iWindowWidth = 0;
+	HWND window;
 
 public:
 	bool GetD3D9Device(void** pTable, size_t size);

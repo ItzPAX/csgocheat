@@ -9,6 +9,10 @@
 #include "classes/IInputSystem.h"
 #include "classes/IPanel.h"
 #include "classes/IGameConsole.h"
+#include "classes/IVModelRender.h"
+#include "classes/IMaterialSystem.h"
+#include "classes/IStudioRender.h"
+#include "classes/IRenderView.h"
 
 class Interface {
 private:
@@ -24,6 +28,10 @@ public:
 	IInputSystem* pInputSystem;
 	IPanel* pPanel;
 	IGameConsole* pConsole;
+	IVModelRender* pModelRender;
+	IMaterialSystem* pMaterialSystem;
+	IStudioRender* pStudioRender;
+	IRenderView* pRenderView;
 
 	// TODO: Find Interface entry for this
 	IClientRenderable* pRenderable;

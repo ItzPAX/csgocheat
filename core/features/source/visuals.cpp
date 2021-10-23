@@ -50,8 +50,11 @@ void Visuals::DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col) {
 	std::string str = std::to_string(pPlayer->iHealth());
 	Vec2D vSize = g_Render.TextSize(g_Render.pEspFont, str.c_str());
 
+	int iWidth = rPlayerRect.right - rPlayerRect.left;
+
+	g_Render.DrawLine(rPlayerRect.left - 5.f, rPlayerRect.top, rPlayerRect.left - 5.f, iScaledNum, 2, Color(50,50,50,col.a));
 	g_Render.DrawLine(rPlayerRect.left - 5.f, rPlayerRect.bottom, rPlayerRect.left - 5.f, iScaledNum, 2, col);
-	g_Render.Text(g_Render.pEspFont, str.c_str(), rPlayerRect.left - 5.f, iScaledNum - vSize.y, 14,Color::White(col.a));
+	g_Render.Text(g_Render.pEspFont, str.c_str(), rPlayerRect.left - 10.f, iScaledNum - 4, 14,Color::White(col.a));
 }
 
 void Visuals::DrawDormant(Player* pPlayer, RECT rPlayerRect) {
@@ -88,7 +91,7 @@ void Visuals::DrawPlayer(Player* pPlayer, RECT rPlayerRect) {
 	int flpAlpha = 0xFF * flEntOpacity[pPlayer->iIndex()];
 
 	// construct our color
-	Color cHealthCol((int)((100 - pPlayer->iHealth()) * 2.55f), (int)(pPlayer->iHealth() * 2.55f), 0.f, flpAlpha);
+	Color cHealthCol(((100 - pPlayer->iHealth()) * 2.55f), (pPlayer->iHealth() * 2.55f), 0.f, flpAlpha);
 
 	DrawBox(rPlayerRect, cHealthCol);
 	DrawName(rPlayerRect, pPlayer, cHealthCol);
@@ -96,11 +99,10 @@ void Visuals::DrawPlayer(Player* pPlayer, RECT rPlayerRect) {
 }
 
 void Visuals::OnEndScene() {
-	// save all players to global vector (just optimizes shit)
 	for (int i = 1; i <= g_Interface.pGlobalVars->iMaxClients; i++) {
 		// get and validate player
 		Player* pPlayer = reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntity(i));
-		if (!pPlayer || !pPlayer->bIsAlive() || pPlayer == Game::pLocal || !pPlayer->bIsEnemy(Game::pLocal))
+		if (!pPlayer || !pPlayer->bIsAlive() || pPlayer == Game::g_pLocal || !pPlayer->bIsEnemy(Game::g_pLocal))
 			continue;
 
 		RECT rPlayerRect = GetPlayerRect(pPlayer);

@@ -3,10 +3,20 @@
 #include "utilities/hooklib/hooklib.h"
 #include "directx/endscene.h"
 #include "clientmode/clientmode.h"
+#include "studiorender/studiorender.h"
+#include "sdk/manager/interface/interface.h"
 
 HookManager g_HookManager{ };
 
 #pragma region HookDefs
+namespace DrawModel {
+	using tDrawModel = void(__fastcall*)(void*, void*, DrawModelResults*, const DrawModelInfo&, Matrix*, float*, float*, const Vec3D&, int);
+	tDrawModel oDrawModel = nullptr;
+
+	int iIndex = 29;
+	__forceinline void __fastcall hkDrawModel(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags);
+}
+
 namespace WndProc {
 	using tWndProc = LRESULT(__stdcall*)(HWND, UINT, WPARAM, LPARAM);
 	tWndProc oWndProc = nullptr;
@@ -27,7 +37,7 @@ namespace EndScene {
 	using tEndScene = HRESULT(__stdcall*)(LPDIRECT3DDEVICE9);
 	tEndScene oEndScene = nullptr;
 
-	inline static bool bDraw = false;
+	inline static bool bDraw = true;
 	inline int iIndex = 42;
 	void* pD3D9Device[119];
 	BYTE pEndSceneBytes[7]{ 0 };
@@ -52,8 +62,10 @@ bool HookManager::AddAllHooks() {
 
 	// grab original function address and add hook to the queue
 	CreateMove::oCreateMove = (CreateMove::tCreateMove)g_HookLib.AddHook(CreateMove::hkCreateMove, g_Interface.pClientMode, CreateMove::iIndex, "CreateMove");
+	DrawModel::oDrawModel = (DrawModel::tDrawModel)g_HookLib.AddHook(DrawModel::hkDrawModel, g_Interface.pStudioRender, DrawModel::iIndex, "DrawModel");
 
-
+	// forward original func pointer to different classes
+	g_Chams.c_oDrawModel = DrawModel::oDrawModel;
 
 	g_HookManager.bHooksAdded = true;
 	g_HookManager.iCounter = g_HookLib.GetCounter();
@@ -113,6 +125,14 @@ void HookManager::LogHookStatus(IHookStatus ihs) {
 }
 
 #pragma region HkFunctions
+void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags = STUDIORENDER_DRAW_ENTIRE_MODEL) {
+	if (Game::g_pLocal && !g_DirectX.bDrawing) {
+		cDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+	}
+
+	DrawModel::oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+}	
+
 LRESULT __stdcall WndProc::hkWndProc(const HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 	if (!WndProc::bInputReceived && GetAsyncKeyState(VK_INSERT) & 0x01) {
@@ -145,10 +165,16 @@ void __stdcall EndScene::hkEndScene(LPDIRECT3DDEVICE9 o_pDevice) {
 	if (!g_DirectX.pDevice)
 		g_DirectX.pDevice = o_pDevice;
 
-	if (Game::pLocal && EndScene::bDraw)
+	// we are drawing in endscene rn
+	g_DirectX.bDrawing = true;
+
+	if (Game::g_pLocal && EndScene::bDraw)
 		cEndScene(); // relay function
 
 	cMenu(); // menu shit
+
+	// we have stopped drawing
+	g_DirectX.bDrawing = false;
 
 	EndScene::bDraw = !EndScene::bDraw;
 	EndScene::oEndScene(g_DirectX.pDevice);

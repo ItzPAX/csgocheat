@@ -3,8 +3,7 @@
 #include "includes.h"
 #include "pch.h"
 
-#define MAXSTUDIOBONES		128
-#define BONE_USED_BY_HITBOX 0x00000100
+#define INVALID -1;
 
 class Entity {
 public:
@@ -24,6 +23,15 @@ public:
 
 		if (this && this->pNetworkable())
 			return (*(original_fn**)pNetworkable())[10](pNetworkable());
+		return INVALID;
+	}
+
+	ClientClass* cGetClientClass() {
+		using original_fn = ClientClass*(__thiscall*)(void*);
+
+		if (this && this->pNetworkable())
+			return (*(original_fn**)pNetworkable())[2](pNetworkable());
+		return nullptr;
 	}
 
 	bool bDormant() { using tOriginalFn = bool(__thiscall*)(void*); return (*static_cast<tOriginalFn**>(pNetworkable()))[9](pNetworkable()); }

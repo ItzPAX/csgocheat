@@ -18,5 +18,6 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
 		break; 	
 
 	}
+
 	return 1;
 }

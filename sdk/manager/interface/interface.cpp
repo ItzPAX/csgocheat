@@ -55,6 +55,11 @@ bool Interface::Init() {
 	pDebugOverlay = (IVDebugOverlay*)GetInterface("engine.dll", "VDebugOverlay");
 	pInputSystem = (IInputSystem*)GetInterface("inputsystem.dll", "InputSystemVersion");
 	pConsole = (IGameConsole*)GetInterface("client.dll", "GameConsole");
+	pModelRender = (IVModelRender*)GetInterface("engine.dll", "VEngineModel");
+	pMaterialSystem = (IMaterialSystem*)GetInterface("materialsystem.dll", "VMaterialSystem");
+	pStudioRender = (IStudioRender*)GetInterface("studiorender.dll", "VStudioRender");
+	pRenderView = (IRenderView*)GetInterface("engine.dll", "VEngineRenderView");
+	
 
 	// custom interfaces
 	pGlobalVars = **reinterpret_cast<CGlobalVars***>((*reinterpret_cast<uintptr_t**>(pClient))[11] + 10);

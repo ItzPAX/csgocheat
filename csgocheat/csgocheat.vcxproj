@@ -185,6 +185,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\core\features\source\chams.cpp" />
     <ClCompile Include="..\core\features\source\visuals.cpp" />
     <ClCompile Include="..\core\hooks\directx\directx.cpp" />
     <ClCompile Include="..\core\hooks\hooks.cpp" />
@@ -230,11 +231,14 @@
     <ClCompile Include="..\utilities\tools\tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\core\features\header\chams.h" />
     <ClInclude Include="..\core\features\header\visuals.h" />
+    <ClInclude Include="..\core\features\variables\variables.h" />
     <ClInclude Include="..\core\hooks\clientmode\clientmode.h" />
     <ClInclude Include="..\core\hooks\directx\directx.h" />
     <ClInclude Include="..\core\hooks\directx\endscene.h" />
     <ClInclude Include="..\core\hooks\hooks.h" />
+    <ClInclude Include="..\core\hooks\studiorender\studiorender.h" />
     <ClInclude Include="..\core\imgui\imconfig.h" />
     <ClInclude Include="..\core\imgui\imgui.h" />
     <ClInclude Include="..\core\imgui\imgui_impl_dx9.h" />
@@ -249,6 +253,7 @@
     <ClInclude Include="..\pch\pch.h" />
     <ClInclude Include="..\sdk\classes\cusercmd.h" />
     <ClInclude Include="..\sdk\classes\entity.h" />
+    <ClInclude Include="..\sdk\classes\entityclass.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\CGlobalVars.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\DebugOverlay.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IBaseClientDLL.h" />
@@ -257,7 +262,12 @@
     <ClInclude Include="..\sdk\manager\interface\classes\IClientRenderable.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IGameConsole.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IInputSystem.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IMaterial.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IMaterialSystem.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IPanel.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IRenderView.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IStudioRender.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IVModelRender.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IVEngineClient.h" />
     <ClInclude Include="..\sdk\manager\interface\interface.h" />
     <ClInclude Include="..\sdk\manager\netvars\netvars.h" />

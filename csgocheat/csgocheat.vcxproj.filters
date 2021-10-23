@@ -85,6 +85,12 @@
     <Filter Include="core\menu">
       <UniqueIdentifier>{b86f5d37-adfd-431d-9715-f6c68d4174be}</UniqueIdentifier>
     </Filter>
+    <Filter Include="core\hooks\studiorender">
+      <UniqueIdentifier>{8321e80a-e2ad-41c9-8cd9-03d6e8d4a387}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\features\variables">
+      <UniqueIdentifier>{0c91149a-cba2-4a1c-a3a0-bf1f51fea784}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dllentry.cpp" />
@@ -150,6 +156,9 @@
     </ClCompile>
     <ClCompile Include="..\core\menu\menu.cpp">
       <Filter>core\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\core\features\source\chams.cpp">
+      <Filter>core\features\source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -270,6 +279,33 @@
     </ClInclude>
     <ClInclude Include="..\sdk\manager\interface\classes\IGameConsole.h">
       <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IVModelRender.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IMaterial.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IMaterialSystem.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IStudioRender.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IRenderView.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\hooks\studiorender\studiorender.h">
+      <Filter>core\hooks\studiorender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\header\chams.h">
+      <Filter>core\features\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\classes\entityclass.h">
+      <Filter>sdk\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\variables\variables.h">
+      <Filter>core\features\variables</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

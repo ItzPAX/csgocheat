@@ -17,6 +17,7 @@ using uchar = unsigned char;
 #include "sdk/manager/netvars/netvars.h"
 #include "sdk/classes/entity.h"
 #include "sdk/classes/cusercmd.h"
+#include "sdk/classes/entityclass.h"
 
 // includes
 #include "utilities/render/render.h"
@@ -33,15 +34,18 @@ using uchar = unsigned char;
 #include "utilities/structures/matrix/matrix.h"
 
 // features
+#include "core/features/variables/variables.h"
 #include "core/menu/menu.h"
 #include "core/features/header/visuals.h"
+#include "core/features/header/chams.h"
 
 // externs
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
+// globally available shit
 namespace Game {
-	inline CUserCmd* pCmd;
-	inline Player* pLocal;
-	inline int iScreenX;
-	inline int iScreenY;
+	inline CUserCmd* g_pCmd;
+	inline Player* g_pLocal;
+	inline int g_iScreenX;
+	inline int g_iScreenY;
 }
