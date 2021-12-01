@@ -20,7 +20,12 @@ void Menu::Render() {
 void Menu::Draw() {
 	// genuine menu here
 	ImGui::Begin("RayBot");
-	ImGui::Text("NLD_HD");
+	ImGui::Checkbox("Box ESP", &Variables::bBoxEsp);
+	ImGui::Checkbox("Name ESP", &Variables::bNameEsp);
+	ImGui::Checkbox("Health ESP", &Variables::bHealthEsp);
+
+	ImGui::Checkbox("Enemy Chams Vis", &Variables::bEnemyChamsVis);
+	ImGui::Checkbox("Enemy Chams Invis", &Variables::bEnemyChamsInvis);
 	ImGui::End();
 }
 

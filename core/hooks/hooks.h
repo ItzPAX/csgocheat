@@ -2,11 +2,11 @@
 
 //hook status interface struct
 struct IHookStatus {
-	IHookStatus() { pBaseFnc = NULL; pHkAddr = nullptr; iIndex = NULL; name = ""; }
+	IHookStatus() { pBaseFnc = NULL; pHkAddr = nullptr; iIndex = NULL; name; }
 	uintptr_t pBaseFnc;
 	PVOID pHkAddr;
 	INT   iIndex;
-	const char* name;
+	std::string *name;
 };
 
 //this class is the interface for the g_HookLib class

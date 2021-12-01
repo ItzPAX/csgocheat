@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "render.h"
 
 Render g_Render;
@@ -8,8 +9,18 @@ bool Render::InitRenderer() {
 }
 
 void Render::DrawFilledRect(int x, int y, int w, int h, Color _col) {
-	D3DRECT rect = { x,y, x + w, y + h };
-	g_DirectX.pDevice->Clear(1, &rect, D3DCLEAR_TARGET, D3DCOLOR_ARGB((int)_col.a, (int)_col.r, (int)_col.g, (int)_col.b), 0.f, 0.f);
+	D3DCOLOR _Col = D3DCOLOR_ARGB((int)_col.a, (int)_col.r, (int)_col.g, (int)_col.b);
+
+	Vertex V[4] = { {x, y + h, 0.0f, 0.0f, _Col}, { x, y, 0.0f, 0.0f, _Col }, { x + w, y + h, 0.0f, 0.0f, _Col }, { x + w, y, 0.0f, 0.0f, _Col } };
+	g_DirectX.pDevice->SetTexture(0, NULL);
+	g_DirectX.pDevice->SetPixelShader(0);
+	g_DirectX.pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+	g_DirectX.pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+	g_DirectX.pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	g_DirectX.pDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
+	g_DirectX.pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	g_DirectX.pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, V, sizeof(Vertex));
+	return;
 }
 
 void Render::DrawLine(int x1, int y1, int x2, int y2, int width, Color _col) {

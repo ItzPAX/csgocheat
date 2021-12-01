@@ -42,13 +42,6 @@ void* Interface::GetInterface(const char* dllname, const char* interfacename) {
 
 bool Interface::Init() {
 	// grab all interfaces here
-	//pClientEntityList = (IClientEntityList*)GetInterface("client.dll", "VClientEntityList003");
-	//pClient = (IBaseClientDLL*)GetInterface("client.dll", "VClient018");
-	//pEngine = (IVEngineClient*)GetInterface("engine.dll", "VEngineClient014");
-	//pDebugOverlay = (IVDebugOverlay*)GetInterface("engine.dll", "VDebugOverlay004");
-	//pInputSystem = (IInputSystem*)GetInterface("inputsystem.dll", "InputSystemVersion001");
-	//pConsole = (IGameConsole*)GetInterface("client.dll", "GameConsole004");
-
 	pClientEntityList = (IClientEntityList*)GetInterface("client.dll", "VClientEntityList");
 	pClient = (IBaseClientDLL*)GetInterface("client.dll", "VClient");
 	pEngine = (IVEngineClient*)GetInterface("engine.dll", "VEngineClient");

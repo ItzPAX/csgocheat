@@ -54,8 +54,16 @@ public:
 		return (*(original_fn**)this)[10](this);
 	}
 
+	Vec3D vEyeOrigin() {
+		using original_fn = Vec3D & (__thiscall*)(void*);
+		return (*(original_fn**)this)[227](this);
+	}
+
 	bool bIsEnemy(Player* to) { return this->iTeamNum() != to->iTeamNum(); }
+	bool bIsAlive() { return iHealth() > 0; }
+
+	Vec3D GetVelocity() { return g_NetVars.GetNetvar<Vec3D>("DT_BasePlayer", "m_vecVelocity[0]", this); }
+	Vec3D GetViewOffset() { return g_NetVars.GetNetvar<Vec3D>("DT_BasePlayer", "m_vecViewOffset[0]", this); }
 	int iHealth() { return g_NetVars.GetNetvar<int>("DT_BasePlayer", "m_iHealth", this); }
 	Vec3D vEyeAngles() { return g_NetVars.GetNetvar<Vec3D>("DT_CSPlayer", "m_angEyeAngles", this); }
-	bool bIsAlive() { return iHealth() > 0; }
 };

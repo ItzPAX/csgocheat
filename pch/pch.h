@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <memory>
 #include <stdio.h>
+#include <cmath>
 
 // File Managment
 #include <fstream>

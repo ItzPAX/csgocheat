@@ -30,3 +30,36 @@ float Math::ScaleNumber(float flVal, float flValMax, float flValMin, float flNew
     float flValPrc = (flValToScale - flValMin) / (flValMax - flValMin);
     return flNewMin + flValPrc * (flNewMax - flNewMin);
 }
+
+void Math::CalcAngle(Vec3D src, Vec3D dst, Vec3D& angles) {
+    // get target Vector
+    Vec3D vTargetVec = dst - src;
+	VectorAngles(vTargetVec, angles);
+}
+
+void Math::VectorAngles(Vec3D& forward, Vec3D angles) {
+	Vec3D view;
+	float flTmp;
+
+	if (forward[1] == 0.f && forward[0] == 0.f) {
+		view[0] = 0.f;
+		view[1] = 0.f;
+	}
+	else {
+		view[1] = RAD2DEG(atan2(forward[1], forward[0]));
+
+		if (view[1] < 0.f)
+			view[1] += 360.f;
+
+		flTmp = forward[0] * forward[0] + forward[1] * forward[1];
+		view[2] = sqrt(flTmp);
+
+		//view[2] = 1/fastInverseSquare(forward[0] * forward[0] + forward[1] * forward[1]);
+
+		view[0] = RAD2DEG(atan2(forward[2], view[2]));
+	}
+
+	angles[0] = -view[0];
+	angles[1] = view[1];
+	angles[2] = 0.f;
+}

@@ -4,12 +4,12 @@
 Init g_Init{ };
 
 ulong __stdcall Init::InitAll(void* p) {
-	// wait for serverbrowser dll
-	while (!GetModuleHandleA("serverbrowser.dll"))
-		Sleep(200);
-
 	// injection started, allocate a console
 	AllocConsole(); FILE* f; freopen_s(&f, "CONOUT$", "w", stdout);
+
+	// wait for serverbrowser dll
+	while (!GetModuleHandle("serverbrowser.dll") && !GetModuleHandle("d3d9.dll"))
+		Sleep(200);
 
 	// find all interfaces
 	std::cout << "[ RAYBOT ] Bruteforcing Interfaces...\n";

@@ -224,7 +224,9 @@
     </ClCompile>
     <ClCompile Include="..\utilities\math\math.cpp" />
     <ClCompile Include="..\utilities\render\render.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="..\utilities\structures\vec2d\vec2d.cpp" />
     <ClCompile Include="..\utilities\structures\vec3d\vec3d.cpp" />
@@ -235,6 +237,7 @@
     <ClInclude Include="..\core\features\header\visuals.h" />
     <ClInclude Include="..\core\features\variables\variables.h" />
     <ClInclude Include="..\core\hooks\clientmode\clientmode.h" />
+    <ClInclude Include="..\core\hooks\client\hudupdate.h" />
     <ClInclude Include="..\core\hooks\directx\directx.h" />
     <ClInclude Include="..\core\hooks\directx\endscene.h" />
     <ClInclude Include="..\core\hooks\hooks.h" />

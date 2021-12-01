@@ -13,6 +13,9 @@ public:
 
 	float NormalizeIntoRange(float flVal, float flMax, float flMin);
 	float ScaleNumber(float flVal, float flValMax, float flValMin, float flNewMax, float flNewMin);
+
+	void CalcAngle(Vec3D src, Vec3D dst, Vec3D& angles);
+	void VectorAngles(Vec3D& forward, Vec3D angles);
 };
 
 extern Math g_Math;

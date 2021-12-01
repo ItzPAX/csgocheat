@@ -26,6 +26,14 @@ public:
     Vec3D operator/(float value);
     Vec3D& operator/=(float value);
     Vec3D& operator=(const Vec3D& vec);
+
+    float& operator[](int i) {
+        return ((float*)this)[i];
+    }
+    float operator[](int i) const {
+        return ((float*)this)[i];
+    }
+
     float DotProduct(const Vec3D& vec);
     Vec3D CrossProduct(const Vec3D& vec);
     float Magnitude();

@@ -41,6 +41,9 @@ public:
 
 	// Player instantaneous view angles.
 	Vec3D	viewangles;
+
+	Vec3D aimdirection;
+
 	// Intended velocities
 	//	forward velocity.
 	float	forwardmove;

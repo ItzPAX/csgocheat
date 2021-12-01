@@ -1,5 +1,27 @@
 #include "hooklib.h"
 
+namespace hkFunctions {
+    SIZE_T __stdcall hkVirtualQuery(LPCVOID lpAddr, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_T lpSize) {
+        SIZE_T sReturnVal = g_HookLib.oVirtualQuery(lpAddr, lpBuffer, lpSize);
+        bool bTamper = false;
+
+        // tamper with return vals only if function has been hooked by us
+        if (lpAddr == VirtualProtect) bTamper = true;
+        for (int i = 0; i < g_HookLib.GetCounter(); i++) {
+            if (lpAddr == g_HookLib.GetBasePointer(i))
+                bTamper = true;
+        }
+
+
+        if (lpBuffer && bTamper) {
+            lpBuffer->AllocationProtect = PAGE_EXECUTE;
+            lpBuffer->Protect = PAGE_EXECUTE;
+        }
+
+        return sReturnVal;
+    }
+}
+
 HookLib g_HookLib{ };
 
 // The VEHHandler, it will change EIP accordingly to the hooked function we added
@@ -10,7 +32,7 @@ LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
 
     // Find the address that triggered the error
     for (int i = 0; i < g_HookLib.GetCounter(); i++) {
-        if ((PVOID)g_HookLib.GetPointerDestructor(i) == pExceptAddr) {
+        if (g_HookLib.GetPointerDestructor(i) == pExceptAddr) {
             dwAddr = (DWORD)g_HookLib.GetHkFnc(i);
             break;
         }
@@ -28,15 +50,18 @@ LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
 #pragma endregion
 
 #pragma region VEHHook
-BOOL HookLib::OverrideVirtualProtect() {
+BOOL HookLib::OverrideACHooks() {
     // bytes of original virtualprotect function
-    BYTE origBytes[] = { 0x8B, 0xFF, 0x55, 0x8B, 0xEC };
+    BYTE wOrigBytes[] = { 0x8B, 0xFF, 0x55, 0x8B, 0xEC };
     DWORD oProc;
 
-    // override volvo shit hook with original bytes
+    // override volvo shit hooks with original bytes
     VirtualProtect(VirtualProtect, 5, PAGE_EXECUTE_WRITECOPY, &oProc);
-    memcpy(VirtualProtect, origBytes, 5);
+    memcpy(VirtualProtect, wOrigBytes, 5);
     VirtualProtect(VirtualProtect, 5, oProc, &oProc);
+
+    // hook virtualquery func and always return false info
+    oVirtualQuery = (tVirtualQuery)TrampHook((char*)VirtualQuery, (char*)hkFunctions::hkVirtualQuery, 5);
 
     return true;
 }

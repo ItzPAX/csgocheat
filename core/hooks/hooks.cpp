@@ -5,10 +5,18 @@
 #include "clientmode/clientmode.h"
 #include "studiorender/studiorender.h"
 #include "sdk/manager/interface/interface.h"
+#include "client/hudupdate.h"
 
 HookManager g_HookManager{ };
 
 #pragma region HookDefs
+namespace HudUpdate {
+	using tHudUpdate = void(__stdcall*)(bool);
+	tHudUpdate oHudUpdate = nullptr;
+
+	int iIndex = 11;
+	__forceinline void __stdcall hkHudUpdate(bool bActive);
+}
 namespace DrawModel {
 	using tDrawModel = void(__fastcall*)(void*, void*, DrawModelResults*, const DrawModelInfo&, Matrix*, float*, float*, const Vec3D&, int);
 	tDrawModel oDrawModel = nullptr;
@@ -16,7 +24,6 @@ namespace DrawModel {
 	int iIndex = 29;
 	__forceinline void __fastcall hkDrawModel(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags);
 }
-
 namespace WndProc {
 	using tWndProc = LRESULT(__stdcall*)(HWND, UINT, WPARAM, LPARAM);
 	tWndProc oWndProc = nullptr;
@@ -25,33 +32,31 @@ namespace WndProc {
 
 	__forceinline LRESULT __stdcall hkWndProc(const HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 }
-
 namespace CreateMove {
 	using tCreateMove = bool(__stdcall*)(float, CUserCmd*);
 	tCreateMove oCreateMove = nullptr;
 	inline int iIndex = 24;
 	__forceinline bool __stdcall hkCreateMove(float flInputSampleTime, CUserCmd* cmd);
 }
-
 namespace EndScene {
 	using tEndScene = HRESULT(__stdcall*)(LPDIRECT3DDEVICE9);
 	tEndScene oEndScene = nullptr;
 
-	inline static bool bDraw = true;
+	inline static bool bDraw = false;
 	inline int iIndex = 42;
 	void* pD3D9Device[119];
 	BYTE pEndSceneBytes[7]{ 0 };
-	
+
 	__forceinline void __stdcall hkEndScene(LPDIRECT3DDEVICE9 o_pDevice);
 }
 #pragma endregion
 
 bool HookManager::AddAllHooks() {
-	// override hook placed by vac in VirtualProtect
-	if (!g_HookLib.OverrideVirtualProtect())
+	// override hooks placed by vac
+	if (!g_HookLib.OverrideACHooks())
 		return false;
 
-	 // hook directx, maybe also hook reset in the future
+	// hook directx
 	if (g_DirectX.GetD3D9Device(EndScene::pD3D9Device, sizeof(EndScene::pD3D9Device))) {
 		memcpy(EndScene::pEndSceneBytes, (char*)EndScene::pD3D9Device[EndScene::iIndex], 7);
 		EndScene::oEndScene = (EndScene::tEndScene)g_HookLib.TrampHook((char*)EndScene::pD3D9Device[EndScene::iIndex], (char*)EndScene::hkEndScene, 7);
@@ -63,6 +68,7 @@ bool HookManager::AddAllHooks() {
 	// grab original function address and add hook to the queue
 	CreateMove::oCreateMove = (CreateMove::tCreateMove)g_HookLib.AddHook(CreateMove::hkCreateMove, g_Interface.pClientMode, CreateMove::iIndex, "CreateMove");
 	DrawModel::oDrawModel = (DrawModel::tDrawModel)g_HookLib.AddHook(DrawModel::hkDrawModel, g_Interface.pStudioRender, DrawModel::iIndex, "DrawModel");
+	HudUpdate::oHudUpdate = (HudUpdate::tHudUpdate)g_HookLib.AddHook(HudUpdate::hkHudUpdate, g_Interface.pClient, HudUpdate::iIndex, "HudUpdate");
 
 	// forward original func pointer to different classes
 	g_Chams.c_oDrawModel = DrawModel::oDrawModel;
@@ -106,15 +112,18 @@ IHookStatus HookManager::GetHookInfo(const char* sName) {
 	ihs.iIndex = hs.iIndex;
 	ihs.pBaseFnc = hs.pBaseFnc;
 	ihs.pHkAddr = hs.pHkAddr;
-	ihs.name = sName;
+	for (int i = 0; i < sName[i] != 0; i++)
+		ihs.name += sName[i];
 
 	return ihs;
 }
 
 void HookManager::LogHookStatus(IHookStatus ihs) {
-	if (ihs.name == "")
+	if (ihs.name->empty())
 		return;
-	auto outFile = std::ofstream(ihs.name);
+
+	ihs.name->append(".txt");
+	auto outFile = std::ofstream(ihs.name->c_str());
 	outFile << "[INDEX] " << ihs.iIndex << std::endl;
 	outFile << "[HKFNC] " << ihs.pHkAddr << std::endl;
 	outFile << "[BASE] " << ihs.pBaseFnc << std::endl;
@@ -125,19 +134,24 @@ void HookManager::LogHookStatus(IHookStatus ihs) {
 }
 
 #pragma region HkFunctions
+void __stdcall HudUpdate::hkHudUpdate(bool bActive) {
+	// do worldtoscreen here (only once per frame)
+	cHudUpdate();
+	oHudUpdate(bActive);
+}
 void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags = STUDIORENDER_DRAW_ENTIRE_MODEL) {
-	if (Game::g_pLocal && !g_DirectX.bDrawing) {
+	if (Game::g_pLocal) {
 		cDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 	}
 
 	DrawModel::oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 }	
-
 LRESULT __stdcall WndProc::hkWndProc(const HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 	if (!WndProc::bInputReceived && GetAsyncKeyState(VK_INSERT) & 0x01) {
 		bInputReceived = true;
 		g_Menu.bToggled = !g_Menu.bToggled;
+
 		// ghetto fix but idc :)
 		g_Menu.bToggled ? g_Interface.pConsole->Activate() : g_Interface.pConsole->Hide();
 	}
@@ -154,28 +168,21 @@ LRESULT __stdcall WndProc::hkWndProc(const HWND hwnd, UINT uMsg, WPARAM wParam, 
 	CallWindowProc(WndProc::oWndProc, hwnd, uMsg, wParam, lParam);
 	return true;
 }
-
 bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	cCreateMove(flInputSampleTime, cmd); // relay function
 
 	return CreateMove::oCreateMove(flInputSampleTime, cmd);
 }
-
 void __stdcall EndScene::hkEndScene(LPDIRECT3DDEVICE9 o_pDevice) {
 	if (!g_DirectX.pDevice)
 		g_DirectX.pDevice = o_pDevice;
 
-	// we are drawing in endscene rn
-	g_DirectX.bDrawing = true;
-
-	if (Game::g_pLocal && EndScene::bDraw)
+	if (Game::g_pLocal && !EndScene::bDraw)
 		cEndScene(); // relay function
 
 	cMenu(); // menu shit
 
-	// we have stopped drawing
-	g_DirectX.bDrawing = false;
-
+	// this is just performance related
 	EndScene::bDraw = !EndScene::bDraw;
 	EndScene::oEndScene(g_DirectX.pDevice);
 }

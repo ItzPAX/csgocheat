@@ -10,7 +10,6 @@
 LONG WINAPI VEHHandler(EXCEPTION_POINTERS* pExceptionInfo);
 
 struct HookStatus {
-public:
     HookStatus() { pBaseFnc = NULL; pHkAddr = nullptr; iIndex = NULL; }
     uintptr_t pBaseFnc;
     PVOID pHkAddr;
@@ -31,6 +30,13 @@ private:
     INT                      iCounter;
     BOOL                     bVehInit;
 
+    // prototypes
+    using tVirtualQuery = SIZE_T(__stdcall*)(LPCVOID, PMEMORY_BASIC_INFORMATION, SIZE_T);
+
+    // global vars
+public:
+    tVirtualQuery oVirtualQuery;
+
     // private functions
 private:
     BOOL DestroyPointers(int index = NOT_FOUND);
@@ -38,8 +44,8 @@ private:
 public:
     HookLib() { iCounter = 0; bVehInit = false; pVEHHandle = NULL; pVTableAddr = NULL; } // constructor
 
-    // if VirtualProtect was hooked via a usermode hook, this will override it
-    BOOL OverrideVirtualProtect();
+    // CALL THIS BEFORE HOOKING!!!! OVERRIDE PLACED AC HOOKS
+    BOOL OverrideACHooks();
 
 #pragma region VEHHook
     // hooks function and returns a pointer to the original function, only works on virtual function pointers
@@ -58,7 +64,8 @@ public:
 #pragma region HandlerCalls
     INT GetCounter() { return iCounter; }     // get icounter for the handler
     PVOID GetHkFnc(int index) { return pHkFnc.at(index); }    // get hooked function addr at index i for the handler
-    uintptr_t GetPointerDestructor(int index) { return pPointerDestructor.at(index); } // get destructed pointer at index i for the handler
+    PVOID GetPointerDestructor(int index) { return reinterpret_cast<PVOID>( pPointerDestructor.at(index)); } // get destructed pointer at index i for the handler
+    PVOID GetBasePointer(int index) { return reinterpret_cast<PVOID>(pOrigFncAddr.at(index)); }// get base fnc pointer at index i for the handler
 #pragma endregion VEHHandler will call these
 
 #pragma region TrampHook

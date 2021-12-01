@@ -2,9 +2,15 @@
 #include "core/hooks/directx/directx.h"
 #include "utilities/structures/vec2d/vec2d.h"
 
+struct Vertex {
+	float x, y, z, ht;
+	DWORD Color;
+};
+
 class Render {
 private:
 	ID3DXLine* g_pLine;
+
 
 public:
 	inline static LPD3DXFONT pEspFont;

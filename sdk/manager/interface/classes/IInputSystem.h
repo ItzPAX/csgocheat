@@ -173,5 +173,4 @@ public:
 		using original_fn = const char* (__thiscall*)(void*, int);
 		return (*(original_fn**)this)[40](this, code);
 	}
-
 };

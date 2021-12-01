@@ -3,7 +3,6 @@
 
 class DirectX {
 public:
-	inline static bool bDrawing = true;
 	inline static LPDIRECT3DDEVICE9 pDevice = nullptr;
 	int iWindowHeight = 0, iWindowWidth = 0;
 	HWND window;

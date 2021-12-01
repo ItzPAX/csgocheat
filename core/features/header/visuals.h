@@ -3,12 +3,13 @@
 class Visuals {
 private:
 	inline static float flEntOpacity[MAX_PLAYERS] { 0 };
+	inline static RECT rPlayerRects[MAX_PLAYERS] { 0 };
 
 public:
-	RECT GetPlayerRect(Player* pPlayer);
+	void UpdatePlayerRects();
 	void DrawBox(RECT rPlayerRect, Color col);
-	void DrawName(RECT rPlayerRect, Player* pPlayer, Color col);
-	void DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col);
+	void DrawName(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);
+	void DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);
 
 	// Main Funcs
 	void DrawDormant(Player* pPlayer, RECT rPlayerRect);

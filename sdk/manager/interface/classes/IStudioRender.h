@@ -50,7 +50,7 @@ struct LightDesc_t;
 //-----------------------------------------------------------------------------
 // DrawModel flags
 //-----------------------------------------------------------------------------
-enum {
+enum DrawModelFlags {
 	STUDIORENDER_DRAW_ENTIRE_MODEL = 0,
 	STUDIORENDER_DRAW_OPAQUE_ONLY = 0x01,
 	STUDIORENDER_DRAW_TRANSLUCENT_ONLY = 0x02,

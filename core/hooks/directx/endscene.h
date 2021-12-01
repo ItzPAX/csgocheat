@@ -1,3 +1,5 @@
+#pragma once
+
 #include "directx/directx.h"
 #include "includes.h"
 

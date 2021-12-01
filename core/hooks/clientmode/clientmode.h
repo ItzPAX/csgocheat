@@ -8,4 +8,6 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 
 	// do shit here
 	Game::g_pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
+
+	std::cout << Game::g_pLocal->vEyeAngles().y << std::endl;
 }

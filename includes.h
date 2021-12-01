@@ -48,4 +48,6 @@ namespace Game {
 	inline Player* g_pLocal;
 	inline int g_iScreenX;
 	inline int g_iScreenY;
+
+	inline HINSTANCE g_hInstance;
 }

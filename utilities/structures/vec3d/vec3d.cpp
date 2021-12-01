@@ -97,9 +97,9 @@ Vec3D Vec3D::Normalized(const Vec3D& vec) {
 }
 
 void Vec3D::Normalize() {
-    g_Math.NormalizeIntoRange(this->x, 89.f, -89.f);
-    g_Math.NormalizeIntoRange(this->y, 180.f, -180.f);
-    // dont normalize z axis
+    this->x = std::isfinite(this->x) ? std::remainderf(this->x, 360.f) : 0.f;
+    this->y = std::isfinite(this->y) ? std::remainderf(this->y, 360.f) : 0.f;
+    this->z = z < 0.f ? (std::isfinite(this->z) ? std::remainderf(this->z, -180.f) : 0.f) : (std::isfinite(this->z) ? std::remainderf(this->z, 180.f) : 0.f);
 }
 
 float Vec3D::Distance(const Vec3D& vec) {

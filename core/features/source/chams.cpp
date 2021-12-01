@@ -14,12 +14,12 @@ void Chams::OverrideMaterial(int iMatIndex, bool bIgnoreZ, Color col) {
 void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags) {
 	Player* pPlayer = reinterpret_cast<Player*>(info.m_pClientEntity);
 
-	// sanity checks
+	// sanity check
 	if (!pPlayer) {
 		return;
 	}
 
-	// we have definetly found a player
+	// we have found a player
 	if (pPlayer->iTeamNum() == 2 || pPlayer->iTeamNum() == 3) {
 
 		bool bEnemy = pPlayer->bIsEnemy(Game::g_pLocal);
@@ -28,14 +28,14 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 		if (bEnemy) {
 			// xqz chams
 			if (Variables::bEnemyChamsInvis) {
-				OverrideMaterial(Materials::DEFAULT, true, Color(255,100,150).ToPercent());
+				OverrideMaterial(Materials::DEFAULT, true, Color(150, 250, 100).ToPercent());
 				c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 			}
 
 			g_Interface.pModelRender->OverrideMaterial(nullptr); // change overwritten material to default
 
 			if (Variables::bEnemyChamsVis) {
-				OverrideMaterial(Materials::DEFAULT, false, Color(150, 250, 100).ToPercent());
+				OverrideMaterial(Materials::DEFAULT, false, Color(255,100,150).ToPercent());
 				c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 			}
 		}
