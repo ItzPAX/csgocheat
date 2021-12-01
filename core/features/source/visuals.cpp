@@ -4,11 +4,9 @@
 Visuals g_Visuals;
 
 void Visuals::UpdatePlayerRects() {
-	for (int i = 1; i <= g_Interface.pGlobalVars->iMaxClients; i++) {
+	for (int i = 0; i < g_Visuals.pSortedPlayers.size(); i++) {
 		// get and validate player
-		Player* pPlayer = reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntity(i));
-		if (!pPlayer || !pPlayer->bIsAlive() || pPlayer == Game::g_pLocal || !pPlayer->bIsEnemy(Game::g_pLocal))
-			continue;
+		Player* pPlayer = pSortedPlayers[i].pPlayer;
 
 		// get pos
 		Vec3D vPlayerPosTop = pPlayer->GetBonePosition(8); // bone id 8 is the head
@@ -30,8 +28,30 @@ void Visuals::UpdatePlayerRects() {
 
 		rPlayerRect.top -= iWidth / 2;
 
-		rPlayerRects[i] = rPlayerRect;
+		rPlayerRects.push_back(rPlayerRect);
 	}
+}
+
+void Visuals::SortPlayers() {
+	g_Visuals.pSortedPlayers.clear();
+	g_Visuals.rPlayerRects.clear();
+
+	static auto SortDistance = [](PlayerDist a, PlayerDist b) {
+		return a.flDist > b.flDist;
+	};
+
+	for (int i = 0; i <= g_Interface.pGlobalVars->iMaxClients; i++) {
+		// get and validate player
+		Player* pPlayer = reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntity(i));
+		if (!pPlayer || !pPlayer->bIsAlive() || pPlayer == Game::g_pLocal || !pPlayer->bIsEnemy(Game::g_pLocal))
+			continue;
+
+		float flDist = pPlayer->vAbsOrigin().Distance(Game::g_pLocal->vAbsOrigin());
+		
+		pSortedPlayers.push_back(PlayerDist(flDist, pPlayer));
+	}
+
+	std::sort(pSortedPlayers.begin(), pSortedPlayers.end(), SortDistance);
 }
 
 void Visuals::DrawBox(RECT rPlayerRect, Color col) {
@@ -115,9 +135,9 @@ void Visuals::DrawPlayer(Player* pPlayer, RECT rPlayerRect) {
 }
 
 void Visuals::OnEndScene() {
-	for (int i = 1; i <= g_Interface.pGlobalVars->iMaxClients; i++) {
+	for (int i = 0; i < pSortedPlayers.size(); i++) {
 		// get and validate player
-		Player* pPlayer = reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntity(i));
+		Player* pPlayer = pSortedPlayers[i].pPlayer;
 		if (!pPlayer || !pPlayer->bIsAlive() || pPlayer == Game::g_pLocal || !pPlayer->bIsEnemy(Game::g_pLocal))
 			continue;
 

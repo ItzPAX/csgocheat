@@ -154,31 +154,6 @@ void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults*
 
 	DrawModel::oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 }	
-LRESULT __stdcall WndProc::hkWndProc(const HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-
-	if (!WndProc::bInputReceived && GetAsyncKeyState(VK_INSERT) & 0x01) {
-		bInputReceived = true;
-		g_Menu.bToggled = !g_Menu.bToggled;
-
-		ImGui::GetIO().MouseDrawCursor = !g_Menu.bToggled;
-		SetCursor(LoadCursor(NULL, IDC_ARROW));
-
-		// ghetto fix but idc :)
-		//g_Menu.bToggled ? g_Interface.pConsole->Activate() : g_Interface.pConsole->Hide();
-	}
-
-	if (WndProc::bInputReceived && GetAsyncKeyState(VK_INSERT) & 0x8000)
-		bInputReceived = false;
-
-	if (g_Menu.bToggled) {// menu opened give input to imgui
-		ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam);
-		return true;
-	}
-
-	// menu closed restore normal input
-	CallWindowProc(WndProc::oWndProc, hwnd, uMsg, wParam, lParam);
-	return true;
-}
 bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	cCreateMove(flInputSampleTime, cmd); // relay function
 
@@ -203,5 +178,30 @@ void __stdcall LockCursor::hkLockCursor() {
 		return;
 	}
 	LockCursor::oLockCursor();
+}
+LRESULT __stdcall WndProc::hkWndProc(const HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+
+	if (!WndProc::bInputReceived && GetAsyncKeyState(VK_INSERT) & 0x01) {
+		bInputReceived = true;
+		g_Menu.bToggled = !g_Menu.bToggled;
+
+		ImGui::GetIO().MouseDrawCursor = !g_Menu.bToggled;
+		SetCursor(LoadCursor(NULL, IDC_ARROW));
+
+		// ghetto fix but idc :)
+		//g_Menu.bToggled ? g_Interface.pConsole->Activate() : g_Interface.pConsole->Hide();
+	}
+
+	if (WndProc::bInputReceived && GetAsyncKeyState(VK_INSERT) & 0x8000)
+		bInputReceived = false;
+
+	if (g_Menu.bToggled) {// menu opened give input to imgui
+		ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam);
+		return true;
+	}
+
+	// menu closed restore normal input
+	CallWindowProc(WndProc::oWndProc, hwnd, uMsg, wParam, lParam);
+	return true;
 }
 #pragma endregion These Functions call the real functions in different cpp files withing the hooks dir

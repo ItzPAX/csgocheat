@@ -1,12 +1,19 @@
 #pragma once
 
+struct PlayerDist {
+	float flDist;
+	Player* pPlayer;
+};
+
 class Visuals {
 private:
-	inline static float flEntOpacity[MAX_PLAYERS] { 0 };
-	inline static RECT rPlayerRects[MAX_PLAYERS] { 0 };
+	inline static float flEntOpacity[MAX_PLAYERS] = { 0.f };
+	inline static std::vector<RECT> rPlayerRects;
+	inline static std::vector<PlayerDist> pSortedPlayers;
 
 public:
 	void UpdatePlayerRects();
+	void SortPlayers();
 	void DrawBox(RECT rPlayerRect, Color col);
 	void DrawName(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);
 	void DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);

@@ -27,13 +27,13 @@ public:
 	CGlobalVars* pGlobalVars;
 	IClientMode* pClientMode;
 	IInputSystem* pInputSystem;
-	IPanel* pPanel;
 	IGameConsole* pConsole;
 	IVModelRender* pModelRender;
 	IMaterialSystem* pMaterialSystem;
 	IStudioRender* pStudioRender;
 	IRenderView* pRenderView;
 	ISurface* pSurface;
+	IPanel* pPanel;
 	
 
 	// TODO: Find Interface entry for this
