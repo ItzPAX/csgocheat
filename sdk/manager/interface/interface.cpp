@@ -52,6 +52,7 @@ bool Interface::Init() {
 	pMaterialSystem = (IMaterialSystem*)GetInterface("materialsystem.dll", "VMaterialSystem");
 	pStudioRender = (IStudioRender*)GetInterface("studiorender.dll", "VStudioRender");
 	pRenderView = (IRenderView*)GetInterface("engine.dll", "VEngineRenderView");
+	pSurface = (ISurface*)GetInterface("vguimatsurface.dll", "VGUI_Surface");
 	
 
 	// custom interfaces

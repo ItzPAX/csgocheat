@@ -13,6 +13,7 @@
 #include "classes/IMaterialSystem.h"
 #include "classes/IStudioRender.h"
 #include "classes/IRenderView.h"
+#include "classes/ISurface.h"
 
 class Interface {
 private:
@@ -32,6 +33,8 @@ public:
 	IMaterialSystem* pMaterialSystem;
 	IStudioRender* pStudioRender;
 	IRenderView* pRenderView;
+	ISurface* pSurface;
+	
 
 	// TODO: Find Interface entry for this
 	IClientRenderable* pRenderable;

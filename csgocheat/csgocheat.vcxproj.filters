@@ -313,6 +313,9 @@
     <ClInclude Include="..\core\hooks\client\hudupdate.h">
       <Filter>core\hooks\client</Filter>
     </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\ISurface.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />

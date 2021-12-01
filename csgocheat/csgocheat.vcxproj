@@ -270,6 +270,7 @@
     <ClInclude Include="..\sdk\manager\interface\classes\IPanel.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IRenderView.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IStudioRender.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\ISurface.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IVModelRender.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IVEngineClient.h" />
     <ClInclude Include="..\sdk\manager\interface\interface.h" />

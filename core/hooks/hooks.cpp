@@ -49,6 +49,13 @@ namespace EndScene {
 
 	__forceinline void __stdcall hkEndScene(LPDIRECT3DDEVICE9 o_pDevice);
 }
+namespace LockCursor {
+	using tLockCursor = void(__stdcall*)();
+	tLockCursor oLockCursor = nullptr;
+
+	int iIndex = 67;
+	__forceinline void __stdcall hkLockCursor();
+}
 #pragma endregion
 
 bool HookManager::AddAllHooks() {
@@ -69,6 +76,7 @@ bool HookManager::AddAllHooks() {
 	CreateMove::oCreateMove = (CreateMove::tCreateMove)g_HookLib.AddHook(CreateMove::hkCreateMove, g_Interface.pClientMode, CreateMove::iIndex, "CreateMove");
 	DrawModel::oDrawModel = (DrawModel::tDrawModel)g_HookLib.AddHook(DrawModel::hkDrawModel, g_Interface.pStudioRender, DrawModel::iIndex, "DrawModel");
 	HudUpdate::oHudUpdate = (HudUpdate::tHudUpdate)g_HookLib.AddHook(HudUpdate::hkHudUpdate, g_Interface.pClient, HudUpdate::iIndex, "HudUpdate");
+	LockCursor::oLockCursor = (LockCursor::tLockCursor)g_HookLib.AddHook(LockCursor::hkLockCursor, g_Interface.pSurface, LockCursor::iIndex, "LockCursor");
 
 	// forward original func pointer to different classes
 	g_Chams.c_oDrawModel = DrawModel::oDrawModel;
@@ -152,14 +160,17 @@ LRESULT __stdcall WndProc::hkWndProc(const HWND hwnd, UINT uMsg, WPARAM wParam, 
 		bInputReceived = true;
 		g_Menu.bToggled = !g_Menu.bToggled;
 
+		ImGui::GetIO().MouseDrawCursor = !g_Menu.bToggled;
+		SetCursor(LoadCursor(NULL, IDC_ARROW));
+
 		// ghetto fix but idc :)
-		g_Menu.bToggled ? g_Interface.pConsole->Activate() : g_Interface.pConsole->Hide();
+		//g_Menu.bToggled ? g_Interface.pConsole->Activate() : g_Interface.pConsole->Hide();
 	}
 
 	if (WndProc::bInputReceived && GetAsyncKeyState(VK_INSERT) & 0x8000)
 		bInputReceived = false;
 
-	if (g_Menu.bToggled) { // menu opened give input to imgui
+	if (g_Menu.bToggled) {// menu opened give input to imgui
 		ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam);
 		return true;
 	}
@@ -185,5 +196,12 @@ void __stdcall EndScene::hkEndScene(LPDIRECT3DDEVICE9 o_pDevice) {
 	// this is just performance related
 	EndScene::bDraw = !EndScene::bDraw;
 	EndScene::oEndScene(g_DirectX.pDevice);
+}
+void __stdcall LockCursor::hkLockCursor() {
+	if (g_Menu.bToggled) {
+		g_Interface.pSurface->UnlockCursor();
+		return;
+	}
+	LockCursor::oLockCursor();
 }
 #pragma endregion These Functions call the real functions in different cpp files withing the hooks dir
