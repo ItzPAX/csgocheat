@@ -1,6 +1,6 @@
 #pragma once
 
-#include "directx/directx.h"
+#include "directx.h"
 #include "includes.h"
 
 void cEndScene() {

@@ -8,7 +8,7 @@ ulong __stdcall Init::InitAll(void* p) {
 	AllocConsole(); FILE* f; freopen_s(&f, "CONOUT$", "w", stdout);
 
 	// wait for serverbrowser dll
-	while (!GetModuleHandle("serverbrowser.dll") && !GetModuleHandle("d3d9.dll"))
+	while (!GetModuleHandle("serverbrowser.dll"))
 		Sleep(200);
 
 	// find all interfaces
@@ -31,11 +31,6 @@ ulong __stdcall Init::InitAll(void* p) {
 	if (!g_HookManager.InitAllHooks())
 		return 0;
 	std::cout << "[ RAYBOT ] Successfully Initialized Hooks\n";
-
-	// init d3dx line
-	if (!g_Render.InitRenderer())
-		return 0;
-	std::cout << "[ RAYBOT ] Successfully Initialized Renderer\n";
 
 	return 1;
 }

@@ -2,6 +2,7 @@
 #include "includes.h"
 #include "utilities/hooklib/hooklib.h"
 #include "directx/endscene.h"
+#include "directx/beginscene.h"
 #include "clientmode/clientmode.h"
 #include "studiorender/studiorender.h"
 #include "sdk/manager/interface/interface.h"
@@ -38,16 +39,18 @@ namespace CreateMove {
 	inline int iIndex = 24;
 	__forceinline bool __stdcall hkCreateMove(float flInputSampleTime, CUserCmd* cmd);
 }
-namespace EndScene {
+namespace HkDirectX {
+	void* pD3D9Device[119];
+	static DWORD dwAllowedReturn = 0;
+
 	using tEndScene = HRESULT(__stdcall*)(LPDIRECT3DDEVICE9);
 	tEndScene oEndScene = nullptr;
 
-	inline static bool bDraw = false;
-	inline int iIndex = 42;
-	void* pD3D9Device[119];
+	int iEndScene = 42;
+
 	BYTE pEndSceneBytes[7]{ 0 };
 
-	__forceinline void __stdcall hkEndScene(LPDIRECT3DDEVICE9 o_pDevice);
+	__forceinline HRESULT __stdcall hkEndScene(LPDIRECT3DDEVICE9 o_pDevice);
 }
 namespace LockCursor {
 	using tLockCursor = void(__stdcall*)();
@@ -64,9 +67,9 @@ bool HookManager::AddAllHooks() {
 		return false;
 
 	// hook directx
-	if (g_DirectX.GetD3D9Device(EndScene::pD3D9Device, sizeof(EndScene::pD3D9Device))) {
-		memcpy(EndScene::pEndSceneBytes, (char*)EndScene::pD3D9Device[EndScene::iIndex], 7);
-		EndScene::oEndScene = (EndScene::tEndScene)g_HookLib.TrampHook((char*)EndScene::pD3D9Device[EndScene::iIndex], (char*)EndScene::hkEndScene, 7);
+	if (g_DirectX.GetD3D9Device(HkDirectX::pD3D9Device, sizeof(HkDirectX::pD3D9Device))) {
+		memcpy(HkDirectX::pEndSceneBytes, (char*)HkDirectX::pD3D9Device[HkDirectX::iEndScene], 7);
+		HkDirectX::oEndScene = (HkDirectX::tEndScene)g_HookLib.TrampHook((char*)HkDirectX::pD3D9Device[HkDirectX::iEndScene], (char*)HkDirectX::hkEndScene, 7);
 	}
 
 	// hook windows functions
@@ -100,7 +103,7 @@ bool HookManager::ReleaseAll() {
 		return false;
 
 	// manually remove the trampoline hook
-	g_HookLib.Patch((char*)EndScene::pD3D9Device[42], (char*)EndScene::pEndSceneBytes, 7);
+	g_HookLib.Patch((char*)HkDirectX::pD3D9Device[42], (char*)HkDirectX::pEndSceneBytes, 7);
 
 	// we have hooks to release, lets call the function
 	g_HookLib.DisableAllHooks();
@@ -145,6 +148,7 @@ void HookManager::LogHookStatus(IHookStatus ihs) {
 void __stdcall HudUpdate::hkHudUpdate(bool bActive) {
 	// do worldtoscreen here (only once per frame)
 	cHudUpdate();
+
 	oHudUpdate(bActive);
 }
 void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags = STUDIORENDER_DRAW_ENTIRE_MODEL) {
@@ -155,22 +159,42 @@ void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults*
 	DrawModel::oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 }	
 bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {
-	cCreateMove(flInputSampleTime, cmd); // relay function
-
-	return CreateMove::oCreateMove(flInputSampleTime, cmd);
+	// relay function
+	cCreateMove(flInputSampleTime, cmd);
+	CreateMove::oCreateMove(flInputSampleTime, cmd);
+	return false;
 }
-void __stdcall EndScene::hkEndScene(LPDIRECT3DDEVICE9 o_pDevice) {
+HRESULT __stdcall HkDirectX::hkEndScene(LPDIRECT3DDEVICE9 o_pDevice) {
 	if (!g_DirectX.pDevice)
 		g_DirectX.pDevice = o_pDevice;
 
-	if (Game::g_pLocal && !EndScene::bDraw)
-		cEndScene(); // relay function
+	if (!g_Render.bInitialized) {
+		// init d3d9 renderer
+		if (!g_Render.InitRenderer())
+			return;
+		std::cout << "[ RAYBOT ] Successfully Initialized Renderer\n";
+	}
 
-	cMenu(); // menu shit
+	// get return address
+	DWORD dwReturnAddress;
+	__asm
+	{
+		push eax
+		mov eax, [ebp + 4]
+		mov dwReturnAddress, eax
+		pop eax
+	}
 
-	// this is just performance related
-	EndScene::bDraw = !EndScene::bDraw;
-	EndScene::oEndScene(g_DirectX.pDevice);
+	// only draw if return address is our own device
+	if (dwAllowedReturn == 0 || dwAllowedReturn == dwReturnAddress) {
+		if (Game::g_pLocal)
+			cEndScene(); // relay function
+		cMenu(); // menu shit
+
+		dwAllowedReturn = dwReturnAddress;
+	}
+
+	return oEndScene(g_DirectX.pDevice);
 }
 void __stdcall LockCursor::hkLockCursor() {
 	if (g_Menu.bToggled) {

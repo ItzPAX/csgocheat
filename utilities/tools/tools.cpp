@@ -40,7 +40,7 @@ DWORD Tools::SignatureScan(const char* pModule, const char* pSig, const char* ma
 }
 
 template<typename T, typename U>
-inline T Tools::CallVirtual(U base, int index) {
+T Tools::CallVirtual(U base, int index) {
 	using original_fn = T & (__thiscall*)(void*);
 	return (*(original_fn**)base)[index](base);
 }

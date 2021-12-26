@@ -14,6 +14,8 @@
 #include "classes/IStudioRender.h"
 #include "classes/IRenderView.h"
 #include "classes/ISurface.h"
+#include "classes/IVModelInfo.h"
+#include "classes/IEngineTrace.h"
 
 class Interface {
 private:
@@ -34,6 +36,8 @@ public:
 	IRenderView* pRenderView;
 	ISurface* pSurface;
 	IPanel* pPanel;
+	IVModelInfo* pModelInfo;
+	IEngineTrace* pEngineTrace;
 	
 
 	// TODO: Find Interface entry for this

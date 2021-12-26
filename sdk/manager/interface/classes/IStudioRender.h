@@ -227,7 +227,7 @@ public:
 		return (StudioHitboxSet*)((uint8_t*)this + iHitboxSetIndex) + i;
 	}
 
-	StudioBox* hitbox(int i, int set)
+	StudioBox* Hitbox(int i, int set)
 	{
 		StudioHitboxSet const* s = HitboxSet(set);
 		if (!s) {

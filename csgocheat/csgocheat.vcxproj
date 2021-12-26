@@ -185,6 +185,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\core\features\source\aimbot.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\core\features\source\chams.cpp" />
     <ClCompile Include="..\core\features\source\visuals.cpp" />
     <ClCompile Include="..\core\hooks\directx\directx.cpp" />
@@ -228,11 +231,13 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="..\utilities\structures\vec2d\vec2d.cpp" />
-    <ClCompile Include="..\utilities\structures\vec3d\vec3d.cpp" />
+    <ClCompile Include="..\utilities\structures\vec3d\vec3d.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\utilities\tools\tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\core\features\header\aimbot.h" />
     <ClInclude Include="..\core\features\header\chams.h" />
     <ClInclude Include="..\core\features\header\visuals.h" />
     <ClInclude Include="..\core\features\variables\variables.h" />
@@ -254,6 +259,7 @@
     <ClInclude Include="..\core\menu\menu.h" />
     <ClInclude Include="..\includes.h" />
     <ClInclude Include="..\pch\pch.h" />
+    <ClInclude Include="..\sdk\classes\collideable.h" />
     <ClInclude Include="..\sdk\classes\cusercmd.h" />
     <ClInclude Include="..\sdk\classes\entity.h" />
     <ClInclude Include="..\sdk\classes\entityclass.h" />
@@ -263,6 +269,7 @@
     <ClInclude Include="..\sdk\manager\interface\classes\IClientEntityList.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IClientMode.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IClientRenderable.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IEngineTrace.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IGameConsole.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IInputSystem.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IMaterial.h" />
@@ -271,18 +278,19 @@
     <ClInclude Include="..\sdk\manager\interface\classes\IRenderView.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IStudioRender.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\ISurface.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IVModelInfo.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IVModelRender.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IVEngineClient.h" />
     <ClInclude Include="..\sdk\manager\interface\interface.h" />
     <ClInclude Include="..\sdk\manager\netvars\netvars.h" />
+    <ClInclude Include="..\sdk\structs\models.h" />
     <ClInclude Include="..\utilities\hooklib\hooklib.h" />
     <ClInclude Include="..\utilities\math\math.h" />
     <ClInclude Include="..\utilities\render\render.h" />
     <ClInclude Include="..\utilities\structures\color\color.h" />
     <ClInclude Include="..\utilities\structures\vec2d\vec2d.h" />
     <ClInclude Include="..\utilities\structures\vec3d\vec3d.h" />
-    <ClInclude Include="..\utilities\structures\vec4d\vec4d.h" />
-    <ClInclude Include="..\utilities\structures\viewmatrix\matrix.h" />
+    <ClInclude Include="..\utilities\structures\vecaligned\vecaligned.h" />
     <ClInclude Include="..\utilities\tools\tools.h" />
   </ItemGroup>
   <ItemGroup>

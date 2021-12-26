@@ -9,7 +9,7 @@ void Visuals::UpdatePlayerRects() {
 		Player* pPlayer = pSortedPlayers[i].pPlayer;
 
 		// get pos
-		Vec3D vPlayerPosTop = pPlayer->GetBonePosition(8); // bone id 8 is the head
+		Vec3D vPlayerPosTop = pPlayer->vGetBonePosition(8); // bone id 8 is the head
 		Vec3D vPlayerPosBottom = pPlayer->vOrigin();
 
 		Vec3D vScreenBottom, vScreenTop;
@@ -40,13 +40,13 @@ void Visuals::SortPlayers() {
 		return a.flDist > b.flDist;
 	};
 
-	for (int i = 0; i <= g_Interface.pGlobalVars->iMaxClients; i++) {
+	for (int i = 1; i <= g_Interface.pGlobalVars->iMaxClients; i++) {
 		// get and validate player
 		Player* pPlayer = reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntity(i));
 		if (!pPlayer || !pPlayer->bIsAlive() || pPlayer == Game::g_pLocal || !pPlayer->bIsEnemy(Game::g_pLocal))
 			continue;
 
-		float flDist = pPlayer->vAbsOrigin().Distance(Game::g_pLocal->vAbsOrigin());
+		float flDist = pPlayer->vAbsOrigin().DistanceTo(Game::g_pLocal->vAbsOrigin());
 		
 		pSortedPlayers.push_back(PlayerDist(flDist, pPlayer));
 	}
@@ -55,7 +55,7 @@ void Visuals::SortPlayers() {
 }
 
 void Visuals::DrawBox(RECT rPlayerRect, Color col) {
-	g_Render.DrawOutlinedRect(rPlayerRect.left, rPlayerRect.top, (rPlayerRect.right - rPlayerRect.left), (rPlayerRect.bottom - rPlayerRect.top), col);
+	g_Render.DrawOutlinedRect(rPlayerRect.left, rPlayerRect.top, (rPlayerRect.right - rPlayerRect.left), (rPlayerRect.bottom - rPlayerRect.top), Color(20,100,130,col.a));
 
 	// box outline
 	g_Render.DrawOutlinedRect(rPlayerRect.left + 1, rPlayerRect.top + 1, (rPlayerRect.right - rPlayerRect.left) - 2, (rPlayerRect.bottom - rPlayerRect.top) - 2, Color::Black(col.a));
@@ -66,25 +66,25 @@ void Visuals::DrawName(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo&
 	Vec2D vSize = g_Render.TextSize(g_Render.pEspFont, info.name);
 
 	// box
-	g_Render.DrawFilledRect((rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) - (vSize.x / 2), (rPlayerRect.top - vSize.y * 1.5) - 6, vSize.x, vSize.y * 1.5f, Color(50, 50, 50, 200));
+	g_Render.DrawFilledRect((rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) - (vSize.x / 1.6), (rPlayerRect.top - vSize.y * 1.5) - 1, vSize.x * 1.3f, vSize.y * 1.25f, Color(30, 30, 30, col.a));
+	g_Render.DrawLine((rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) - (vSize.x / 1.6), (rPlayerRect.top - 4), (rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) + (vSize.x / 1.6), (rPlayerRect.top - 4), 1, Color(130,20,60,col.a));
 
 	// text
-	g_Render.Text(g_Render.pEspFont, info.name, rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2), (rPlayerRect.top - vSize.y * 1.5f) - 4, 14, col);
+	g_Render.Text(g_Render.pEspFont, info.name, rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2), (rPlayerRect.top - vSize.y * 1.5f) - 1, col);
 }
 
 void Visuals::DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info) {
-	float flScaledNum = g_Math.ScaleNumber(pPlayer->iHealth(), 100.f, 0.f, 1.f, -1.f);
+	Vec2D vSize = g_Render.TextSize(g_Render.pEspFont, info.name);
+	float flScaledNum = g_Math.ScaleNumber(pPlayer->iHealth(), 100.f, 0.f, rPlayerRect.top, rPlayerRect.bottom);
 
 	std::string str = std::to_string(pPlayer->iHealth());
-	Vec2D vSize = g_Render.TextSize(g_Render.pEspFont, info.name);
+	str += "hp";
+	Vec2D vSizeHP = g_Render.TextSize(g_Render.pEspFont, str.c_str());
 
-	int iWidth = rPlayerRect.right - rPlayerRect.left;
+	g_Render.DrawLine(rPlayerRect.left - 4, rPlayerRect.bottom, rPlayerRect.left - 4, rPlayerRect.top, 1, Color(50,50,50,col.a));
+	g_Render.DrawLine(rPlayerRect.left - 4, rPlayerRect.bottom, rPlayerRect.left - 4, flScaledNum, 1, col);
 
-	g_Render.DrawLine((rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) - (vSize.x / 2), (rPlayerRect.top - 6), (rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) + (vSize.x / 2), (rPlayerRect.top - 6), 1, Color(130, 130, 130, 150));
-	g_Render.DrawLine((rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) - (vSize.x / 2), (rPlayerRect.top - 6), (rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) + ((vSize.x / 2) * flScaledNum), (rPlayerRect.top - 6), 1, col);
-
-	//g_Render.DrawLine(rPlayerRect.left - 5.f, rPlayerRect.bottom - 1.f, rPlayerRect.left - 5.f, iScaledNum + 1.f, 2, col);
-	//g_Render.Text(g_Render.pEspFont, str.c_str(), rPlayerRect.left - 10.f, iScaledNum - 4, 14, Color::White(col.a));
+	g_Render.Text(g_Render.pEspFont, str.c_str(), rPlayerRect.left - (vSizeHP.x / 2.f) - 5, flScaledNum - (vSizeHP.y / 2), Color::White(col.a));
 }
 
 void Visuals::DrawDormant(Player* pPlayer, RECT rPlayerRect) {

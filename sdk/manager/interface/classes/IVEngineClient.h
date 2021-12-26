@@ -90,9 +90,9 @@ public:
 	virtual bool				IsStreaming(void* pAudioSource) const = 0;
 
 	// Copy current view orientation into va
-	virtual void				GetViewAngles(Vec3D& va) = 0;
+	virtual void				PadFn1() = 0;
 	// Set current view orientation from va
-	virtual void				SetViewAngles(Vec3D& va) = 0;
+	virtual void				PadFn2() = 0;
 
 	// Retrieve the current game's maxclients setting
 	virtual int					GetMaxClients(void) = 0;
@@ -117,9 +117,9 @@ public:
 
 	// Prints the formatted string to the notification area of the screen ( down the right hand edge
 	//  numbered lines starting at position 0
-	virtual void				PadFn() = 0;
+	virtual void				PadFn3() = 0;
 	// Similar to Con_NPrintf, but allows specifying custom text color and duration information
-	virtual void				PadFn2() = 0;
+	virtual void				PadFn4() = 0;
 
 	// Is the specified world-space bounding box inside the view frustum?
 	virtual int					IsBoxVisible(const Vec3D& mins, const Vec3D& maxs) = 0;
@@ -378,4 +378,14 @@ public:
 	//  returns the string name of the key to which this string is bound. Returns NULL if no such binding exists
 	// Unlike Key_LookupBinding, leading '+' characters are not stripped from bindings.
 	virtual	const char* Key_LookupBindingExact(const char* pBinding) = 0;
+
+	void GetViewAngles(Vec3D& angles) {
+		using original_fn = void(__thiscall*)(IVEngineClient*, Vec3D&);
+		return (*(original_fn**)this)[18](this, angles);
+	}
+
+	void SetViewAngles(Vec3D& angles) {
+		using original_fn = void(__thiscall*)(IVEngineClient*, Vec3D&);
+		return (*(original_fn**)this)[19](this, angles);
+	}
 };

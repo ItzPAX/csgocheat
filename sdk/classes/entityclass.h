@@ -21,7 +21,7 @@ enum ClassIds {
 	CBaseCSGrenade = 8,
 	CBaseCSGrenadeProjectile = 9,
 	CBaseDoor = 10,
-	CBaseEntity = 11,
+	CBaseEnt = 11,
 	CBaseFlex = 12,
 	CBaseGrenade = 13,
 	CBaseParticleEntity = 14,

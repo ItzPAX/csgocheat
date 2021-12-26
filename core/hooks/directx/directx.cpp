@@ -5,7 +5,7 @@
 DirectX g_DirectX{ };
 
 HWND DirectX::GetProcessWindow() {
-	window = FindWindow(NULL, "Counter-Strike: Global Offensive");
+	window = FindWindow(NULL, "Counter-Strike: Global Offensive - Direct3D 9");
 
 	g_Interface.pEngine->GetScreenSize(iWindowWidth, iWindowHeight);
 

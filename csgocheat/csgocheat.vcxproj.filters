@@ -67,12 +67,6 @@
     <Filter Include="utilities\structs\color">
       <UniqueIdentifier>{17903e89-4843-4676-a147-da36c48eaa90}</UniqueIdentifier>
     </Filter>
-    <Filter Include="utilities\structs\vec4d">
-      <UniqueIdentifier>{73fb5556-2a76-4ac8-b990-9b2d6c016ab6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="utilities\structs\matrix">
-      <UniqueIdentifier>{a98c6153-a1c1-4c30-add2-10fdd5e6dd32}</UniqueIdentifier>
-    </Filter>
     <Filter Include="core\hooks\directx">
       <UniqueIdentifier>{326a5d82-036f-458d-91ef-20ba227d2716}</UniqueIdentifier>
     </Filter>
@@ -93,6 +87,12 @@
     </Filter>
     <Filter Include="core\hooks\client">
       <UniqueIdentifier>{3dc32654-a82a-4962-81fa-f730aa34f91a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk\structs">
+      <UniqueIdentifier>{5e6a7671-830d-41b9-a480-db0f0d830a07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utilities\structs\vecaligned">
+      <UniqueIdentifier>{e647e043-78bb-4aa6-9418-c78bfbd8850b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -123,9 +123,6 @@
     </ClCompile>
     <ClCompile Include="..\utilities\structures\vec3d\vec3d.cpp">
       <Filter>utilities\structs\vec3d</Filter>
-    </ClCompile>
-    <ClCompile Include="..\utilities\structures\vec2d\vec2d.cpp">
-      <Filter>utilities\structs\vec2d</Filter>
     </ClCompile>
     <ClCompile Include="..\core\features\source\visuals.cpp">
       <Filter>core\features\source</Filter>
@@ -161,6 +158,9 @@
       <Filter>core\menu</Filter>
     </ClCompile>
     <ClCompile Include="..\core\features\source\chams.cpp">
+      <Filter>core\features\source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\core\features\source\aimbot.cpp">
       <Filter>core\features\source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -216,12 +216,6 @@
     </ClInclude>
     <ClInclude Include="..\sdk\manager\interface\classes\DebugOverlay.h">
       <Filter>sdk\manager\interface\classes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\utilities\structures\vec4d\vec4d.h">
-      <Filter>utilities\structs\vec4d</Filter>
-    </ClInclude>
-    <ClInclude Include="..\utilities\structures\viewmatrix\matrix.h">
-      <Filter>utilities\structs\matrix</Filter>
     </ClInclude>
     <ClInclude Include="..\core\features\header\visuals.h">
       <Filter>core\features\header</Filter>
@@ -314,6 +308,24 @@
       <Filter>core\hooks\client</Filter>
     </ClInclude>
     <ClInclude Include="..\sdk\manager\interface\classes\ISurface.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\header\aimbot.h">
+      <Filter>core\features\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\structs\models.h">
+      <Filter>sdk\structs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IVModelInfo.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\structures\vecaligned\vecaligned.h">
+      <Filter>utilities\structs\vecaligned</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\classes\collideable.h">
+      <Filter>sdk\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IEngineTrace.h">
       <Filter>sdk\manager\interface\classes</Filter>
     </ClInclude>
   </ItemGroup>

@@ -32,34 +32,40 @@ float Math::ScaleNumber(float flVal, float flValMax, float flValMin, float flNew
 }
 
 void Math::CalcAngle(Vec3D src, Vec3D dst, Vec3D& angles) {
-    // get target Vector
-    Vec3D vTargetVec = dst - src;
-	VectorAngles(vTargetVec, angles);
+	// get target vector
+	Vec3D vecDelta = dst - src;
+	VectorAngles(vecDelta, angles);
+	angles.Normalize();
 }
 
-void Math::VectorAngles(Vec3D& forward, Vec3D angles) {
-	Vec3D view;
-	float flTmp;
+void Math::VectorAngles(Vec3D forward, Vec3D& angles) {
+	float flPitch, flYaw;
 
-	if (forward[1] == 0.f && forward[0] == 0.f) {
-		view[0] = 0.f;
-		view[1] = 0.f;
+	if (forward.x == 0.f && forward.y == 0.f)
+	{
+		flPitch = (forward.z > 0.f) ? 270.f : 90.f;
+		flYaw = 0.f;
 	}
-	else {
-		view[1] = RAD2DEG(atan2(forward[1], forward[0]));
+	else
+	{
+		flPitch = std::atan2f(-forward.z, forward.Length2D()) * 180.f / M_PI;
 
-		if (view[1] < 0.f)
-			view[1] += 360.f;
+		if (flPitch < 0.f)
+			flPitch += 360.f;
 
-		flTmp = forward[0] * forward[0] + forward[1] * forward[1];
-		view[2] = sqrt(flTmp);
+		flYaw = std::atan2f(forward.y, forward.x) * 180.f / M_PI;
 
-		//view[2] = 1/fastInverseSquare(forward[0] * forward[0] + forward[1] * forward[1]);
-
-		view[0] = RAD2DEG(atan2(forward[2], view[2]));
+		if (flYaw < 0.f)
+			flYaw += 360.f;
 	}
 
-	angles[0] = -view[0];
-	angles[1] = view[1];
-	angles[2] = 0.f;
+	angles.x = flPitch;
+	angles.y = flYaw;
+	angles.z = 0.f;
+}
+
+void Math::TransformVector(Vec3D& a, Matrix& b, Vec3D& out) {
+	out.x = a.Dot(b.MatVal[0]) + b.MatVal[0][3];
+	out.y = a.Dot(b.MatVal[1]) + b.MatVal[1][3];
+	out.z = a.Dot(b.MatVal[2]) + b.MatVal[2][3];
 }

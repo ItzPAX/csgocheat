@@ -1,108 +1,87 @@
-#include "pch.h"
-#include "includes.h"
+#include "vec3d.h"
+#include <cstdint>
+#include <algorithm>
+#include <iostream>
+#include <iomanip>
+#include <random>
 
-// constructor
-Vec3D::Vec3D(const Vec3D& vec) {
-    x = vec.x;
-    y = vec.y;
-    z = vec.z;
+Vec3D::Vec3D(void) {
+	x = y = z = 0.0f;
 }
 
-//addition
-Vec3D Vec3D ::operator+(const Vec3D& vec) {
-    return Vec3D(x + vec.x, y + vec.y, z + vec.z);
+Vec3D::Vec3D(float _x, float _y, float _z) {
+	x = _x;
+	y = _y;
+	z = _z;
 }
 
-Vec3D& Vec3D ::operator+=(const Vec3D& vec) {
-    x += vec.x;
-    y += vec.y;
-    z += vec.z;
-    return *this;
+Vec3D::~Vec3D(void) {};
+
+void Vec3D::Init(float _x, float _y, float _z) {
+	x = _x; y = _y; z = _z;
 }
 
-//substraction//
-Vec3D Vec3D ::operator-(const Vec3D& vec) {
-    return Vec3D(x - vec.x, y - vec.y, z - vec.z);
+void Vec3D::Clamp(void) {
+	x = std::clamp(x, -89.0f, 89.0f);
+	y = std::clamp(std::remainder(y, 360.0f), -180.0f, 180.0f);
+	z = std::clamp(z, -50.0f, 50.0f);
 }
 
-Vec3D& Vec3D::operator-=(const Vec3D& vec) {
-    x -= vec.x;
-    y -= vec.y;
-    z -= vec.z;
-    return *this;
+Vec3D Vec3D::Clamped() {
+	Vec3D clamped = *this;
+	clamped.Clamp();
+	return clamped;
 }
 
-//scalar multiplication
-Vec3D Vec3D::operator*(float value) {
-    return Vec3D(x * value, y * value, z * value);
-}
+float Vec3D::DistanceTo(const Vec3D& other) {
+	Vec3D delta;
+	delta.x = x - other.x;
+	delta.y = y - other.y;
+	delta.z = z - other.z;
 
-Vec3D& Vec3D::operator*=(float value) {
-    x *= value;
-    y *= value;
-    z *= value;
-    return *this;
-}
-
-//scalar division
-Vec3D Vec3D ::operator/(float value) {
-    return Vec3D(x / value, y / value, z / value);
-}
-
-Vec3D& Vec3D ::operator/=(float value) {
-    x /= value;
-    y /= value;
-    z /= value;
-    return *this;
-}
-
-Vec3D& Vec3D::operator=(const Vec3D& vec) {
-    x = vec.x;
-    y = vec.y;
-    z = vec.z;
-    return *this;
-}
-
-//Dot product
-float Vec3D::DotProduct(const Vec3D& vec) {
-    return x * vec.x + vec.y * y + vec.z * z;
-}
-
-//cross product
-Vec3D Vec3D::CrossProduct(const Vec3D& vec)
-{
-    float ni = y * vec.z - z * vec.y;
-    float nj = z * vec.x - x * vec.z;
-    float nk = x * vec.y - y * vec.x;
-    return Vec3D(ni, nj, nk);
-}
-
-float Vec3D::Magnitude() {
-    return sqrt(Square());
-}
-
-float Vec3D::Square() {
-    return x * x + y * y + z * z;
-}
-
-Vec3D Vec3D::Normalization() {
-    *this /= Magnitude();
-    return *this;
-}
-
-Vec3D Vec3D::Normalized(const Vec3D& vec) {
-    g_Math.NormalizeIntoRange(vec.x, 89.f, -89.f);
-    g_Math.NormalizeIntoRange(vec.y, 180.f, -180.f);
-    // dont normalize z axis
+	return delta.Length();
 }
 
 void Vec3D::Normalize() {
-    this->x = std::isfinite(this->x) ? std::remainderf(this->x, 360.f) : 0.f;
-    this->y = std::isfinite(this->y) ? std::remainderf(this->y, 360.f) : 0.f;
-    this->z = z < 0.f ? (std::isfinite(this->z) ? std::remainderf(this->z, -180.f) : 0.f) : (std::isfinite(this->z) ? std::remainderf(this->z, 180.f) : 0.f);
+	x = std::isfinite(x) ? std::remainderf(x, 360.0f) : 0.0f;
+	y = std::isfinite(y) ? std::remainderf(y, 360.0f) : 0.0f;
+	z = 0.0f;
 }
 
-float Vec3D::Distance(const Vec3D& vec) {
-    Vec3D dist = *this - vec;
-    return dist.Magnitude();
+Vec3D Vec3D::Normalized(void) {
+	Vec3D vec(*this);
+	vec.Normalize();
+
+	return vec;
+}
+
+float Vec3D::Length(void) {
+	float root = 0.0f, sqsr = this->LengthSqr();
+
+	__asm        sqrtss xmm0, sqsr
+	__asm        movss root, xmm0
+
+	return root;
+}
+
+float Vec3D::LengthSqr(void) {
+	auto sqr = [](float n) {
+		return static_cast<float>(n * n);
+	};
+
+	return (sqr(x) + sqr(y) + sqr(z));
+}
+
+float Vec3D::Length2DSqr(void) const {
+	return (x * x + y * y);
+}
+
+float Vec3D::Dot(const Vec3D other) {
+	return (x * other.x + y * other.y + z * other.z);
+}
+
+float Vec3D::Dot(const float* other) {
+	const Vec3D& a = *this;
+
+	return(a.x * other[0] + a.y * other[1] + a.z * other[2]);
 }

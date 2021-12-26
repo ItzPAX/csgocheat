@@ -6,7 +6,7 @@ public:
 	int iFrameCount;
 	float flAbsFrametime;
 	float flAbsFrameStartTime;
-	float flCurTime;
+	float flCurTime; // seconds
 	float flFrameTime;
 	int iMaxClients;
 	int iTickCount;

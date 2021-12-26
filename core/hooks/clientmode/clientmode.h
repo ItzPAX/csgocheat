@@ -9,5 +9,9 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	// do shit here
 	Game::g_pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
 
-	std::cout << Game::g_pLocal->vEyeAngles().y << std::endl;
+	// check if we have a local player
+	if (Game::g_pLocal) {
+		// call aimbot
+		g_LegitBot.AimAtBestPlayer();
+	}
 }

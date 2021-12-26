@@ -54,6 +54,8 @@ bool Interface::Init() {
 	pRenderView = (IRenderView*)GetInterface("engine.dll", "VEngineRenderView");
 	pSurface = (ISurface*)GetInterface("vguimatsurface.dll", "VGUI_Surface");
 	pPanel = (IPanel*)GetInterface("vgui2.dll", "VGUI_Panel");
+	pModelInfo = (IVModelInfo*)GetInterface("engine.dll", "VModelInfoClient");
+	pEngineTrace = (IEngineTrace*)GetInterface("engine.dll", "EngineTraceClient");
 	
 
 	// custom interfaces
