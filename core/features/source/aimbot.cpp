@@ -39,17 +39,17 @@ AimPlayer LegitBot::GetClosestEnemyToCrosshair(float flFov, Vec3D& vViewAngles, 
 
 	// distance based fov shitttttssssssss
 	if (!pBestPlayer)
-		return AimPlayer{pBestPlayer, iBestHitbox};
+		return AimPlayer{ nullptr, Hitboxes::HitboxNone };
 
 	if (Variables::bDistanceBasedFov) {
 		float flDistanceBestDelta = DistanceAdjustedFOV(flFov, vEyeOrigin, pBestPlayer->vEyeOrigin(), pBestPlayer);
-		if (flDistanceBestDelta < flBestDelta)
+		if (flDistanceBestDelta > flBestDelta)
 			return AimPlayer{ pBestPlayer, iBestHitbox };
 		else
 			return AimPlayer{ nullptr, Hitboxes::HitboxNone };
 	}
 
-	return AimPlayer{ pBestPlayer, Hitboxes::HitboxNone };
+	return AimPlayer{ pBestPlayer, iBestHitbox };
 }
 
 void LegitBot::SmoothAim(Vec3D& vViewAngles, Vec3D& vAngle, float flSmoothingVal) {
@@ -57,11 +57,10 @@ void LegitBot::SmoothAim(Vec3D& vViewAngles, Vec3D& vAngle, float flSmoothingVal
 	if (flSmoothingVal == 0.f)
 		return;
 
-	// get distance to still travel
-	float flDistanceToTarget = (vAngle - vViewAngles).Length() / 8.f;
+	float flDist = (vViewAngles - vAngle).Normalized().Length2D() / flSmoothingVal;
 
-	// adjust smoothing by with the Distance
-	vAngle = (vViewAngles + (vAngle - vViewAngles).Clamped() / (flSmoothingVal / flDistanceToTarget)).Clamped();
+	// adjust smoothing
+	vAngle = (vViewAngles + (vAngle - vViewAngles).Clamped() / (flSmoothingVal / flDist)).Clamped();
 }
 
 void LegitBot::CompensateRecoil(Vec3D& vAngle, Vec3D vAimPunchAngle, float flCorrection) {
@@ -71,6 +70,9 @@ void LegitBot::CompensateRecoil(Vec3D& vAngle, Vec3D vAimPunchAngle, float flCor
 
 bool LegitBot::AimAtBestPlayer() {
 	if (!Variables::bAimbot)
+		return false;
+
+	if (!GetAsyncKeyState(VK_LBUTTON))
 		return false;
 
 	// get local viewangles
@@ -89,6 +91,36 @@ bool LegitBot::AimAtBestPlayer() {
 	// we have not found a player return
 	if (!pPlayer)
 		return false;
+
+	// do trace ray from localplayers viewangles to wait after enemy has been targeted
+	static float flCurTimeAtTarget = 0.f;
+
+	if (Variables::bWaitAfterTargetting) {
+		float c = std::cos(vViewAngles.x * M_PI / 180.f);
+		Vec3D vForward = Vec3D(c * std::cos(vViewAngles.y * M_PI / 180.f), c * std::sin(vViewAngles.y * M_PI / 180.f), -std::sin(vViewAngles.x * M_PI / 180.f));
+		vForward *= 8192.f; // yesyes ik magic number is ghetto ill fix it when i implemented weapons
+
+		Vec3D vEnd;
+		vEnd = vEyeOrigin + vForward;
+
+		trace_t tTrace;
+		Ray_t rRay;
+		CTraceFilter cFilter;
+		cFilter.pSkip = Game::g_pLocal;
+		rRay.Init(vEyeOrigin, vEnd);
+
+		g_Interface.pEngineTrace->TraceRay(rRay, MASK_SHOT, &cFilter, &tTrace);
+
+		if (tTrace.m_pEnt == pPlayer) {
+			flCurTimeAtTarget = g_Interface.pGlobalVars->flCurTime;
+		}
+
+		// wait before targetting again at all
+		if (g_Interface.pGlobalVars->flCurTime - flCurTimeAtTarget < Variables::flReactionTime) {
+			return false;
+		}
+	}
+
 
 	// calc viewangles to shoot at enemy
 	Vec3D vAngle;
@@ -109,10 +141,10 @@ bool LegitBot::AimAtBestPlayer() {
 }
 
 bool LegitBot::NonSticky(Vec3D vViewAngles, Vec3D vEyeOrigin, Vec3D vAngle, Player* pTarget) {
-	static float flCurTimePlayerReached = 0.f; // needed for non sticky
+	static float flCurTimePlayerReached = 0.f; 
 	static int iNonStickPlayerId = INVALID;
 
-	// do trace ray from localplayer
+	// do trace ray from localplayers viewangles
 	float c = std::cos(vViewAngles.x * M_PI / 180.f);
 	Vec3D vForward = Vec3D(c * std::cos(vViewAngles.y * M_PI / 180.f), c * std::sin(vViewAngles.y * M_PI / 180.f), -std::sin(vViewAngles.x * M_PI / 180.f));
 	vForward *= 8192.f; // yesyes ik magic number is ghetto ill fix it when i implemented weapons
@@ -166,7 +198,6 @@ float LegitBot::DistanceAdjustedFOV(float flBaseFov, Vec3D vEyeOrigin, Vec3D vTa
 
 	// get distance
 	float flDist = sqrtf(sqrtf((tTrace.endpos - tTrace.startpos).Length())) - 2.f;
-	std::cout << flDist << '\n';
 
 	// cant divide by 0
 	if (flDist == NULL)

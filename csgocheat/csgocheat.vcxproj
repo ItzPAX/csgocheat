@@ -292,6 +292,7 @@
     <ClInclude Include="..\utilities\structures\vec3d\vec3d.h" />
     <ClInclude Include="..\utilities\structures\vecaligned\vecaligned.h" />
     <ClInclude Include="..\utilities\tools\tools.h" />
+    <ClInclude Include="..\utilities\tools\xorstr.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
