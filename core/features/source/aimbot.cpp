@@ -121,7 +121,6 @@ bool LegitBot::AimAtBestPlayer() {
 		}
 	}
 
-
 	// calc viewangles to shoot at enemy
 	Vec3D vAngle;
 	g_Math.CalcAngle(vEyeOrigin, pPlayer->vGetHitboxPos(pAimPlayer.iHitbox), vAngle);

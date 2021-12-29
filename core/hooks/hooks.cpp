@@ -94,7 +94,11 @@ bool HookManager::InitAllHooks() {
 	if (!g_HookManager.bHooksAdded)
 		return false;
 
-	return g_HookLib.EnableAllHooks();
+	bool bStatus = g_HookLib.EnableAllHooks();
+
+	// restore hooks placed by vac
+	g_HookLib.RestoreACHooks();
+	return bStatus;
 }
 
 bool HookManager::ReleaseAll() {
