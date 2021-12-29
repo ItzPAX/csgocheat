@@ -20,11 +20,11 @@ public:
 
 	bool InitMaterials() {
 		IMaterial* pMat;
-		pMat = g_Interface.pMaterialSystem->FindMaterial("debug/debugambientcube", TEXTURE_GROUP_OTHER);
+		pMat = g_Interface.pMaterialSystem->FindMaterial(XOR("debug/debugambientcube"), TEXTURE_GROUP_OTHER);
 		pMats.push_back(pMat);
 		pMat->IncrementReferenceCount();
 
-		pMat = g_Interface.pMaterialSystem->FindMaterial("debug/debugdrawflat", TEXTURE_GROUP_OTHER);
+		pMat = g_Interface.pMaterialSystem->FindMaterial(XOR("debug/debugdrawflat"), TEXTURE_GROUP_OTHER);
 		pMats.push_back(pMat);
 		pMat->IncrementReferenceCount();
 

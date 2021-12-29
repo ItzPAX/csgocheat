@@ -43,6 +43,7 @@ using uchar = unsigned char;
 
 // includes
 #include "utilities/tools/tools.h"
+#include "utilities/tools/xorstr.h"
 #include "utilities/render/render.h"
 #include "core/init/init.h"
 #include "core/hooks/hooks.h"

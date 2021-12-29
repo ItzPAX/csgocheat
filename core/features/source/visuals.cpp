@@ -78,7 +78,7 @@ void Visuals::DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInf
 	float flScaledNum = g_Math.ScaleNumber(pPlayer->iHealth(), 100.f, 0.f, rPlayerRect.top, rPlayerRect.bottom);
 
 	std::string str = std::to_string(pPlayer->iHealth());
-	str += "hp";
+	str += XOR("hp");
 	Vec2D vSizeHP = g_Render.TextSize(g_Render.pEspFont, str.c_str());
 
 	g_Render.DrawLine(rPlayerRect.left - 4, rPlayerRect.bottom, rPlayerRect.left - 4, rPlayerRect.top, 1, Color(50,50,50,col.a));

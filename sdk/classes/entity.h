@@ -1,5 +1,6 @@
 #pragma once
 #include "utilities/structures/matrix/matrix.h"
+#include "utilities/tools/xorstr.h"
 #include "includes.h"
 #include "pch.h"
 
@@ -49,8 +50,8 @@ public:
 	}
 
 	bool bDormant() { using tOriginalFn = bool(__thiscall*)(void*); return (*static_cast<tOriginalFn**>(pNetworkable()))[9](pNetworkable()); }
-	Vec3D vOrigin() { return g_NetVars.GetNetvar<Vec3D>("DT_BasePlayer", "m_vecOrigin", this); }
-	int iTeamNum() { return g_NetVars.GetNetvar<int>("DT_CSPlayer", "m_iTeamNum", this); };
+	Vec3D vOrigin() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecOrigin"), this); }
+	int iTeamNum() { return g_NetVars.GetNetvar<int>(XOR("DT_CSPlayer"), XOR("m_iTeamNum"), this); };
 };
 
 class Player : public Entity {
@@ -106,10 +107,10 @@ public:
 	bool bIsEnemy(Player* to) { return this->iTeamNum() != to->iTeamNum(); }
 	bool bIsAlive() { return iHealth() > 0; }
 
-	Vec3D vGetVelocity() { return g_NetVars.GetNetvar<Vec3D>("DT_BasePlayer", "m_vecVelocity[0]", this); }
-	Vec3D vGetViewOffset() { return g_NetVars.GetNetvar<Vec3D>("DT_BasePlayer", "m_vecViewOffset[0]", this); }
-	Vec3D vGetAimPunchAngle() { return g_NetVars.GetNetvar<Vec3D>("DT_BasePlayer", "m_aimPunchAngle", this); }
-	int iGetHitboxSet() { return g_NetVars.GetNetvar<int>("DT_BasePlayer", "m_nHitboxSet", this); }
-	int iHealth() { return g_NetVars.GetNetvar<int>("DT_BasePlayer", "m_iHealth", this); }
-	Vec3D vEyeAngles() { return g_NetVars.GetNetvar<Vec3D>("DT_CSPlayer", "m_angEyeAngles", this); }
+	Vec3D vGetVelocity() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecVelocity[0]"), this); }
+	Vec3D vGetViewOffset() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecViewOffset[0]"), this); }
+	Vec3D vGetAimPunchAngle() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_aimPunchAngle"), this); }
+	int iGetHitboxSet() { return g_NetVars.GetNetvar<int>(XOR("DT_BasePlayer"), XOR("m_nHitboxSet"), this); }
+	int iHealth() { return g_NetVars.GetNetvar<int>(XOR("DT_BasePlayer"), XOR("m_iHealth"), this); }
+	Vec3D vEyeAngles() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_CSPlayer"), XOR("m_angEyeAngles"), this); }
 };

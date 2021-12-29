@@ -76,10 +76,10 @@ bool HookManager::AddAllHooks() {
 	WndProc::oWndProc = (WndProc::tWndProc)SetWindowLong(g_DirectX.window, GWL_WNDPROC, (LONG)WndProc::hkWndProc);
 
 	// grab original function address and add hook to the queue
-	CreateMove::oCreateMove = (CreateMove::tCreateMove)g_HookLib.AddHook(CreateMove::hkCreateMove, g_Interface.pClientMode, CreateMove::iIndex, "CreateMove");
-	DrawModel::oDrawModel = (DrawModel::tDrawModel)g_HookLib.AddHook(DrawModel::hkDrawModel, g_Interface.pStudioRender, DrawModel::iIndex, "DrawModel");
-	HudUpdate::oHudUpdate = (HudUpdate::tHudUpdate)g_HookLib.AddHook(HudUpdate::hkHudUpdate, g_Interface.pClient, HudUpdate::iIndex, "HudUpdate");
-	LockCursor::oLockCursor = (LockCursor::tLockCursor)g_HookLib.AddHook(LockCursor::hkLockCursor, g_Interface.pSurface, LockCursor::iIndex, "LockCursor");
+	CreateMove::oCreateMove = (CreateMove::tCreateMove)g_HookLib.AddHook(CreateMove::hkCreateMove, g_Interface.pClientMode, CreateMove::iIndex, XOR("CreateMove"));
+	DrawModel::oDrawModel = (DrawModel::tDrawModel)g_HookLib.AddHook(DrawModel::hkDrawModel, g_Interface.pStudioRender, DrawModel::iIndex, XOR("DrawModel"));
+	HudUpdate::oHudUpdate = (HudUpdate::tHudUpdate)g_HookLib.AddHook(HudUpdate::hkHudUpdate, g_Interface.pClient, HudUpdate::iIndex, XOR("HudUpdate"));
+	LockCursor::oLockCursor = (LockCursor::tLockCursor)g_HookLib.AddHook(LockCursor::hkLockCursor, g_Interface.pSurface, LockCursor::iIndex, XOR("LockCursor"));
 
 	// forward original func pointer to different classes
 	g_Chams.c_oDrawModel = DrawModel::oDrawModel;
@@ -133,15 +133,15 @@ void HookManager::LogHookStatus(IHookStatus ihs) {
 	if (ihs.name->empty())
 		return;
 
-	ihs.name->append(".txt");
+	ihs.name->append(XOR(".txt"));
 	auto outFile = std::ofstream(ihs.name->c_str());
-	outFile << "[INDEX] " << ihs.iIndex << std::endl;
-	outFile << "[HKFNC] " << ihs.pHkAddr << std::endl;
-	outFile << "[BASE] " << ihs.pBaseFnc << std::endl;
+	outFile << XOR("[INDEX] ") << ihs.iIndex << std::endl;
+	outFile << XOR("[HKFNC] ") << ihs.pHkAddr << std::endl;
+	outFile << XOR("[BASE] ") << ihs.pBaseFnc << std::endl;
 
-	std::cout << "[INDEX] " << ihs.iIndex << std::endl;
-	std::cout << "[HKFNC] " << ihs.pHkAddr << std::endl;
-	std::cout << "[BASE] " << ihs.pBaseFnc << std::endl;
+	std::cout << XOR("[INDEX] ") << ihs.iIndex << std::endl;
+	std::cout << XOR("[HKFNC] ") << ihs.pHkAddr << std::endl;
+	std::cout << XOR("[BASE] ") << ihs.pBaseFnc << std::endl;
 }
 
 #pragma region HkFunctions
@@ -172,7 +172,7 @@ HRESULT __stdcall HkDirectX::hkEndScene(LPDIRECT3DDEVICE9 o_pDevice) {
 		// init d3d9 renderer
 		if (!g_Render.InitRenderer())
 			return;
-		std::cout << "[ RAYBOT ] Successfully Initialized Renderer\n";
+		std::cout << XOR("[ RAYBOT ] Successfully Initialized Renderer\n");
 	}
 
 	// get return address

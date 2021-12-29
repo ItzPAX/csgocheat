@@ -10,7 +10,7 @@ void Menu::Render() {
 	ImGui::NewFrame();
 
 	// call our menu
-	ImGui::Begin("RayBot");
+	ImGui::Begin(XOR("RayBot"));
 	g_Menu.Draw();
 	ImGui::End();
 
@@ -22,19 +22,21 @@ void Menu::Render() {
 
 void Menu::Draw() {
 	// genuine menu here
-	ImGui::Checkbox("Box ESP", &Variables::bBoxEsp);
-	ImGui::Checkbox("Name ESP", &Variables::bNameEsp);
-	ImGui::Checkbox("Health ESP", &Variables::bHealthEsp);
+	ImGui::Checkbox(XOR("Box ESP"), &Variables::bBoxEsp);
+	ImGui::Checkbox(XOR("Name ESP"), &Variables::bNameEsp);
+	ImGui::Checkbox(XOR("Health ESP"), &Variables::bHealthEsp);
 
-	ImGui::Checkbox("Enemy Chams Vis", &Variables::bEnemyChamsVis);
-	ImGui::Checkbox("Enemy Chams Invis", &Variables::bEnemyChamsInvis);
+	ImGui::Checkbox(XOR("Enemy Chams Vis"), &Variables::bEnemyChamsVis);
+	ImGui::Checkbox(XOR("Enemy Chams Invis"), &Variables::bEnemyChamsInvis);
 
-	ImGui::Checkbox("Aimbot", &Variables::bAimbot);
-	ImGui::Checkbox("Non-Sticky Aimbot", &Variables::bNonSticky);
-	ImGui::Checkbox("Distance Based FOV", &Variables::bDistanceBasedFov);
-	ImGui::SliderFloat("Aimbot Smoothing", &Variables::flSmoothing, 1.f, 100.f, "%.0f%", 1.f);
-	ImGui::SliderFloat("RCS Correction", &Variables::flCorrecting, 0.f, 100.f, "%.0f%", 1.f);
-	ImGui::SliderFloat("Aimbot FOV", &Variables::flFov, 0.f, 180.f, "%.0f%", 1.f);
+	ImGui::Checkbox(XOR("Aimbot"), &Variables::bAimbot);
+	ImGui::Checkbox(XOR("Non-Sticky Aimbot"), &Variables::bNonSticky);
+	ImGui::Checkbox(XOR("Distance Based FOV"), &Variables::bDistanceBasedFov);
+	ImGui::Checkbox(XOR("Wait after locked"), &Variables::bWaitAfterTargetting);
+	ImGui::SliderFloat(XOR("Aimbot ReactionTime"), &Variables::flReactionTime, 0.f, 4.f, "%.2fs", 0.25f);
+	ImGui::SliderFloat(XOR("Aimbot Smoothing"), &Variables::flSmoothing, 1.f, 100.f, "%.0f%", 1.f);
+	ImGui::SliderFloat(XOR("RCS Correction"), &Variables::flCorrecting, 0.f, 100.f, "%.0f%", 1.f);
+	ImGui::SliderFloat(XOR("Aimbot FOV"), &Variables::flFov, 0.f, 180.f, "%.0f%", 1.f);
 }
 
 void Menu::Init() {
@@ -48,5 +50,5 @@ void Menu::Init() {
 	ImGui_ImplDX9_Init(g_DirectX.pDevice);
 
 	bInitialized = true;
-	std::cout << "[ RAYBOT ] Successfully Initialized ImGui\n";
+	std::cout << XOR("[ RAYBOT ] Successfully Initialized ImGui\n");
 }

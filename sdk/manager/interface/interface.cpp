@@ -6,7 +6,7 @@
 Interface g_Interface{ };
 
 void* Interface::GetInterface(const char* dllname, const char* interfacename) {
-	tCreateInterface CreateInterface = (tCreateInterface)GetProcAddress(GetModuleHandle(dllname), "CreateInterface");
+	tCreateInterface CreateInterface = (tCreateInterface)GetProcAddress(GetModuleHandle(dllname), XOR("CreateInterface"));
 
 	int iReturnCode;
 	void* pInterface = nullptr;
@@ -18,15 +18,15 @@ void* Interface::GetInterface(const char* dllname, const char* interfacename) {
 		std::string toadd = "";
 	
 		if (iTries < 10) {
-			toadd = "00";
+			toadd = XOR("00");
 			toadd += std::to_string(iTries);
 		}
 		else if (iTries < 100) {
-			toadd = "0";
+			toadd = XOR("0");
 			toadd += std::to_string(iTries);
 		}
 		else {
-			toadd = "";
+			toadd = XOR("");
 			toadd += std::to_string(iTries);
 		}
 	
@@ -42,27 +42,27 @@ void* Interface::GetInterface(const char* dllname, const char* interfacename) {
 
 bool Interface::Init() {
 	// grab all interfaces here
-	pClientEntityList = (IClientEntityList*)GetInterface("client.dll", "VClientEntityList");
-	pClient = (IBaseClientDLL*)GetInterface("client.dll", "VClient");
-	pEngine = (IVEngineClient*)GetInterface("engine.dll", "VEngineClient");
-	pDebugOverlay = (IVDebugOverlay*)GetInterface("engine.dll", "VDebugOverlay");
-	pInputSystem = (IInputSystem*)GetInterface("inputsystem.dll", "InputSystemVersion");
-	pConsole = (IGameConsole*)GetInterface("client.dll", "GameConsole");
-	pModelRender = (IVModelRender*)GetInterface("engine.dll", "VEngineModel");
-	pMaterialSystem = (IMaterialSystem*)GetInterface("materialsystem.dll", "VMaterialSystem");
-	pStudioRender = (IStudioRender*)GetInterface("studiorender.dll", "VStudioRender");
-	pRenderView = (IRenderView*)GetInterface("engine.dll", "VEngineRenderView");
-	pSurface = (ISurface*)GetInterface("vguimatsurface.dll", "VGUI_Surface");
-	pPanel = (IPanel*)GetInterface("vgui2.dll", "VGUI_Panel");
-	pModelInfo = (IVModelInfo*)GetInterface("engine.dll", "VModelInfoClient");
-	pEngineTrace = (IEngineTrace*)GetInterface("engine.dll", "EngineTraceClient");
+	pClientEntityList = (IClientEntityList*)GetInterface(XOR("client.dll"), XOR("VClientEntityList"));
+	pClient = (IBaseClientDLL*)GetInterface(XOR("client.dll"), XOR("VClient"));
+	pEngine = (IVEngineClient*)GetInterface(XOR("engine.dll"), XOR("VEngineClient"));
+	pDebugOverlay = (IVDebugOverlay*)GetInterface(XOR("engine.dll"), XOR("VDebugOverlay"));
+	pInputSystem = (IInputSystem*)GetInterface(XOR("inputsystem.dll"), XOR("InputSystemVersion"));
+	pConsole = (IGameConsole*)GetInterface(XOR("client.dll"), XOR("GameConsole"));
+	pModelRender = (IVModelRender*)GetInterface(XOR("engine.dll"), XOR("VEngineModel"));
+	pMaterialSystem = (IMaterialSystem*)GetInterface(XOR("materialsystem.dll"), XOR("VMaterialSystem"));
+	pStudioRender = (IStudioRender*)GetInterface(XOR("studiorender.dll"), XOR("VStudioRender"));
+	pRenderView = (IRenderView*)GetInterface(XOR("engine.dll"), XOR("VEngineRenderView"));
+	pSurface = (ISurface*)GetInterface(XOR("vguimatsurface.dll"), XOR("VGUI_Surface"));
+	pPanel = (IPanel*)GetInterface(XOR("vgui2.dll"), XOR("VGUI_Panel"));
+	pModelInfo = (IVModelInfo*)GetInterface(XOR("engine.dll"), XOR("VModelInfoClient"));
+	pEngineTrace = (IEngineTrace*)GetInterface(XOR("engine.dll"), XOR("EngineTraceClient"));
 	
 
 	// custom interfaces
 	pGlobalVars = **reinterpret_cast<CGlobalVars***>((*reinterpret_cast<uintptr_t**>(pClient))[11] + 10);
 
 	// sig interfaces 
-	pClientMode = **reinterpret_cast<IClientMode***>(g_Tools.SignatureScan("client.dll", "\x8B\x0D\x00\x00\x00\x00\x8B\x01\x5D\xFF\x60\x30", "xx????xxxxxx") + 0x02);
+	pClientMode = **reinterpret_cast<IClientMode***>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8B\x0D\x00\x00\x00\x00\x8B\x01\x5D\xFF\x60\x30"), XOR("xx????xxxxxx")) + 0x02);
 
 	return true;
 }
