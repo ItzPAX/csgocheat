@@ -2,6 +2,13 @@
 
 #include <Windows.h>
 
+typedef struct _UNICODE_STRING
+{
+	USHORT Length;
+	USHORT MaximumLength;
+	PWSTR  Buffer;
+} UNICODE_STRING, * PUNICODE_STRING;
+
 #ifndef InitializeObjectAttributes
 #define InitializeObjectAttributes( p, n, a, r, s ) { \
 	(p)->Length = sizeof( OBJECT_ATTRIBUTES );        \
@@ -25,13 +32,6 @@ typedef struct _PS_ATTRIBUTE
 	PSIZE_T ReturnLength;
 } PS_ATTRIBUTE, * PPS_ATTRIBUTE;
 
-typedef struct _UNICODE_STRING
-{
-	USHORT Length;
-	USHORT MaximumLength;
-	PWSTR  Buffer;
-} UNICODE_STRING, * PUNICODE_STRING;
-
 typedef struct _OBJECT_ATTRIBUTES
 {
 	ULONG           Length;
@@ -54,6 +54,14 @@ typedef struct _PS_ATTRIBUTE_LIST
 	PS_ATTRIBUTE Attributes[1];
 } PS_ATTRIBUTE_LIST, * PPS_ATTRIBUTE_LIST;
 
+EXTERN_C NTSTATUS NtAllocateVirtualMemory(
+	IN HANDLE ProcessHandle,
+	IN OUT PVOID* BaseAddress,
+	IN ULONG ZeroBits,
+	IN OUT PSIZE_T RegionSize,
+	IN ULONG AllocationType,
+	IN ULONG Protect);
+
 EXTERN_C NTSTATUS NtCreateThreadEx(
 	OUT PHANDLE ThreadHandle,
 	IN ACCESS_MASK DesiredAccess,
@@ -73,12 +81,12 @@ EXTERN_C NTSTATUS NtOpenProcess(
 	IN POBJECT_ATTRIBUTES ObjectAttributes,
 	IN PCLIENT_ID ClientId OPTIONAL);
 
-EXTERN_C NTSTATUS NtReadVirtualMemory(
+EXTERN_C NTSTATUS NtProtectVirtualMemory(
 	IN HANDLE ProcessHandle,
-	IN PVOID BaseAddress OPTIONAL,
-	OUT PVOID Buffer,
-	IN SIZE_T BufferSize,
-	OUT PSIZE_T NumberOfBytesRead OPTIONAL);
+	IN OUT PVOID* BaseAddress,
+	IN OUT PSIZE_T RegionSize,
+	IN ULONG NewProtect,
+	OUT PULONG OldProtect);
 
 EXTERN_C NTSTATUS NtWriteVirtualMemory(
 	IN HANDLE ProcessHandle,
@@ -87,11 +95,10 @@ EXTERN_C NTSTATUS NtWriteVirtualMemory(
 	IN SIZE_T NumberOfBytesToWrite,
 	OUT PSIZE_T NumberOfBytesWritten OPTIONAL);
 
-EXTERN_C NTSTATUS NtAllocateVirtualMemory(
+EXTERN_C NTSTATUS NtReadVirtualMemory(
 	IN HANDLE ProcessHandle,
-	IN OUT PVOID* BaseAddress,
-	IN ULONG ZeroBits,
-	IN OUT PSIZE_T RegionSize,
-	IN ULONG AllocationType,
-	IN ULONG Protect);
+	IN PVOID BaseAddress OPTIONAL,
+	OUT PVOID Buffer,
+	IN SIZE_T BufferSize,
+	OUT PSIZE_T NumberOfBytesRead OPTIONAL);
 

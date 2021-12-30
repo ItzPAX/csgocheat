@@ -13,6 +13,7 @@ int pid = 0;
 LPVOID ll_address;
 PVOID ll_hooked_bytes;
 DWORD ll_offset = 0x204F0;
+DWORD oldProtect;
 
 HANDLE NtOpenProcessByName(LPCTSTR name)
 {
@@ -39,8 +40,9 @@ HANDLE NtOpenProcessByName(LPCTSTR name)
             }
         }
     }
-
+    
     CloseHandle(snapshot);
+    return INVALID_HANDLE_VALUE;
 }
 
 BOOL IsWow64()
@@ -50,30 +52,44 @@ BOOL IsWow64()
     return bIsWow64;
 }
 
+SIZE_T psize = sizeof(DWORD) * 20;
 void InitializePatch()
 {
     ll_address = GetRemoteProcAddress(hProcess, GetRemoteModuleHandle(hProcess, "KERNEL32.DLL"), "LoadLibraryA", 0, FALSE);
+    std::cout << "  - LoadLibraryExW Address: " << ll_address << std::endl;
     NtReadVirtualMemory(hProcess, ll_address, &ll_hooked_bytes, 12, nullptr);
+    std::cout << "  - LoadLibraryExW Bytes: " << ll_hooked_bytes << std::endl;
+
+    auto temp_ll_address = ll_address;
+    NtProtectVirtualMemory(hProcess, &temp_ll_address, &psize, PAGE_EXECUTE_READWRITE, &oldProtect);
+    std::cout << "  - LoadLibraryExW Address2: " << ll_address << std::endl;
+    //std::cout << "  - PageProtection changed!" << std::endl;
 }
 
 
 void PatchLL()
 {
+    NTSTATUS result;
+    std::cout << "  - Overwriting LoadLibraryExW..." << std::endl;
     if (IsWow64()) {
         BYTE originalBytes[5] = { 0x8B, 0xFF, 0x55, 0x8B, 0xEC };
-        std::cout << NtWriteVirtualMemory(hProcess, ll_address, &originalBytes, 5, NULL) << std::endl;
+        result = NtWriteVirtualMemory(hProcess, ll_address, &originalBytes, 5, NULL);
     }
     else
     {
         BYTE originalBytes[7];
         NtReadVirtualMemory(hProcess, GetProcAddress(GetModuleHandle("KERNEL32.DLL"), "LoadLibraryA"), &originalBytes, 7, nullptr);
-        NtWriteVirtualMemory(hProcess, ll_address, &originalBytes, 7, NULL);
+        result = NtWriteVirtualMemory(hProcess, ll_address, &originalBytes, 7, NULL);
     }
+
+    std::cout << "  - Result: " << result << " (" << GetLastError() << ")" << std::endl;
 }
 
 void RestoreLL()
 {
     NtWriteVirtualMemory(hProcess, ll_address, ll_hooked_bytes, 12, NULL);
+    auto temp_ll_address = ll_address;
+    NtProtectVirtualMemory(hProcess, &temp_ll_address, &psize, PAGE_EXECUTE_READ, &oldProtect);
 }
 
 uintptr_t GetModuleBaseAddress(LPCSTR lpDllName) {
@@ -127,8 +143,11 @@ int main(int argc, char* argv[])
     hProcess = NtOpenProcessByName(argv[1]);
     std::cout << "[*] NtOpenProcess called!" << std::endl;
 
-    InitializePatch();
+    std::cout << "[*] Removing potential LoadLibrary-hook..." << std::endl;
+
+    InitializePatch();  //important for ll_address, dont remove
     PatchLL();
+    
 
     HANDLE hThread = NULL;
     LPVOID lpAllocationStart = nullptr;
@@ -169,8 +188,8 @@ int main(int argc, char* argv[])
         return -5;
     }
 
+    std::cout << "[*] Restoring potential LoadLibrary-hook!" << std::endl;
     RestoreLL();
-    std::cout << "[*] Restored potential LoadLibrary-hook!" << std::endl;
 
     CloseHandle(hThread);
     CloseHandle(hProcess);

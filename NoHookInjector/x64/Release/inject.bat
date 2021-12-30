@@ -1,5 +1,5 @@
 @echo off
-cd C:\Users\emlin\source\repos\NoHookInjector\x64\Release
+cd %~dp0
 echo RayInjector - the syscalling and hook-defeating dll-injector
 echo.
 set /p process=Process name: 
