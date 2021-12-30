@@ -285,6 +285,7 @@
     <ClInclude Include="..\sdk\manager\netvars\netvars.h" />
     <ClInclude Include="..\sdk\structs\models.h" />
     <ClInclude Include="..\utilities\hooklib\hooklib.h" />
+    <ClInclude Include="..\utilities\hooklib\syscalls.h" />
     <ClInclude Include="..\utilities\math\math.h" />
     <ClInclude Include="..\utilities\render\render.h" />
     <ClInclude Include="..\utilities\structures\color\color.h" />
@@ -296,6 +297,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
+    <None Include="syscalls.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

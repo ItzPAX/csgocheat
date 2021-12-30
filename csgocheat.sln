@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "csgocheat", "csgocheat\csgocheat.vcxproj", "{67A6AEDC-1DB7-4556-AEFC-34A5F19B83CE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NoHookInjector", "NoHookInjector\NoHookInjector\NoHookInjector.vcxproj", "{7DC4470E-0872-4A89-B8FE-C11EAE071BAF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NoHookInjector", "NoHookInjector\NoHookInjector.vcxproj", "{7DC4470E-0872-4A89-B8FE-C11EAE071BAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

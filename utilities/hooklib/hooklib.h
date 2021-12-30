@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Windows.h>
+#include "syscalls.h"
 #include <vector>
 #include <iostream>
 
