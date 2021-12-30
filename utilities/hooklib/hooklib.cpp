@@ -6,7 +6,7 @@ namespace hkFunctions {
         bool bTamper = false;
 
         // tamper with return vals only if function has been hooked by us
-        if (lpAddr == VirtualProtect) bTamper = true;
+        if (lpAddr == VirtualProtect && g_HookLib.GetACHookStatus()) bTamper = true;
         for (int i = 0; i < g_HookLib.GetCounter(); i++) {
             if (lpAddr == g_HookLib.GetBasePointer(i))
                 bTamper = true;
@@ -14,8 +14,8 @@ namespace hkFunctions {
 
 
         if (lpBuffer && bTamper) {
-            lpBuffer->AllocationProtect = PAGE_EXECUTE;
-            lpBuffer->Protect = PAGE_EXECUTE;
+            lpBuffer->AllocationProtect = PAGE_EXECUTE_READ;
+            lpBuffer->Protect = PAGE_EXECUTE_READ;
         }
 
         return sReturnVal;
@@ -51,17 +51,39 @@ LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
 
 #pragma region VEHHook
 BOOL HookLib::OverrideACHooks() {
-    // bytes of original virtualprotect function
-    BYTE wOrigBytes[] = { 0x8B, 0xFF, 0x55, 0x8B, 0xEC };
     DWORD oProc;
 
-    // override volvo shit hooks with original bytes
+    // copy the old bytes to restore the hook later
+    memcpy(wHookedBytes, VirtualProtect, 5);
+
+    // override the ac hook with original bytes, since vac is stupid they dont scan for writecopy
     VirtualProtect(VirtualProtect, 5, PAGE_EXECUTE_WRITECOPY, &oProc);
     memcpy(VirtualProtect, wOrigBytes, 5);
     VirtualProtect(VirtualProtect, 5, oProc, &oProc);
 
-    // hook virtualquery func and always return false info
+    // hook virtualquery func and return false info
     oVirtualQuery = (tVirtualQuery)TrampHook((char*)VirtualQuery, (char*)hkFunctions::hkVirtualQuery, 5);
+
+    bACHooksOverwritten = true;
+
+    return true;
+}
+
+BOOL HookLib::RestoreACHooks() {
+    // no hooks overwritten, so we can't patch anything
+    if (!bACHooksOverwritten)
+        return false;
+
+    // dont restore the virtualquery hook, since we just overwrote the hook from vac
+
+    // restore the virtualprotect hook, we aren't hooked rn so this call is fine
+    DWORD oProc;
+
+    VirtualProtect(VirtualProtect, 5, PAGE_EXECUTE_WRITECOPY, &oProc);
+    memcpy(VirtualProtect, wHookedBytes, 5);
+    VirtualProtect(VirtualProtect, 5, oProc, &oProc);
+
+    bACHooksOverwritten = false;
 
     return true;
 }
