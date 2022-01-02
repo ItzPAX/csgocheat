@@ -1,6 +1,6 @@
 #pragma once
 
-#include "syscalls.h"
+#include <Windows.h>
 #include <vector>
 #include <iostream>
 
@@ -39,17 +39,25 @@ private:
 
     // prototypes
     using tVirtualQuery = SIZE_T(__stdcall*)(LPCVOID, PMEMORY_BASIC_INFORMATION, SIZE_T);
+    using tRtlAddVectoredHandler = PVOID(NTAPI*)(IN ULONG FirstHandler, IN PVECTORED_EXCEPTION_HANDLER VectoredHandler);
 
     // global vars
 public:
     tVirtualQuery oVirtualQuery;
+    tRtlAddVectoredHandler RtlAddVectoredHandler;
 
     // private functions
 private:
     BOOL DestroyPointers(int index = NOT_FOUND);
 
 public:
-    HookLib() { iCounter = 0; bVehInit = false; pVEHHandle = NULL; pVTableAddr = NULL; } // constructor
+    HookLib() { 
+        iCounter = 0; 
+        bVehInit = false; 
+        pVEHHandle = NULL; 
+        pVTableAddr = NULL; 
+        RtlAddVectoredHandler = reinterpret_cast<tRtlAddVectoredHandler>(GetProcAddress(GetModuleHandle("ntdll.dll"), "RtlAddVectoredExceptionHandler"));
+    } // constructor
 
     // If hooking where an ac is present, call this BEFORE hooking everything
     BOOL OverrideACHooks();

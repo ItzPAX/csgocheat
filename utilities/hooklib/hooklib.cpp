@@ -5,21 +5,24 @@ namespace hkFunctions {
         SIZE_T sReturnVal = g_HookLib.oVirtualQuery(lpAddr, lpBuffer, lpSize);
         bool bTamper = false;
 
+        // we finished hooking, or havent started yet
+        if (!g_HookLib.GetACHookStatus())
+            return sReturnVal;
+
         // tamper with return vals only if function has been hooked by us
-        if (lpAddr == VirtualProtect && g_HookLib.GetACHookStatus()) bTamper = true;
+        if (lpAddr == VirtualProtect) bTamper = true;
         for (int i = 0; i < g_HookLib.GetCounter(); i++) {
             if (lpAddr == g_HookLib.GetBasePointer(i))
                 bTamper = true;
         }
 
-
         if (lpBuffer && bTamper) {
-            lpBuffer->AllocationProtect = PAGE_EXECUTE_READ;
-            lpBuffer->Protect = PAGE_EXECUTE_READ;
+            lpBuffer->AllocationProtect = PAGE_EXECUTE;
+            lpBuffer->Protect = PAGE_EXECUTE;
         }
 
         return sReturnVal;
-    }
+    } 
 }
 
 HookLib g_HookLib{ };
@@ -130,7 +133,7 @@ LPVOID HookLib::AddHook(PVOID pHkFunc, PVOID pVTable, INT16 iIndex, const char* 
 
 BOOL HookLib::EnableAllHooks() {
     if (!bVehInit)
-        g_HookLib.pVEHHandle = AddVectoredExceptionHandler(true, (PVECTORED_EXCEPTION_HANDLER)VEHHandler);
+        g_HookLib.pVEHHandle = RtlAddVectoredHandler(true, (PVECTORED_EXCEPTION_HANDLER)VEHHandler);
 
     // we didnt manage to register a handler
     if (!pVEHHandle)
@@ -159,7 +162,7 @@ BOOL HookLib::EnableHook(const char* sName, int ind) {
 
     // add the handler
     if (!bVehInit)
-        g_HookLib.pVEHHandle = AddVectoredExceptionHandler(true, (PVECTORED_EXCEPTION_HANDLER)VEHHandler);
+        g_HookLib.pVEHHandle = RtlAddVectoredHandler(true, (PVECTORED_EXCEPTION_HANDLER)VEHHandler);
 
     // we didnt manage to register a handler
     if (!pVEHHandle)

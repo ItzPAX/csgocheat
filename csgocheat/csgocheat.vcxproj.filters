@@ -331,14 +331,8 @@
     <ClInclude Include="..\utilities\tools\xorstr.h">
       <Filter>utilities\tools</Filter>
     </ClInclude>
-    <ClInclude Include="..\utilities\hooklib\syscalls.h">
-      <Filter>utilities\hooklib</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
-    <None Include="syscalls.asm">
-      <Filter>utilities\hooklib</Filter>
-    </None>
   </ItemGroup>
 </Project>
