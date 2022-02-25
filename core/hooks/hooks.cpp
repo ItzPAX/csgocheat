@@ -164,8 +164,8 @@ void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults*
 }	
 bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	// relay function
-	cCreateMove(flInputSampleTime, cmd);
 	CreateMove::oCreateMove(flInputSampleTime, cmd);
+	cCreateMove(flInputSampleTime, cmd);
 	return false;
 }
 HRESULT __stdcall HkDirectX::hkEndScene(LPDIRECT3DDEVICE9 o_pDevice) {
@@ -215,9 +215,6 @@ LRESULT __stdcall WndProc::hkWndProc(const HWND hwnd, UINT uMsg, WPARAM wParam, 
 
 		ImGui::GetIO().MouseDrawCursor = !g_Menu.bToggled;
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
-
-		// ghetto fix but idc :)
-		//g_Menu.bToggled ? g_Interface.pConsole->Activate() : g_Interface.pConsole->Hide();
 	}
 
 	if (WndProc::bInputReceived && GetAsyncKeyState(VK_INSERT) & 0x8000)

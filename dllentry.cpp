@@ -12,6 +12,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
 		HANDLE hThread = CreateThread(nullptr, NULL, Init::InitAll, hinstDLL, NULL, nullptr);
 		if (!hThread)
 			return 0;
+		CloseHandle(hThread);
 
 		break;
 	}

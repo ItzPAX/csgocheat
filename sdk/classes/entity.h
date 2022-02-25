@@ -19,6 +19,11 @@ public:
 		return INVALID;
 	}
 
+	bool bIsPlayer() {
+		using original_fn = bool(__thiscall*)(void*);
+		return (*(original_fn**)this)[158](this);
+	}
+
 	ClientClass* cGetClientClass() {
 		using original_fn = ClientClass*(__thiscall*)(void*);
 
