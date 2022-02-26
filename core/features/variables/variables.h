@@ -16,6 +16,7 @@ namespace Variables {
 	inline bool bDistanceBasedFov = true;
 	inline bool bAimbot = false;
 	inline bool bWaitAfterTargetting = true;
+	inline bool bStandaloneRCS = false;
 	inline float flSmoothing = 10.f;
 	inline float flCorrecting = 40.f;
 	inline float flReactionTime = 0.f;

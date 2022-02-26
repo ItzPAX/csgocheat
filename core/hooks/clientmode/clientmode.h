@@ -11,6 +11,9 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 
 	// check if we have a local player
 	if (Game::g_pLocal) {
+		if (Variables::bStandaloneRCS)
+			g_LegitBot.StandaloneRCS(cmd);
+
 		// call aimbot
 		g_LegitBot.AimAtBestPlayer();
 	}

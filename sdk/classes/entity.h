@@ -118,4 +118,5 @@ public:
 	int iGetHitboxSet() { return g_NetVars.GetNetvar<int>(XOR("DT_BasePlayer"), XOR("m_nHitboxSet"), this); }
 	int iHealth() { return g_NetVars.GetNetvar<int>(XOR("DT_BasePlayer"), XOR("m_iHealth"), this); }
 	Vec3D vEyeAngles() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_CSPlayer"), XOR("m_angEyeAngles"), this); }
+	int iShotsFired() { return g_NetVars.GetNetvar<int>("DT_CSPlayer", "m_iShotsFired", this); }
 };

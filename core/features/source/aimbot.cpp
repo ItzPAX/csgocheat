@@ -44,23 +44,23 @@ AimPlayer LegitBot::GetClosestEnemyToCrosshair(float flFov, Vec3D& vViewAngles, 
 	if (Variables::bDistanceBasedFov) {
 		float flDistanceBestDelta = DistanceAdjustedFOV(flFov, vEyeOrigin, pBestPlayer->vEyeOrigin(), pBestPlayer);
 		if (flDistanceBestDelta > flBestDelta)
-			return AimPlayer{ pBestPlayer, iBestHitbox };
+			return AimPlayer{ pBestPlayer, iBestHitbox, flDistanceBestDelta };
 		else
-			return AimPlayer{ nullptr, Hitboxes::HitboxNone };
+			return AimPlayer{ nullptr, Hitboxes::HitboxNone, flBestDelta };
 	}
 
-	return AimPlayer{ pBestPlayer, iBestHitbox };
+	return AimPlayer{ pBestPlayer, iBestHitbox, flBestDelta };
 }
 
-void LegitBot::SmoothAim(Vec3D& vViewAngles, Vec3D& vAngle, float flSmoothingVal) {
+void LegitBot::SmoothAim(Vec3D& vViewAngles, Vec3D& vAngle, float flSmoothingVal, float flFov) {
 	// no division by zero
 	if (flSmoothingVal == 0.f)
 		return;
 
-	float flDist = (vViewAngles - vAngle).Normalized().Length2D() / flSmoothingVal;
+	float flMod = flFov / 5;
 
 	// adjust smoothing
-	vAngle = (vViewAngles + (vAngle - vViewAngles).Clamped() / (flSmoothingVal / flDist)).Clamped();
+	vAngle = (vViewAngles + (vAngle - vViewAngles).Clamped() / (flSmoothingVal / flMod)).Clamped();
 }
 
 void LegitBot::CompensateRecoil(Vec3D& vAngle, Vec3D vAimPunchAngle, float flCorrection) {
@@ -68,8 +68,21 @@ void LegitBot::CompensateRecoil(Vec3D& vAngle, Vec3D vAimPunchAngle, float flCor
 	vAngle.y -= vAimPunchAngle.y * (1.f + (flCorrection / 100.f));
 }
 
+void LegitBot::StandaloneRCS(CUserCmd* cmd) {
+	static Vec3D vOldPunch(0, 0, 0);
+	if (Game::g_pLocal->iShotsFired() > 1) {
+		Vec3D vAimPunch = Game::g_pLocal->vGetAimPunchAngle() * (1 + (Variables::flCorrecting / 100.f));
+		Vec3D vRCS = cmd->viewangles - (vAimPunch - vOldPunch);
+		vRCS.Clamp();
+		vRCS.Normalize();
+		g_Interface.pEngine->SetViewAngles(vRCS);
+		vOldPunch = vAimPunch;
+	}
+	else vOldPunch.x = vOldPunch.y = vOldPunch.z = 0;
+}
+
 bool LegitBot::AimAtBestPlayer() {
-	if (!Variables::bAimbot)
+	if (!Variables::bAimbot || Game::g_pLocal->iTeamNum() == 1 || Game::g_pLocal->iTeamNum() == 0);
 		return false;
 
 	if (!GetAsyncKeyState(VK_LBUTTON))
@@ -125,8 +138,9 @@ bool LegitBot::AimAtBestPlayer() {
 	Vec3D vAngle;
 	g_Math.CalcAngle(vEyeOrigin, pPlayer->vGetHitboxPos(pAimPlayer.iHitbox), vAngle);
 
-	CompensateRecoil(vAngle, vAimPunchAngle, Variables::flCorrecting);
-	SmoothAim(vViewAngles, vAngle, Variables::flSmoothing);
+	if (!Variables::bStandaloneRCS)
+		CompensateRecoil(vAngle, vAimPunchAngle, Variables::flCorrecting);
+	SmoothAim(vViewAngles, vAngle, Variables::flSmoothing, pAimPlayer.flFov);
 
 	// if Non Sticky extra calculation
 	if (Variables::bNonSticky)

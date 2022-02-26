@@ -151,20 +151,17 @@ void HookManager::LogHookStatus(IHookStatus ihs) {
 #pragma region HkFunctions
 void __stdcall HudUpdate::hkHudUpdate(bool bActive) {
 	// do worldtoscreen here (only once per frame)
-	cHudUpdate();
-
+	if (Game::g_pLocal)
+		cHudUpdate();
 	oHudUpdate(bActive);
 }
 void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags = STUDIORENDER_DRAW_ENTIRE_MODEL) {
-	if (Game::g_pLocal) {
+	if (Game::g_pLocal)
 		cDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
-	}
-
 	DrawModel::oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 }	
 bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	// relay function
-	CreateMove::oCreateMove(flInputSampleTime, cmd);
 	cCreateMove(flInputSampleTime, cmd);
 	return false;
 }
