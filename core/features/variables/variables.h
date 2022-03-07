@@ -5,8 +5,8 @@ namespace Variables {
 	// chams
 	inline int iChamType = 0;
 
-	inline bool bEnemyChamsVis = true;
-	inline bool bEnemyChamsInvis = true;
+	inline bool bEnemyChamsVis = false;
+	inline bool bEnemyChamsInvis = false;
 
 	inline Color cVisColor;
 	inline float flVisCol[4] = { 1.f,0.3f,0.6f,1.f };
@@ -14,15 +14,15 @@ namespace Variables {
 	inline float flInvisCol[4] = { 0.6f,0.9f,0.3f,1.f };
 		   
 	// esp
-	inline bool bNameEsp = true;
-	inline bool bBoxEsp = true;
-	inline bool bHealthEsp = true;
+	inline bool bNameEsp = false;
+	inline bool bBoxEsp = false;
+	inline bool bHealthEsp = false;
 
 	// aimbot
-	inline bool bNonSticky = true;
-	inline bool bDistanceBasedFov = true;
+	inline bool bNonSticky = false;
+	inline bool bDistanceBasedFov = false;
 	inline bool bAimbot = false;
-	inline bool bWaitAfterTargetting = true;
+	inline bool bWaitAfterTargetting = false;
 	inline bool bStandaloneRCS = false;
 	inline float flSmoothing = 10.f;
 	inline float flCorrecting = 40.f;
