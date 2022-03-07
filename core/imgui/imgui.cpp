@@ -2522,6 +2522,8 @@ void ImGui::PushStyleColor(ImGuiCol idx, const ImVec4& col)
 void ImGui::PopStyleColor(int count)
 {
     ImGuiContext& g = *GImGui;
+    if (count >= g.ColorStack.size())
+        return;
     while (count > 0)
     {
         ImGuiColorMod& backup = g.ColorStack.back();

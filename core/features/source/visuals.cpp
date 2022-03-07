@@ -55,19 +55,19 @@ void Visuals::SortPlayers() {
 }
 
 void Visuals::DrawBox(RECT rPlayerRect, Color col) {
-	g_Render.DrawOutlinedRect(rPlayerRect.left, rPlayerRect.top, (rPlayerRect.right - rPlayerRect.left), (rPlayerRect.bottom - rPlayerRect.top), Color(20,100,130,col.a));
+	g_Render.DrawOutlinedRect(rPlayerRect.left, rPlayerRect.top, (rPlayerRect.right - rPlayerRect.left), (rPlayerRect.bottom - rPlayerRect.top), Color(20,100,130,col.rgba[3]));
 
 	// box outline
-	g_Render.DrawOutlinedRect(rPlayerRect.left + 1, rPlayerRect.top + 1, (rPlayerRect.right - rPlayerRect.left) - 2, (rPlayerRect.bottom - rPlayerRect.top) - 2, Color::Black(col.a));
-	g_Render.DrawOutlinedRect(rPlayerRect.left - 1, rPlayerRect.top - 1, (rPlayerRect.right - rPlayerRect.left) + 2, (rPlayerRect.bottom - rPlayerRect.top) + 2, Color::Black(col.a));
+	g_Render.DrawOutlinedRect(rPlayerRect.left + 1, rPlayerRect.top + 1, (rPlayerRect.right - rPlayerRect.left) - 2, (rPlayerRect.bottom - rPlayerRect.top) - 2, Color::Black(col.rgba[3]));
+	g_Render.DrawOutlinedRect(rPlayerRect.left - 1, rPlayerRect.top - 1, (rPlayerRect.right - rPlayerRect.left) + 2, (rPlayerRect.bottom - rPlayerRect.top) + 2, Color::Black(col.rgba[3]));
 }
 
 void Visuals::DrawName(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info) {
 	Vec2D vSize = g_Render.TextSize(g_Render.pEspFont, info.name);
 
 	// box
-	g_Render.DrawFilledRect((rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) - (vSize.x / 1.6), (rPlayerRect.top - vSize.y * 1.5) - 1, vSize.x * 1.3f, vSize.y * 1.25f, Color(30, 30, 30, col.a));
-	g_Render.DrawLine((rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) - (vSize.x / 1.6), (rPlayerRect.top - 4), (rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) + (vSize.x / 1.5), (rPlayerRect.top - 4), 1, Color(130,20,60,col.a));
+	g_Render.DrawFilledRect((rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) - (vSize.x / 1.6), (rPlayerRect.top - vSize.y * 1.5) - 1, vSize.x * 1.3f, vSize.y * 1.25f, Color(30, 30, 30, col.rgba[3]));
+	g_Render.DrawLine((rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) - (vSize.x / 1.6), (rPlayerRect.top - 4), (rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) + (vSize.x / 1.5), (rPlayerRect.top - 4), 1, Color(130,20,60, col.rgba[3]));
 
 	// text
 	g_Render.Text(g_Render.pEspFont, info.name, rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2), (rPlayerRect.top - vSize.y * 1.5f) - 1, col);
@@ -81,10 +81,10 @@ void Visuals::DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInf
 	str += XOR("hp");
 	Vec2D vSizeHP = g_Render.TextSize(g_Render.pEspFont, str.c_str());
 
-	g_Render.DrawLine(rPlayerRect.left - 4, rPlayerRect.bottom, rPlayerRect.left - 4, rPlayerRect.top, 1, Color(50,50,50,col.a));
+	g_Render.DrawLine(rPlayerRect.left - 4, rPlayerRect.bottom, rPlayerRect.left - 4, rPlayerRect.top, 1, Color(50,50,50,col.rgba[3]));
 	g_Render.DrawLine(rPlayerRect.left - 4, rPlayerRect.bottom, rPlayerRect.left - 4, flScaledNum, 1, col);
 
-	g_Render.Text(g_Render.pEspFont, str.c_str(), rPlayerRect.left - (vSizeHP.x / 2.f) - 5, flScaledNum - (vSizeHP.y / 2), Color::White(col.a));
+	g_Render.Text(g_Render.pEspFont, str.c_str(), rPlayerRect.left - (vSizeHP.x / 2.f) - 5, flScaledNum - (vSizeHP.y / 2), Color::White(col.rgba[3]));
 }
 
 void Visuals::DrawDormant(Player* pPlayer, RECT rPlayerRect) {

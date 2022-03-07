@@ -82,7 +82,7 @@ void LegitBot::StandaloneRCS(CUserCmd* cmd) {
 }
 
 bool LegitBot::AimAtBestPlayer() {
-	if (!Variables::bAimbot || Game::g_pLocal->iTeamNum() == 1 || Game::g_pLocal->iTeamNum() == 0);
+	if (!Variables::bAimbot || Game::g_pLocal->iTeamNum() == 1 || Game::g_pLocal->iTeamNum() == 0)
 		return false;
 
 	if (!GetAsyncKeyState(VK_LBUTTON))

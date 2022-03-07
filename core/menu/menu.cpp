@@ -71,23 +71,67 @@ void Menu::Render() {
 }
 
 void Menu::Draw() {
-	// genuine menu here
-	ImGui::Checkbox(XOR("Box ESP"), &Variables::bBoxEsp);
-	ImGui::Checkbox(XOR("Name ESP"), &Variables::bNameEsp);
-	ImGui::Checkbox(XOR("Health ESP"), &Variables::bHealthEsp);
+	ImVec2 vSize = ImGui::GetWindowSize();
 
-	ImGui::Checkbox(XOR("Enemy Chams Vis"), &Variables::bEnemyChamsVis);
-	ImGui::Checkbox(XOR("Enemy Chams Invis"), &Variables::bEnemyChamsInvis);
+	if (g_Menu.iCurrentTab == 0) {
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.54f, 0.2f, 0.89f, 1.00f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.64f, 0.27f, 0.99f, 1.00f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.84f, 0.47f, 1.f, 1.00f));
+	}
+	if (ImGui::Button("Aimbot", ImVec2((vSize.x / 2) - 18, 25))) g_Menu.iCurrentTab = 0;
+	if (g_Menu.iCurrentTab == 0) ImGui::PopStyleColor(3);
+	ImGui::SameLine();
+	if (g_Menu.iCurrentTab == 1) {
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.54f, 0.2f, 0.89f, 1.00f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.64f, 0.27f, 0.99f, 1.00f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.84f, 0.47f, 1.f, 1.00f));
+	}
+	if (ImGui::Button("ESP", ImVec2((vSize.x / 2) - 18, 25))) g_Menu.iCurrentTab = 1;
+	if (g_Menu.iCurrentTab == 1) ImGui::PopStyleColor(3);
 
-	ImGui::Checkbox(XOR("Aimbot"), &Variables::bAimbot);
-	ImGui::Checkbox(XOR("Non-Sticky Aimbot"), &Variables::bNonSticky);
-	ImGui::Checkbox(XOR("Distance Based FOV"), &Variables::bDistanceBasedFov);
-	ImGui::Checkbox(XOR("Wait after locked"), &Variables::bWaitAfterTargetting);
-	ImGui::SliderFloat(XOR("Aimbot ReactionTime"), &Variables::flReactionTime, 0.f, 4.f, "%.2fs", 0.25f);
-	ImGui::SliderFloat(XOR("Aimbot Smoothing"), &Variables::flSmoothing, 1.f, 100.f, "%.0f%", 1.f);
-	ImGui::SliderFloat(XOR("RCS Correction"), &Variables::flCorrecting, 0.f, 100.f, "%.0f%", 1.f);
-	ImGui::Checkbox(XOR("Standalone RCS"), &Variables::bStandaloneRCS);
-	ImGui::SliderFloat(XOR("Aimbot FOV"), &Variables::flFov, 0.f, 180.f, "%.0f%", 1.f);
+	ImGui::NewLine();
+
+	switch (g_Menu.iCurrentTab) {
+		//AIMBOT
+	case 0: {
+		ImGui::Text("Main Aimbot");
+		ImGui::BeginChild("Main-Aimbot", ImVec2(0.f, 0.f), true);
+		ImGui::Checkbox(XOR("Aimbot"), &Variables::bAimbot);
+		ImGui::Checkbox(XOR("Non-Sticky Aimbot"), &Variables::bNonSticky);
+		ImGui::Checkbox(XOR("Distance Based FOV"), &Variables::bDistanceBasedFov);
+		ImGui::Checkbox(XOR("Wait after locked"), &Variables::bWaitAfterTargetting);
+		ImGui::SliderFloat(XOR("Aimbot ReactionTime"), &Variables::flReactionTime, 0.f, 4.f, "%.2fs", 0.25f);
+		ImGui::SliderFloat(XOR("Aimbot Smoothing"), &Variables::flSmoothing, 1.f, 100.f, "%.0f%", 1.f);
+		ImGui::SliderFloat(XOR("RCS Correction"), &Variables::flCorrecting, 0.f, 100.f, "%.0f%", 1.f);
+		ImGui::Checkbox(XOR("Standalone RCS"), &Variables::bStandaloneRCS);
+		ImGui::SliderFloat(XOR("Aimbot FOV"), &Variables::flFov, 0.f, 180.f, "%.0f%", 1.f);
+		ImGui::EndChild();
+	}
+		  break;
+		  //ESP
+	case 1: {
+		ImGui::Text("Main ESP");
+		ImGui::BeginChild("Main-ESP", ImVec2(0.f, 0.f), true);
+		ImGui::Checkbox(XOR("Box ESP"), &Variables::bBoxEsp);
+		ImGui::Checkbox(XOR("Name ESP"), &Variables::bNameEsp);
+		ImGui::Checkbox(XOR("Health ESP"), &Variables::bHealthEsp);
+
+		static const char* pChamTypes[] = { "Material", "Flat" };
+		ImGui::Combo(XOR("Chams Type"), &Variables::iChamType, pChamTypes, IM_ARRAYSIZE(pChamTypes));
+
+		ImGui::Checkbox(XOR("Enemy Chams Vis		  "), &Variables::bEnemyChamsVis);
+		ImGui::SameLine();
+		ImGui::ColorEdit4(XOR("Vis Col"), Variables::flVisCol, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+		Variables::cVisColor.SetFromPercent(Variables::flVisCol);
+
+		ImGui::Checkbox(XOR("Enemy Chams Invis		"), &Variables::bEnemyChamsInvis);
+		ImGui::SameLine();
+		ImGui::ColorEdit4(XOR("Invis Col"), Variables::flInvisCol, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+		Variables::cInvisColor.SetFromPercent(Variables::flInvisCol);
+		ImGui::EndChild();
+	}
+		  break;
+	}
 }
 
 void Menu::Init() {

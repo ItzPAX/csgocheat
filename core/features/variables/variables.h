@@ -3,8 +3,15 @@
 
 namespace Variables {
 	// chams
+	inline int iChamType = 0;
+
 	inline bool bEnemyChamsVis = true;
 	inline bool bEnemyChamsInvis = true;
+
+	inline Color cVisColor;
+	inline float flVisCol[4] = { 1.f,0.3f,0.6f,1.f };
+	inline Color cInvisColor;
+	inline float flInvisCol[4] = { 0.6f,0.9f,0.3f,1.f };
 		   
 	// esp
 	inline bool bNameEsp = true;

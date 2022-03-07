@@ -15,7 +15,7 @@ bool Render::InitRenderer() {
 }
 
 void Render::DrawFilledRect(int x, int y, int w, int h, Color _col) {
-	D3DCOLOR _Col = D3DCOLOR_ARGB((int)_col.a, (int)_col.r, (int)_col.g, (int)_col.b);
+	D3DCOLOR _Col = D3DCOLOR_ARGB((int)_col.rgba[3], (int)_col.rgba[0], (int)_col.rgba[1], (int)_col.rgba[2]);
 
 	vertex V[4];
 
@@ -70,7 +70,7 @@ void Render::DrawLine(int x1, int y1, int x2, int y2, int width, Color _col) {
 	Line[1] = D3DXVECTOR2(x2, y2);
 
 	g_Render.g_pLine->SetWidth(width);
-	g_Render.g_pLine->Draw(Line, 2, D3DCOLOR_ARGB((int)_col.a, (int)_col.r, (int)_col.g, (int)_col.b));
+	g_Render.g_pLine->Draw(Line, 2, D3DCOLOR_ARGB((int)_col.rgba[3], (int)_col.rgba[0], (int)_col.rgba[1], (int)_col.rgba[2]));
 }
 
 void Render::DrawLine(Vec2D src, Vec2D dst, int width, Color _col) {
@@ -88,10 +88,10 @@ void Render::Text(LPD3DXFONT font, const char* text, float x, float y, Color _co
 	RECT rect;
 
 	SetRect(&rect, x + 1, y + 1, x + 1, y + 1);
-	font->DrawTextA(NULL, text, -1, &rect, DT_CENTER | DT_NOCLIP, D3DCOLOR_ARGB((int)_col.a, 0, 0, 0));
+	font->DrawTextA(NULL, text, -1, &rect, DT_CENTER | DT_NOCLIP, D3DCOLOR_ARGB((int)_col.rgba[3], 0, 0, 0));
 
 	SetRect(&rect, x, y, x, y);
-	font->DrawTextA(NULL, text, -1, &rect, DT_CENTER | DT_NOCLIP, D3DCOLOR_ARGB((int)_col.a, (int)_col.r, (int)_col.g, (int)_col.b));
+	font->DrawTextA(NULL, text, -1, &rect, DT_CENTER | DT_NOCLIP, D3DCOLOR_ARGB((int)_col.rgba[3], (int)_col.rgba[0], (int)_col.rgba[1], (int)_col.rgba[2]));
 }
 
 Vec2D Render::TextSize(LPD3DXFONT font, const char* text) {

@@ -3,19 +3,25 @@
 
 class Color {
 public:
-	float r, g, b, a;
+	// 0-r | 1-g | 2-b | 3-a
+	float rgba[4];
+	
 	Color() = default;
 	Color(float cr, float cg, float cb, float ca = 255) {
-		r = cr; g = cg; b = cb; a = ca;
+		rgba[0] = cr; rgba[1] = cg; rgba[2] = cb; rgba[3] = ca;
 	}
 
 	Color ToPercent() {
-		return Color(this->r / 255.f, this->g / 255.f, this->b / 255.f, this->a / 255.f);
+		return Color(rgba[0] / 255.f, rgba[1] / 255.f, rgba[2] / 255.f, rgba[3] / 255.f);
+	}
+
+	void SetFromPercent(float* flVals) {
+		this->rgba[0] = flVals[0] * 255.f; this->rgba[1] = flVals[1] * 255.f; this->rgba[2] = flVals[2] * 255.f; this->rgba[3] = flVals[3] * 255.f;
 	}
 
 	// imgui translation stuff
 	ImVec4 ToVec4D() {
-		return ImVec4(this->r, this->g, this->b, this->a);
+		return ImVec4(this->rgba[0], this->rgba[1], this->rgba[2], this->rgba[3]);
 	}
 	Color FromVec4D(ImVec4 vec) {
 		return Color(vec.x, vec.y, vec.z, vec.w);
