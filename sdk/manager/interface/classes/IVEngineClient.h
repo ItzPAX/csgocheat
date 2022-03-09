@@ -230,9 +230,6 @@ public:
 	virtual void* SaveAllocMemory(size_t num, size_t size) = 0;
 	virtual void		SaveFreeMemory(void* pSaveMem) = 0;
 
-	// returns info interface for client netchannel
-	virtual void* GetNetChannelInfo(void) = 0;
-
 	// Debugging functionality:
 	// Very slow routine to draw a physics model
 	virtual void		DebugDrawPhysCollide(const void* pCollide, void* pMaterial, void* transform, const void* color) = 0;
@@ -387,5 +384,12 @@ public:
 	void SetViewAngles(Vec3D& angles) {
 		using original_fn = void(__thiscall*)(IVEngineClient*, Vec3D&);
 		return (*(original_fn**)this)[19](this, angles);
+	}
+
+
+	// returns info interface for client netchannel
+	class INetChannelInfo* GetNetChannelInfo() {
+		using original_fn = INetChannelInfo * (__thiscall*)(IVEngineClient*);
+		return (*(original_fn**)this)[78](this);
 	}
 };

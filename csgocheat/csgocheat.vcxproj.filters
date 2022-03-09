@@ -163,6 +163,12 @@
     <ClCompile Include="..\core\features\source\aimbot.cpp">
       <Filter>core\features\source</Filter>
     </ClCompile>
+    <ClCompile Include="..\core\features\source\backtrack.cpp">
+      <Filter>core\features\source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\core\features\source\misc.cpp">
+      <Filter>core\features\source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes.h" />
@@ -330,6 +336,45 @@
     </ClInclude>
     <ClInclude Include="..\utilities\tools\xorstr.h">
       <Filter>utilities\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\ICvar.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IAppSystem.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\classes\convar.h">
+      <Filter>sdk\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\classes\INetChannelInfo.h">
+      <Filter>sdk\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\header\backtrack.h">
+      <Filter>core\features\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\header\misc.h">
+      <Filter>core\features\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientUnknown.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\CBaseHandle.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IHandleEntity.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\ICollideable.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientEntity.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientThinkable.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientNetworkable.h">
+      <Filter>sdk\manager\interface\classes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

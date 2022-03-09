@@ -188,7 +188,13 @@
     <ClCompile Include="..\core\features\source\aimbot.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\core\features\source\backtrack.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\core\features\source\chams.cpp" />
+    <ClCompile Include="..\core\features\source\misc.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\core\features\source\visuals.cpp" />
     <ClCompile Include="..\core\hooks\directx\directx.cpp" />
     <ClCompile Include="..\core\hooks\hooks.cpp" />
@@ -238,7 +244,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\core\features\header\aimbot.h" />
+    <ClInclude Include="..\core\features\header\backtrack.h" />
     <ClInclude Include="..\core\features\header\chams.h" />
+    <ClInclude Include="..\core\features\header\misc.h" />
     <ClInclude Include="..\core\features\header\visuals.h" />
     <ClInclude Include="..\core\features\variables\variables.h" />
     <ClInclude Include="..\core\hooks\clientmode\clientmode.h" />
@@ -260,17 +268,28 @@
     <ClInclude Include="..\includes.h" />
     <ClInclude Include="..\pch\pch.h" />
     <ClInclude Include="..\sdk\classes\collideable.h" />
+    <ClInclude Include="..\sdk\classes\convar.h" />
     <ClInclude Include="..\sdk\classes\cusercmd.h" />
     <ClInclude Include="..\sdk\classes\entity.h" />
     <ClInclude Include="..\sdk\classes\entityclass.h" />
+    <ClInclude Include="..\sdk\classes\INetChannelInfo.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\CBaseHandle.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\CGlobalVars.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\DebugOverlay.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IAppSystem.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IBaseClientDLL.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientEntity.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IClientEntityList.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IClientMode.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientNetworkable.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IClientRenderable.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientThinkable.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientUnknown.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\ICollideable.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\ICvar.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IEngineTrace.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IGameConsole.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IHandleEntity.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IInputSystem.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IMaterial.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IMaterialSystem.h" />

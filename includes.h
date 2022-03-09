@@ -33,13 +33,16 @@ using uchar = unsigned char;
 #include "utilities/math/math.h"
 
 // sdk
-#include "sdk/classes/collideable.h"
+#include "sdk/manager/interface/classes/ICollideable.h"
+#include "sdk/manager/interface/classes/IClientUnknown.h"
 #include "sdk/manager/interface/interface.h"
 #include "sdk/manager/netvars/netvars.h"
 #include "sdk/structs/models.h"
 #include "sdk/classes/entity.h"
 #include "sdk/classes/cusercmd.h"
 #include "sdk/classes/entityclass.h"
+#include "sdk/classes/INetChannelInfo.h"
+#include "sdk/classes/convar.h"
 
 // includes
 #include "utilities/tools/tools.h"
@@ -56,6 +59,8 @@ using uchar = unsigned char;
 #include "core/features/header/visuals.h"
 #include "core/features/header/chams.h"
 #include "core/features/header/aimbot.h"
+#include "core/features/header/backtrack.h"
+#include "core/features/header/misc.h"
 
 // externs
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);

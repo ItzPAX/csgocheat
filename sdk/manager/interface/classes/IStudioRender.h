@@ -1,6 +1,7 @@
 #pragma once
 #include "IMaterial.h"
 #include "IMaterialSystem.h"
+#include "IAppSystem.h"
 
 using Quaternion = float[4];
 using RadEuler = float[3];
@@ -254,21 +255,15 @@ struct ColorMeshInfo_t {
 
 struct DrawModelInfo {
 	StudioHDR* m_pStudioHdr;
-	StudioHWData* m_pHardwareData;
-	StudioDecalHandle m_Decals;
-	int				m_Skin;
-	int				m_Body;
-	int				m_HitboxSet;
-	void*			m_pClientEntity;
-	int				m_Lod;
-	ColorMeshInfo_t* m_pColorMeshes;
-	bool			m_bStaticLighting;
-	Vec3D			m_vecAmbientCube[6];		// ambient, and lights that aren't in locallight[]
-	int				m_nLocalLightCount;
-	void*			m_Pad[4];
+	void* m_pHardwareData;
+	int m_iDecals;
+	int m_iSkin;
+	int m_iBody;
+	int m_iHitboxSet;
+	IClientRenderable* m_pRenderable;
 };
 
-class IStudioRender {
+class IStudioRender : IAppSystem {
 public:
 	// outdated, maybe find new funcs
 

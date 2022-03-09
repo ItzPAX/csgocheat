@@ -5,7 +5,7 @@ Menu g_Menu;
 
 void Menu::Render() {
 	// apply style
-	ImGuiStyle* style = &ImGui::GetStyle();
+	style = &ImGui::GetStyle();
 
 	style->WindowPadding = ImVec2(15, 15);
 	//style->WindowRounding = 5.0f;
@@ -72,13 +72,15 @@ void Menu::Render() {
 
 void Menu::Draw() {
 	ImVec2 vSize = ImGui::GetWindowSize();
+	if (!style)
+		ImGui::Render();
 
 	if (g_Menu.iCurrentTab == 0) {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.54f, 0.2f, 0.89f, 1.00f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.64f, 0.27f, 0.99f, 1.00f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.84f, 0.47f, 1.f, 1.00f));
 	}
-	if (ImGui::Button("Aimbot", ImVec2((vSize.x / 2) - 18, 25))) g_Menu.iCurrentTab = 0;
+	if (ImGui::Button(XOR("Aimbot"), ImVec2((vSize.x / 3) - style->WindowPadding.x, 25))) g_Menu.iCurrentTab = 0;
 	if (g_Menu.iCurrentTab == 0) ImGui::PopStyleColor(3);
 	ImGui::SameLine();
 	if (g_Menu.iCurrentTab == 1) {
@@ -86,16 +88,24 @@ void Menu::Draw() {
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.64f, 0.27f, 0.99f, 1.00f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.84f, 0.47f, 1.f, 1.00f));
 	}
-	if (ImGui::Button("ESP", ImVec2((vSize.x / 2) - 18, 25))) g_Menu.iCurrentTab = 1;
+	if (ImGui::Button(XOR("ESP"), ImVec2((vSize.x / 3) - style->WindowPadding.x, 25))) g_Menu.iCurrentTab = 1;
 	if (g_Menu.iCurrentTab == 1) ImGui::PopStyleColor(3);
+	ImGui::SameLine();
+	if (g_Menu.iCurrentTab == 2) {
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.54f, 0.2f, 0.89f, 1.00f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.64f, 0.27f, 0.99f, 1.00f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.84f, 0.47f, 1.f, 1.00f));
+	}
+	if (ImGui::Button(XOR("Misc"), ImVec2((vSize.x / 3) - style->WindowPadding.x, 25))) g_Menu.iCurrentTab = 2;
+	if (g_Menu.iCurrentTab == 2) ImGui::PopStyleColor(3);
 
 	ImGui::NewLine();
 
 	switch (g_Menu.iCurrentTab) {
 		//AIMBOT
 	case 0: {
-		ImGui::Text("Main Aimbot");
-		ImGui::BeginChild("Main-Aimbot", ImVec2(0.f, 0.f), true);
+		ImGui::Text(XOR("Main Aimbot"));
+		ImGui::BeginChild(XOR("Main-Aimbot"), ImVec2(0.f, 0.f), true);
 		ImGui::Checkbox(XOR("Aimbot"), &Variables::bAimbot);
 		ImGui::Checkbox(XOR("Non-Sticky Aimbot"), &Variables::bNonSticky);
 		ImGui::Checkbox(XOR("Distance Based FOV"), &Variables::bDistanceBasedFov);
@@ -110,8 +120,8 @@ void Menu::Draw() {
 		  break;
 		  //ESP
 	case 1: {
-		ImGui::Text("Main ESP");
-		ImGui::BeginChild("Main-ESP", ImVec2(0.f, 0.f), true);
+		ImGui::Text(XOR("Main ESP"));
+		ImGui::BeginChild(XOR("Main-ESP"), ImVec2(0.f, 0.f), true);
 		ImGui::Checkbox(XOR("Box ESP"), &Variables::bBoxEsp);
 		ImGui::Checkbox(XOR("Name ESP"), &Variables::bNameEsp);
 		ImGui::Checkbox(XOR("Health ESP"), &Variables::bHealthEsp);
@@ -128,9 +138,19 @@ void Menu::Draw() {
 		ImGui::SameLine();
 		ImGui::ColorEdit4(XOR("Invis Col"), Variables::flInvisCol, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 		Variables::cInvisColor.SetFromPercent(Variables::flInvisCol);
+
+		ImGui::Checkbox(XOR("Lagcomp Chams"), &Variables::bLagcompChams);
+
 		ImGui::EndChild();
 	}
 		  break;
+	case 2: {
+		ImGui::Text(XOR("Main Misc"));
+		ImGui::BeginChild(XOR("Main-Misc"), ImVec2(0.f, 0.f), true);
+		ImGui::Checkbox(XOR("Bunnyhop"), &Variables::bBunnyHop);
+		ImGui::Checkbox(XOR("Lagcompensation"), &Variables::bLagcomp);
+		ImGui::EndChild();
+	}
 	}
 }
 

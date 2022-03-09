@@ -2,6 +2,7 @@
 #include "includes.h"
 #include "pch.h"
 
+static bool bBacktrackInit = false;
 void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	// set cmd to be globally accessible
 	Game::g_pCmd = cmd;
@@ -9,12 +10,21 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	// do shit here
 	Game::g_pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
 
-	// check if we have a local player
-	if (Game::g_pLocal) {
-		if (Variables::bStandaloneRCS)
-			g_LegitBot.StandaloneRCS(cmd);
+	if (!Game::g_pLocal)
+		return;
 
-		// call aimbot
-		g_LegitBot.AimAtBestPlayer();
+	if (!bBacktrackInit) {
+		g_Backtrack.Init();
+		bBacktrackInit = true;
 	}
+
+	g_Backtrack.RecordData();
+	
+	g_Misc.BunnyHop(cmd);
+
+	if (Variables::bStandaloneRCS)
+		g_LegitBot.StandaloneRCS(cmd);
+
+	// call aimbot
+	g_LegitBot.AimAtBestPlayer();
 }

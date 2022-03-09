@@ -56,6 +56,8 @@ bool Interface::Init() {
 	pPanel = (IPanel*)GetInterface(XOR("vgui2.dll"), XOR("VGUI_Panel"));
 	pModelInfo = (IVModelInfo*)GetInterface(XOR("engine.dll"), XOR("VModelInfoClient"));
 	pEngineTrace = (IEngineTrace*)GetInterface(XOR("engine.dll"), XOR("EngineTraceClient"));
+	pICVar = (ICvar*)GetInterface(XOR("vstdlib.dll"), XOR("VEngineCvar"));
+	pICVarQuery = (ICvarQuery*)GetInterface(XOR("vstdlib.dll"), XOR("VCvarQuery"));
 	
 
 	// custom interfaces

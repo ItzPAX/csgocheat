@@ -12,48 +12,57 @@ void Chams::OverrideMaterial(int iMatIndex, bool bIgnoreZ, Color col) {
 }
 
 void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags) {
-	// sanity check
-	if (!Game::g_pLocal || !info.m_pClientEntity) {
+	if (!Game::g_pLocal || !info.m_pRenderable)
 		return;
-	}
 	
-	Entity* pEntity = reinterpret_cast<Entity*>(info.m_pClientEntity);
-
-	if (!pEntity)
+	Entity* pEntity = info.m_pRenderable->GetIClientUnknown()->GetBaseEntity();
+	if (!pEntity || !pEntity->bIsPlayer())
 		return;
 
-	// we have found a player
-	if (pEntity->iTeamNum() == 2 || pEntity->iTeamNum() == 3) {
+	Player* pPlayer = reinterpret_cast<Player*>(pEntity);
 
-		Player* pPlayer = reinterpret_cast<Player*>(pEntity);
+	// we have found a valid player
+	if (!pPlayer->bIsAlive())
+		return;
 
-		bool bEnemy = pPlayer->bIsEnemy(Game::g_pLocal);
+	bool bEnemy = pPlayer->bIsEnemy(Game::g_pLocal);
 
-		// enemy chams
-		if (bEnemy) {
+	// enemy chams
+	if (bEnemy) {
 
-			// xqz chams
-			if (Variables::bEnemyChamsInvis) {
-				OverrideMaterial(Variables::iChamType, true, Variables::cInvisColor.ToPercent());
-				c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
-			}
-
-			g_Interface.pModelRender->OverrideMaterial(nullptr); // change overwritten material to default
-
-			if (Variables::bEnemyChamsVis) {
-				OverrideMaterial(Variables::iChamType, false, Variables::cVisColor.ToPercent());
-				c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+		// backtrack chams
+		if (Variables::bLagcompChams) {
+			for (int i = 0; i < g_Backtrack.deqLagRecords[pPlayer->iIndex()].size(); i++) {
+				if (!g_Backtrack.ValidTick(g_Backtrack.deqLagRecords[pPlayer->iIndex()][i]) || !g_Backtrack.deqLagRecords[pPlayer->iIndex()][i].boneMat)
+					continue;
+				OverrideMaterial(Variables::iChamType, false, Color(255 - (i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size())), i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size()), 255, 30));
+				c_oDrawModel(pEcx, pEdx, pResults, info, g_Backtrack.deqLagRecords[pPlayer->iIndex()][i].boneMat, pFlexWeights, pFlexDelayedWeights, g_Backtrack.deqLagRecords[pPlayer->iIndex()][i].vOrigin, flags);
 			}
 		}
 
-		// team chams
-		if (!bEnemy) {
+		PostLagcompChams:
 
+		// xqz chams
+		if (Variables::bEnemyChamsInvis) {
+			OverrideMaterial(Variables::iChamType, true, Variables::cInvisColor.ToPercent());
+			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 		}
 
-		// local chams
-		if (pPlayer == Game::g_pLocal) {
+		g_Interface.pModelRender->OverrideMaterial(nullptr); // change overwritten material to default
 
+		if (Variables::bEnemyChamsVis) {
+			OverrideMaterial(Variables::iChamType, false, Variables::cVisColor.ToPercent());
+			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 		}
+	}
+
+	// team chams
+	if (!bEnemy) {
+
+	}
+
+	// local chams
+	if (pPlayer == Game::g_pLocal) {
+
 	}
 }

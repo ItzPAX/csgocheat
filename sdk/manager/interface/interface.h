@@ -16,6 +16,7 @@
 #include "classes/ISurface.h"
 #include "classes/IVModelInfo.h"
 #include "classes/IEngineTrace.h"
+#include "classes/ICvar.h"
 
 class Interface {
 private:
@@ -37,6 +38,8 @@ public:
 	ISurface* pSurface;
 	IPanel* pPanel;
 	IVModelInfo* pModelInfo;
+	ICvar* pICVar;
+	ICvarQuery* pICVarQuery;
 	IEngineTrace* pEngineTrace;
 	
 

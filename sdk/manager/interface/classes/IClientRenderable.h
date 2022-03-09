@@ -4,6 +4,9 @@
 
 class IClientRenderable {
 public:
+	// Gets at the containing class...
+	virtual IClientUnknown* GetIClientUnknown() = 0;
+
 	bool SetupBones(Matrix pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime) {
 		using original_fn = bool(__thiscall*)(IClientRenderable*, Matrix, int, int, float);
 		return (*(original_fn**)this)[13](this, pBoneToWorldOut, nMaxBones, boneMask, currentTime);

@@ -2,11 +2,16 @@
 #include "includes.h"
 
 namespace Variables {
+	// misc
+	inline bool bBunnyHop = false;
+	inline bool bLagcomp = false;
+
 	// chams
 	inline int iChamType = 0;
 
 	inline bool bEnemyChamsVis = false;
 	inline bool bEnemyChamsInvis = false;
+	inline bool bLagcompChams = false;
 
 	inline Color cVisColor;
 	inline float flVisCol[4] = { 1.f,0.3f,0.6f,1.f };
