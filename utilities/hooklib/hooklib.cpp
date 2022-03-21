@@ -279,3 +279,48 @@ HookStatus HookLib::GetHookInfo(const char* sName, int ind) {
 
     return HookStatus();
 }
+
+uintptr_t HookLib::FindCodeCave(const char* cModuleName, size_t iSize) {
+    MODULEINFO moduleInfo = GetModuleInfo(cModuleName);
+    uintptr_t pFinalAddr = 0x00;
+    BYTE* moduleContent = (BYTE*)malloc(moduleInfo.SizeOfImage);
+    if (!moduleContent)
+        return -1;
+
+    memcpy(moduleContent, moduleInfo.lpBaseOfDll, moduleInfo.SizeOfImage - 1);
+
+    for (int i = 0; i < moduleInfo.SizeOfImage; i++)
+    {
+        bool found = true;
+        for (int j = 0; j < iSize + 1; j++)
+        {
+            if (moduleContent[i + j] != 0x00)
+                found = false;
+        }
+
+        if (found == true)
+            return ((uintptr_t)moduleInfo.lpBaseOfDll + i);
+    }
+
+    return -1;
+}
+
+// TODO: Emlin pls fix
+LPVOID HookLib::HookVMT(LPVOID lpVirtualTable, PVOID phkFunction, UINT16 nIndex) {
+    // the virtual table and function we want to hook
+    uintptr_t dwVTable = *((uintptr_t*)lpVirtualTable);
+    uintptr_t dwEntry = dwVTable + (sizeof(uintptr_t) * nIndex);
+    uintptr_t dwOrig = *((uintptr_t*)dwEntry);
+
+    // change prot so we can override
+    DWORD oProc;
+    VirtualProtect((LPVOID)dwEntry, sizeof(dwEntry), PAGE_EXECUTE_READWRITE, &oProc);
+
+    // swap the pointer
+    *((uintptr_t*)dwEntry) = (uintptr_t)phkFunction;
+
+    VirtualProtect((LPVOID)dwEntry, sizeof(dwEntry), oProc, &oProc);
+
+    // return the original pointer
+    return (LPVOID)dwOrig;
+}

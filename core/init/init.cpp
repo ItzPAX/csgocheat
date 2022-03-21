@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "includes.h"
+#include "convar.h"
 
 Init g_Init{ };
 
@@ -33,6 +34,10 @@ ulong __stdcall Init::InitAll(void* p) {
 	if (!g_HookManager.InitAllHooks())
 		return 0;
 	std::cout << XOR("[ RAYBOT ] Successfully Initialized Hooks\n");
+
+	if (!InitConvars())
+		return 0;
+	std::cout << XOR("[ RAYBOT ] Successfully Initialized ConVars\n");
 
 	return 1;
 }

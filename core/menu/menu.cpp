@@ -149,8 +149,11 @@ void Menu::Draw() {
 		ImGui::BeginChild(XOR("Main-Misc"), ImVec2(0.f, 0.f), true);
 		ImGui::Checkbox(XOR("Bunnyhop"), &Variables::bBunnyHop);
 		ImGui::Checkbox(XOR("Lagcompensation"), &Variables::bLagcomp);
+		ImGui::Checkbox(XOR("Accurate Lagcomp"), &Variables::bAccurateLagcomp);
 		ImGui::EndChild();
 	}
+
+		  break;
 	}
 }
 

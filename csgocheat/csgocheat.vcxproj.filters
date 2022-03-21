@@ -169,6 +169,9 @@
     <ClCompile Include="..\core\features\source\misc.cpp">
       <Filter>core\features\source</Filter>
     </ClCompile>
+    <ClCompile Include="..\core\features\source\antiaim.cpp">
+      <Filter>core\features\source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes.h" />
@@ -374,6 +377,18 @@
       <Filter>sdk\manager\interface\classes</Filter>
     </ClInclude>
     <ClInclude Include="..\sdk\manager\interface\classes\IClientNetworkable.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientLeafSystem.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\header\antiaim.h">
+      <Filter>core\features\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\init\convar.h">
+      <Filter>core\init</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IInput.h">
       <Filter>sdk\manager\interface\classes</Filter>
     </ClInclude>
   </ItemGroup>

@@ -64,8 +64,33 @@ void Math::VectorAngles(Vec3D forward, Vec3D& angles) {
 	angles.z = 0.f;
 }
 
+void Math::SinCos(float r, float* s, float* c) {
+	*s = sin(r);
+	*c = sin(r);
+}
+
 void Math::TransformVector(Vec3D& a, Matrix& b, Vec3D& out) {
 	out.x = a.Dot(b.MatVal[0]) + b.MatVal[0][3];
 	out.y = a.Dot(b.MatVal[1]) + b.MatVal[1][3];
 	out.z = a.Dot(b.MatVal[2]) + b.MatVal[2][3];
+}
+
+void Math::AngleVector2(const Vec3D& angles, Vec3D& forward) {
+	float sp, sy, cp, cy;
+
+	SinCos(DEG2RAD(angles[0]), &sp, &cp);
+	SinCos(DEG2RAD(angles[1]), &sy, &cy);
+
+	forward.x = cp * cy;
+	forward.y = cp * sy;
+	forward.z = -sp;
+}
+
+float Math::GetFOV(const Vec3D& viewAngle, const Vec3D& aimAngle) {
+	Vec3D vAng, vAim;
+
+	AngleVector2(viewAngle, vAim);
+	AngleVector2(aimAngle, vAng);
+
+	return RAD2DEG(acos(vAim.Dot(vAim) / vAim.LengthSqr()));
 }

@@ -5,6 +5,7 @@ namespace Variables {
 	// misc
 	inline bool bBunnyHop = false;
 	inline bool bLagcomp = false;
+	inline bool bAccurateLagcomp = false;
 
 	// chams
 	inline int iChamType = 0;
@@ -18,6 +19,9 @@ namespace Variables {
 	inline Color cInvisColor;
 	inline float flInvisCol[4] = { 0.6f,0.9f,0.3f,1.f };
 		   
+	// visuals
+	inline bool bThirdPerson = false;
+
 	// esp
 	inline bool bNameEsp = false;
 	inline bool bBoxEsp = false;

@@ -58,13 +58,14 @@ bool Interface::Init() {
 	pEngineTrace = (IEngineTrace*)GetInterface(XOR("engine.dll"), XOR("EngineTraceClient"));
 	pICVar = (ICvar*)GetInterface(XOR("vstdlib.dll"), XOR("VEngineCvar"));
 	pICVarQuery = (ICvarQuery*)GetInterface(XOR("vstdlib.dll"), XOR("VCvarQuery"));
-	
+	pClientLeafSystem = (IClientLeafSystem*)GetInterface(XOR("client.dll"), XOR("ClientLeafSystem"));
 
 	// custom interfaces
 	pGlobalVars = **reinterpret_cast<CGlobalVars***>((*reinterpret_cast<uintptr_t**>(pClient))[11] + 10);
 
 	// sig interfaces 
 	pClientMode = **reinterpret_cast<IClientMode***>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8B\x0D\x00\x00\x00\x00\x8B\x01\x5D\xFF\x60\x30"), XOR("xx????xxxxxx")) + 0x02);
+	pInput = *reinterpret_cast<IInput**>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\xB9\x00\x00\x00\x00\xF3\x0F\x11\x04\x24\xFF\x50\x10"), XOR("x????xxxxxxxx")) + 0x01);
 
 	return true;
 }

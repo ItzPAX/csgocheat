@@ -17,6 +17,8 @@
 #include "classes/IVModelInfo.h"
 #include "classes/IEngineTrace.h"
 #include "classes/ICvar.h"
+#include "classes/IInput.h"
+#include "classes/IClientLeafSystem.h"
 
 class Interface {
 private:
@@ -41,7 +43,8 @@ public:
 	ICvar* pICVar;
 	ICvarQuery* pICVarQuery;
 	IEngineTrace* pEngineTrace;
-	
+	IClientLeafSystem* pClientLeafSystem;
+	IInput* pInput;
 
 	// TODO: Find Interface entry for this
 	IClientRenderable* pRenderable;

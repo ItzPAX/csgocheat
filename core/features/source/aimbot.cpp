@@ -2,7 +2,7 @@
 
 LegitBot g_LegitBot;
 
-AimPlayer LegitBot::GetClosestEnemyToCrosshair(float flFov, Vec3D& vViewAngles, Vec3D vAimPunchAngle, Vec3D vEyeOrigin) {
+AimPlayer LegitBot::GetClosestEnemyToCrosshair(LagRecord* pRecord, float flFov, Vec3D& vViewAngles, Vec3D vAimPunchAngle, Vec3D vEyeOrigin) {
 	Player* pBestPlayer = nullptr;
 	int iBestHitbox = Hitboxes::HitboxNone;
 	float flBestDelta = flFov;
@@ -17,7 +17,7 @@ AimPlayer LegitBot::GetClosestEnemyToCrosshair(float flFov, Vec3D& vViewAngles, 
 		Vec3D vAngle;
 
 		for (int j = 0; j < sizeof(Variables::iAllowedHitboxes) / sizeof(int); j++) {
-			Vec3D vHitboxPos = pPlayer->vGetHitboxPos(Variables::iAllowedHitboxes[j]);
+			Vec3D vHitboxPos = pRecord != nullptr ? pRecord->GetHitboxPos(Variables::iAllowedHitboxes[j]) : pPlayer->vGetHitboxPos(Variables::iAllowedHitboxes[j]);
 
 			trace_t tTraceRes;
 
@@ -81,7 +81,7 @@ void LegitBot::StandaloneRCS(CUserCmd* cmd) {
 	else vOldPunch.x = vOldPunch.y = vOldPunch.z = 0;
 }
 
-bool LegitBot::AimAtBestPlayer() {
+bool LegitBot::AimAtBestPlayer(LagRecord* pRecord) {
 	if (!Variables::bAimbot || Game::g_pLocal->iTeamNum() == 1 || Game::g_pLocal->iTeamNum() == 0)
 		return false;
 
@@ -98,7 +98,7 @@ bool LegitBot::AimAtBestPlayer() {
 	// get local aimpunchangle
 	Vec3D vAimPunchAngle = Game::g_pLocal->vGetAimPunchAngle();
 
-	AimPlayer pAimPlayer = GetClosestEnemyToCrosshair(Variables::flFov, vViewAngles, vAimPunchAngle, vEyeOrigin);
+	AimPlayer pAimPlayer = GetClosestEnemyToCrosshair(pRecord, Variables::flFov, vViewAngles, vAimPunchAngle, vEyeOrigin);
 	Player* pPlayer = pAimPlayer.pPlayer;
 
 	// we have not found a player return
@@ -136,7 +136,8 @@ bool LegitBot::AimAtBestPlayer() {
 
 	// calc viewangles to shoot at enemy
 	Vec3D vAngle;
-	g_Math.CalcAngle(vEyeOrigin, pPlayer->vGetHitboxPos(pAimPlayer.iHitbox), vAngle);
+	Vec3D vHitboxPos = pRecord != nullptr ? pRecord->GetHitboxPos(pAimPlayer.iHitbox) : pPlayer->vGetHitboxPos(pAimPlayer.iHitbox);
+	g_Math.CalcAngle(vEyeOrigin, vHitboxPos, vAngle);
 
 	if (!Variables::bStandaloneRCS)
 		CompensateRecoil(vAngle, vAimPunchAngle, Variables::flCorrecting);

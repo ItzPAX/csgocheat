@@ -6,6 +6,7 @@ struct LagRecord {
 	Player* pTargetPlayer;
 	Matrix boneMat[MAXSTUDIOBONES], tempMat[MAXSTUDIOBONES];
 	Vec3D vAbsOrigin, vAbsAngles, vOrigin, vAngles;
+	Vec3D vHitBoxPos[HitboxMax];
 	float flSimTime;
 
 	// overload constructor
@@ -15,6 +16,10 @@ struct LagRecord {
 		pTargetPlayer = pPlayer;
 		pPlayer->SetupBones(boneMat, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, 0.f);
 
+		for (int i = 0; i < HitboxMax; i++) {
+			vHitBoxPos[i] = pPlayer->vGetHitboxPos(i);
+		}
+
 		vAbsOrigin = pPlayer->vAbsOrigin();
 		vAbsAngles = pPlayer->vAbsAngles();
 
@@ -22,6 +27,10 @@ struct LagRecord {
 		vAngles = pPlayer->vEyeAngles();
 
 		flSimTime = pPlayer->flSimTime();
+	}
+
+	Vec3D GetHitboxPos(int idx) {
+		return this->vHitBoxPos[idx];
 	}
 
 	void ApplyToPlayer(Player* pPlayer) {
@@ -52,8 +61,8 @@ public:
 	bool ValidTick(LagRecord& pRecord);
 	float GetLerpTime();
 	void RecordData();
-	void Lagcompensation();
-	void ApplyRecord(LagRecord& pRecord, CUserCmd* cmd);
+	LagRecord* Lagcompensation(CUserCmd* cmd);
+	void ApplyRecord(CUserCmd* cmd, LagRecord* record);
 
 	__forceinline void Init() {
 		deqLagRecords->clear();

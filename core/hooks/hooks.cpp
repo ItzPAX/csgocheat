@@ -11,6 +11,16 @@
 HookManager g_HookManager{ };
 
 #pragma region HookDefs
+namespace SvCheats {
+	using tSvCheats = bool(__thiscall*)(void*);
+	tSvCheats oSvCheats = nullptr;
+
+	BYTE pOrigBytes[7] = {0};
+
+	int iIndex = 13;
+	__forceinline bool __fastcall hkSvCheats(void* ConVar, int edx);
+}
+
 namespace HudUpdate {
 	using tHudUpdate = void(__stdcall*)(bool);
 	tHudUpdate oHudUpdate = nullptr;
@@ -71,6 +81,10 @@ bool HookManager::AddAllHooks() {
 		memcpy(HkDirectX::pEndSceneBytes, (char*)HkDirectX::pD3D9Device[HkDirectX::iEndScene], 7);
 		HkDirectX::oEndScene = (HkDirectX::tEndScene)g_HookLib.TrampHook((char*)HkDirectX::pD3D9Device[HkDirectX::iEndScene], (char*)HkDirectX::hkEndScene, 7);
 	}
+
+	// hook svcheats
+	ConVar* pSvCheats = g_Interface.pICVar->FindVar(XOR("sv_cheats"));
+	SvCheats::oSvCheats = (SvCheats::tSvCheats)g_HookLib.HookVMT(pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex);
 
 	// hook windows functions
 	WndProc::oWndProc = (WndProc::tWndProc)SetWindowLong(g_DirectX.window, GWL_WNDPROC, (LONG)WndProc::hkWndProc);
@@ -149,6 +163,17 @@ void HookManager::LogHookStatus(IHookStatus ihs) {
 }
 
 #pragma region HkFunctions
+bool __fastcall SvCheats::hkSvCheats(void* ConVar, int edx) {
+	static auto pCamThink = reinterpret_cast<void*>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x85\xC0\x75\x30\x38\x86"), XOR("xxxxxx")));
+	
+	if (!ConVar)
+		return false;
+	
+	if ((_ReturnAddress()) == pCamThink)
+		return true;
+	return oSvCheats(ConVar);
+}
+
 void __stdcall HudUpdate::hkHudUpdate(bool bActive) {
 	// do worldtoscreen here (only once per frame)
 	if (Game::g_pLocal)

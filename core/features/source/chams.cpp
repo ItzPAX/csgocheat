@@ -12,16 +12,25 @@ void Chams::OverrideMaterial(int iMatIndex, bool bIgnoreZ, Color col) {
 }
 
 void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags) {
+	g_Interface.pModelRender->OverrideMaterial(nullptr); // change overwritten material to default
+
 	if (!Game::g_pLocal || !info.m_pRenderable)
 		return;
 	
 	Entity* pEntity = info.m_pRenderable->GetIClientUnknown()->GetBaseEntity();
-	if (!pEntity || !pEntity->bIsPlayer())
+	// we have a valid player
+	if (!pEntity || !pEntity->bIsPlayer() || pEntity->iIndex() > g_Interface.pGlobalVars->iMaxClients || pEntity->iTeamNum() < 2)
 		return;
+
+	if (pEntity->bIsBaseCombatWeapon()) {
+		OverrideMaterial(Variables::iChamType, false, Variables::cInvisColor.ToPercent());
+		c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+		return;
+	}
 
 	Player* pPlayer = reinterpret_cast<Player*>(pEntity);
 
-	// we have found a valid player
+	// the player is alive
 	if (!pPlayer->bIsAlive())
 		return;
 
@@ -35,12 +44,10 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 			for (int i = 0; i < g_Backtrack.deqLagRecords[pPlayer->iIndex()].size(); i++) {
 				if (!g_Backtrack.ValidTick(g_Backtrack.deqLagRecords[pPlayer->iIndex()][i]) || !g_Backtrack.deqLagRecords[pPlayer->iIndex()][i].boneMat)
 					continue;
-				OverrideMaterial(Variables::iChamType, false, Color(255 - (i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size())), i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size()), 255, 30));
+				OverrideMaterial(Variables::iChamType, false, Color(255 - (i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size())), i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size()), 255, 30).ToPercent());
 				c_oDrawModel(pEcx, pEdx, pResults, info, g_Backtrack.deqLagRecords[pPlayer->iIndex()][i].boneMat, pFlexWeights, pFlexDelayedWeights, g_Backtrack.deqLagRecords[pPlayer->iIndex()][i].vOrigin, flags);
 			}
 		}
-
-		PostLagcompChams:
 
 		// xqz chams
 		if (Variables::bEnemyChamsInvis) {

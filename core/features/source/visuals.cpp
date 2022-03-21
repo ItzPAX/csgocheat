@@ -3,6 +3,16 @@
 
 Visuals g_Visuals;
 
+void Visuals::ThirdPerson() {
+	static bool bInThirdPerson = false;
+
+	if (GetAsyncKeyState(VK_MBUTTON) & 0x01)
+		bInThirdPerson = !bInThirdPerson;
+
+	if (g_Interface.pInput->bCameraInThirdperson = bInThirdPerson)
+		g_Interface.pInput->vCameraOffset.z = 100.f;
+}
+
 void Visuals::UpdatePlayerRects() {
 	for (int i = 0; i < g_Visuals.pSortedPlayers.size(); i++) {
 		// get and validate player

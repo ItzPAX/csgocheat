@@ -4,6 +4,13 @@
 
 static bool bBacktrackInit = false;
 void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
+	if (!cmd || !cmd->command_number)
+		return;
+
+	uintptr_t* pFramePointer;
+	__asm mov pFramePointer, ebp;
+	bool& bSendPacket = *reinterpret_cast<bool*>(*pFramePointer - 0x1C);
+
 	// set cmd to be globally accessible
 	Game::g_pCmd = cmd;
 
@@ -13,18 +20,26 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	if (!Game::g_pLocal)
 		return;
 
+	// thirdperson
+	g_Visuals.ThirdPerson();
+
+	// lagcomp stuff
 	if (!bBacktrackInit) {
 		g_Backtrack.Init();
 		bBacktrackInit = true;
 	}
+	{
+		g_Backtrack.RecordData();
+		LagRecord* pRecord = g_Backtrack.Lagcompensation(cmd);
 
-	g_Backtrack.RecordData();
-	
+		// call aimbot with best record
+		g_LegitBot.AimAtBestPlayer(pRecord);
+
+		g_Backtrack.ApplyRecord(cmd, pRecord);
+	}
+
 	g_Misc.BunnyHop(cmd);
 
 	if (Variables::bStandaloneRCS)
 		g_LegitBot.StandaloneRCS(cmd);
-
-	// call aimbot
-	g_LegitBot.AimAtBestPlayer();
 }

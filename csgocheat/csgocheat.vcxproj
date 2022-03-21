@@ -188,6 +188,9 @@
     <ClCompile Include="..\core\features\source\aimbot.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\core\features\source\antiaim.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\core\features\source\backtrack.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -244,6 +247,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\core\features\header\aimbot.h" />
+    <ClInclude Include="..\core\features\header\antiaim.h" />
     <ClInclude Include="..\core\features\header\backtrack.h" />
     <ClInclude Include="..\core\features\header\chams.h" />
     <ClInclude Include="..\core\features\header\misc.h" />
@@ -263,6 +267,7 @@
     <ClInclude Include="..\core\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\core\imgui\imstb_textedit.h" />
     <ClInclude Include="..\core\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\core\init\convar.h" />
     <ClInclude Include="..\core\init\init.h" />
     <ClInclude Include="..\core\menu\menu.h" />
     <ClInclude Include="..\includes.h" />
@@ -280,6 +285,7 @@
     <ClInclude Include="..\sdk\manager\interface\classes\IBaseClientDLL.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IClientEntity.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IClientEntityList.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IClientLeafSystem.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IClientMode.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IClientNetworkable.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IClientRenderable.h" />
@@ -290,6 +296,7 @@
     <ClInclude Include="..\sdk\manager\interface\classes\IEngineTrace.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IGameConsole.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IHandleEntity.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IInput.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IInputSystem.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IMaterial.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IMaterialSystem.h" />

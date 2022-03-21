@@ -13,6 +13,7 @@ namespace Game {
 }
 
 // defines
+#define FLOAT_MAX				3.402823E+38
 #define MAX_PLAYERS				65
 
 #define TICK_INTERVAL			(g_Interface.pGlobalVars->flIntervalPerTick)
@@ -54,13 +55,14 @@ using uchar = unsigned char;
 #include "sdk/manager/netvars/netvars.h"
 
 // features
+#include "core/features/header/backtrack.h"
 #include "core/features/variables/variables.h"
 #include "core/menu/menu.h"
 #include "core/features/header/visuals.h"
 #include "core/features/header/chams.h"
 #include "core/features/header/aimbot.h"
-#include "core/features/header/backtrack.h"
 #include "core/features/header/misc.h"
+#include "core/features/header/antiaim.h"
 
 // externs
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);

@@ -6,6 +6,7 @@
 #include <memory>
 #include <stdio.h>
 #include <cmath>
+#include <intrin.h>
 
 // File Managment
 #include <fstream>

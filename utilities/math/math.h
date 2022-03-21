@@ -17,7 +17,12 @@ public:
 	void CalcAngle(Vec3D src, Vec3D dst, Vec3D& angles);
 	void VectorAngles(Vec3D forward, Vec3D& angles);
 
+	void SinCos(float r, float* s, float* c);
+
 	void TransformVector(Vec3D& a, Matrix& b, Vec3D& out);
+
+	void AngleVector2(const Vec3D& angles, Vec3D& forward);
+	float GetFOV(const Vec3D& viewAngle, const Vec3D& aimAngle);
 };
 
 extern Math g_Math;

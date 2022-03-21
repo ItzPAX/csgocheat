@@ -5,7 +5,7 @@
 #include "includes.h"
 #include "pch.h"
 
-#define INVALID -1;
+#define INVALID -1
 
 enum entity_flags {
 	FL_ONGROUND= (1 << 0),
@@ -54,6 +54,11 @@ public:
 	bool bIsPlayer() {
 		using original_fn = bool(__thiscall*)(void*);
 		return (*(original_fn**)this)[158](this);
+	}
+
+	bool bIsBaseCombatWeapon() {
+		using original_fn = bool(__thiscall*)(void*);
+		return (*(original_fn**)this)[165](this);
 	}
 
 	ClientClass* cGetClientClass() {

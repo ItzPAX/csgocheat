@@ -12,6 +12,9 @@ private:
 	inline static std::vector<PlayerDist> pSortedPlayers;
 
 public:
+	// local stuff
+	void ThirdPerson();
+
 	void UpdatePlayerRects();
 	void SortPlayers();
 	void DrawBox(RECT rPlayerRect, Color col);

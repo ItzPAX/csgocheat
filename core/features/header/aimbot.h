@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "includes.h"
 
+struct LagRecord;
+
 struct AimPlayer {
 	Player* pPlayer;
 	int iHitbox;
@@ -10,8 +12,8 @@ struct AimPlayer {
 
 class LegitBot {
 public:
-	AimPlayer GetClosestEnemyToCrosshair(float flFov, Vec3D& vViewAngles, Vec3D vAimPunchAngle, Vec3D vEyeOrigin);
-	bool AimAtBestPlayer();
+	AimPlayer GetClosestEnemyToCrosshair(LagRecord* pRecord, float flFov, Vec3D& vViewAngles, Vec3D vAimPunchAngle, Vec3D vEyeOrigin);
+	bool AimAtBestPlayer(LagRecord* pRecord);
 
 	bool NonSticky(Vec3D vViewAngles, Vec3D vEyeOrigin, Vec3D vAngle, Player* pTarget);
 	float DistanceAdjustedFOV(float flBaseFov, Vec3D vEyeOrigin, Vec3D vTargetPos, Player* pTarget);

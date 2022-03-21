@@ -54,21 +54,98 @@ void Backtrack::RecordData() {
 			deqLagRecords[i].push_front(record);
 		}
 
-		while (deqLagRecords[i].size() > 3 && deqLagRecords[i].size() > static_cast<size_t>(TIME_TO_TICKS(0.2f)))
-			deqLagRecords[i].pop_back();
-
 		auto invalid = std::find_if(std::cbegin(deqLagRecords[i]), std::cend(deqLagRecords[i]), [](LagRecord rec) { return !g_Backtrack.ValidTick(rec); });
 		if (invalid != std::cend(deqLagRecords[i]))
 			deqLagRecords[i].erase(invalid, std::cend(deqLagRecords[i]));
 	}
 }
 
-void Backtrack::Lagcompensation()
-{
+LagRecord* Backtrack::Lagcompensation(CUserCmd* cmd) {
+	int iBestPlayerInd = INVALID;
+	Player* pBestPlayer = nullptr;
+	float flBestDelta = FLOAT_MAX;
+	float flBestDeltaRecord = FLOAT_MAX;
+
+	int iBestRecord = INVALID;
+
+	Vec3D vViewAngles;
+	g_Interface.pEngine->GetViewAngles(vViewAngles);
+
+	// local eye pos
+	Vec3D vEyeOrigin = Game::g_pLocal->vEyeOrigin();
+
+	// get local aimpunchangle
+	Vec3D vAimPunchAngle = Game::g_pLocal->vGetAimPunchAngle();
+
+	for (int i = 1; i <= g_Interface.pGlobalVars->iMaxClients; i++) {
+		// get entity and validate it
+		Player* pPlayer = reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntity(i));
+		if (!pPlayer || !pPlayer->bIsAlive() || pPlayer == Game::g_pLocal || !pPlayer->bIsEnemy(Game::g_pLocal) || pPlayer->bDormant())
+			continue;
+
+		Vec3D vAngle;
+
+		Vec3D vHitboxPos = pPlayer->vGetHitboxPos(HitboxHead);
+
+		g_Math.CalcAngle(vEyeOrigin, vHitboxPos, vAngle);
+		vAngle.Clamp();
+
+		float flCurrDelta = (vAngle - vAimPunchAngle - vViewAngles).Clamped().Length();
+		if (flCurrDelta < flBestDelta) {
+			flBestDelta = flCurrDelta;
+			pBestPlayer = pPlayer;
+			iBestPlayerInd = i;
+		}
+	}
+
+	if (iBestPlayerInd == INVALID || !pBestPlayer || deqLagRecords[iBestPlayerInd].size() <= 3)
+		return nullptr;
+
+	for (int i = 0; i < deqLagRecords[iBestPlayerInd].size(); i++) {
+		LagRecord record = deqLagRecords[iBestPlayerInd][i];
+		if (!ValidTick(record))
+			continue;
+
+		if (Variables::bAccurateLagcomp) {
+			for (int j = 0; j < sizeof(Variables::iAllowedHitboxes) / sizeof(int); j++) {
+				Vec3D vAngle;
+
+				Vec3D vHitboxPos = record.GetHitboxPos(Variables::iAllowedHitboxes[j]);
+
+				g_Math.CalcAngle(vEyeOrigin, vHitboxPos - (Game::g_pLocal->vGetAimPunchAngle() * 2.f), vAngle);
+				vAngle.Clamp();
+
+				float flCurrDelta = (vAngle - vAimPunchAngle - vViewAngles).Clamped().Length();
+				if (flCurrDelta < flBestDeltaRecord) {
+					flBestDeltaRecord = flCurrDelta;
+					iBestRecord = i;
+				}
+			}
+		}
+		else {
+			Vec3D vAngle;
+
+			Vec3D vHitboxPos = record.GetHitboxPos(HitboxHead);
+
+			g_Math.CalcAngle(vEyeOrigin, vHitboxPos - (Game::g_pLocal->vGetAimPunchAngle() * 2.f), vAngle);
+			vAngle.Clamp();
+
+			float flCurrDelta = (vAngle - vAimPunchAngle - vViewAngles).Clamped().Length();
+			if (flCurrDelta < flBestDeltaRecord) {
+				flBestDeltaRecord = flCurrDelta;
+				iBestRecord = i;
+			}
+		}
+	}
+
+	if (iBestRecord != INVALID)
+		return &deqLagRecords[iBestPlayerInd][iBestRecord];
+	return nullptr;
 }
 
-void Backtrack::ApplyRecord(LagRecord& pRecord, CUserCmd* cmd) {
+void Backtrack::ApplyRecord(CUserCmd* cmd, LagRecord* record) {
 	// apply tickount to cmd
-	if (cmd->buttons & InAttack)
-		cmd->tick_count = TIME_TO_TICKS(pRecord.flSimTime);
+	if (cmd->buttons & InAttack && record) {
+		cmd->tick_count = TIME_TO_TICKS(record->flSimTime + GetLerpTime());
+	}
 }

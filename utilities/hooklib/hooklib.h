@@ -3,8 +3,11 @@
 #include <Windows.h>
 #include <vector>
 #include <iostream>
+#include <TlHelp32.h>
+#include <Psapi.h>
 
 #define NOT_FOUND -1
+#define CHUNK_SIZE 256
 
 // init our handler outside of class
 LONG WINAPI VEHHandler(EXCEPTION_POINTERS* pExceptionInfo);
@@ -93,6 +96,20 @@ public:
     BOOL Hook(char* src, char* dst, short len);
     char* TrampHook(char* src, char* dst, short len);
 #pragma endregion Hook using inline patching
+
+    MODULEINFO GetModuleInfo(const char* szModule) {
+        MODULEINFO modInfo = { 0 };
+        HMODULE hModule = GetModuleHandle(szModule);
+        if (hModule == 0)
+            return modInfo;
+
+        GetModuleInformation(GetCurrentProcess(), hModule, &modInfo, sizeof(MODULEINFO));
+        return modInfo;
+    }
+
+    uintptr_t FindCodeCave(const char* cModuleName, size_t iSize = 6);
+
+    LPVOID HookVMT(LPVOID lpVirtualTable, PVOID phkFunction, UINT16 nIndex);
 
     // functions to debug, only works if hook placed via VEH
     HookStatus GetHookInfo(const char* sName, int ind = NOT_FOUND);
