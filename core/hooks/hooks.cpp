@@ -84,16 +84,16 @@ bool HookManager::AddAllHooks() {
 
 	// hook svcheats
 	ConVar* pSvCheats = g_Interface.pICVar->FindVar(XOR("sv_cheats"));
-	SvCheats::oSvCheats = (SvCheats::tSvCheats)g_HookLib.HookVMT(pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex);
+	SvCheats::oSvCheats = (SvCheats::tSvCheats)g_HookLib.AddHook(XOR("client.dll"), pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex);
 
 	// hook windows functions
 	WndProc::oWndProc = (WndProc::tWndProc)SetWindowLong(g_DirectX.window, GWL_WNDPROC, (LONG)WndProc::hkWndProc);
 
 	// grab original function address and add hook to the queue
-	CreateMove::oCreateMove = (CreateMove::tCreateMove)g_HookLib.AddHook(CreateMove::hkCreateMove, g_Interface.pClientMode, CreateMove::iIndex, XOR("CreateMove"));
-	DrawModel::oDrawModel = (DrawModel::tDrawModel)g_HookLib.AddHook(DrawModel::hkDrawModel, g_Interface.pStudioRender, DrawModel::iIndex, XOR("DrawModel"));
-	HudUpdate::oHudUpdate = (HudUpdate::tHudUpdate)g_HookLib.AddHook(HudUpdate::hkHudUpdate, g_Interface.pClient, HudUpdate::iIndex, XOR("HudUpdate"));
-	LockCursor::oLockCursor = (LockCursor::tLockCursor)g_HookLib.AddHook(LockCursor::hkLockCursor, g_Interface.pSurface, LockCursor::iIndex, XOR("LockCursor"));
+	CreateMove::oCreateMove = (CreateMove::tCreateMove)g_HookLib.AddHook(XOR("engine.dll"), g_Interface.pClientMode, CreateMove::hkCreateMove, CreateMove::iIndex);
+	DrawModel::oDrawModel = (DrawModel::tDrawModel)g_HookLib.AddHook(XOR("client.dll"), g_Interface.pStudioRender, DrawModel::hkDrawModel, DrawModel::iIndex);
+	HudUpdate::oHudUpdate = (HudUpdate::tHudUpdate)g_HookLib.AddHook(XOR("engine.dll"), g_Interface.pClient, HudUpdate::hkHudUpdate, HudUpdate::iIndex);
+	LockCursor::oLockCursor = (LockCursor::tLockCursor)g_HookLib.AddHook(XOR("client.dll"), g_Interface.pSurface, LockCursor::hkLockCursor, LockCursor::iIndex);
 
 	// forward original func pointer to different classes
 	g_Chams.c_oDrawModel = DrawModel::oDrawModel;

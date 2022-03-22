@@ -7,7 +7,12 @@
 #include <Psapi.h>
 
 #define NOT_FOUND -1
-#define CHUNK_SIZE 256
+#define SIZE 7
+
+enum Mode {
+    MODE_VEH,
+    MODE_TRUSTEDMODULE
+};
 
 // init our handler outside of class
 LONG WINAPI VEHHandler(EXCEPTION_POINTERS* pExceptionInfo);
@@ -19,6 +24,11 @@ struct HookStatus {
     INT   iIndex;
 };
 
+struct CodeCave {
+    uintptr_t pAddr;
+    size_t iSize;
+};
+
 class HookLib {
     // vars
 private:
@@ -28,6 +38,7 @@ private:
     std::vector<uintptr_t>   pPointerDestructor;
     std::vector<uintptr_t>   pOrigFncAddr;
     std::vector<INT16>       nIndex;
+    std::vector<CodeCave>    cCodeCaves;
     PVOID                    pVEHHandle;
     PVOID                    pVTableAddr;
     INT                      iCounter;
@@ -38,7 +49,9 @@ private:
     // bytes of hooked virtualprotect, will be filled out
     BYTE                     wHookedBytes[5] = { 0x00, 0x00, 0x00, 0x00, 0x00 };
     // bytes of original virtualprotect function
-    BYTE                    wOrigBytes[5] = { 0x8B, 0xFF, 0x55, 0x8B, 0xEC };
+    BYTE                     wOrigBytes[5] = { 0x8B, 0xFF, 0x55, 0x8B, 0xEC };
+
+    Mode                    iMode = MODE_TRUSTEDMODULE;
 
     // prototypes
     using tVirtualQuery = SIZE_T(__stdcall*)(LPCVOID, PMEMORY_BASIC_INFORMATION, SIZE_T);
@@ -64,13 +77,18 @@ public:
 
     // If hooking where an ac is present, call this BEFORE hooking everything
     BOOL OverrideACHooks();
-
     // If hooking where an ac is present, call this AFTER hooking everything 
     BOOL RestoreACHooks();
 
+    void SetMode(Mode mode) {
+        iMode = mode;
+    }
+
 #pragma region VEHHook
-    // hooks function and returns a pointer to the original function, only works on virtual function pointers
+    /// FOR MODE = VEH
     LPVOID AddHook(PVOID pHkFunc, PVOID pVTable, INT16 iIndex, const char* sName = "");
+    /// FOR MODE = TRUSTEDMODULE
+    uintptr_t AddHook(const char* cModuleName, void* pVTable, void* pTargetFunction, size_t iIndex);
 
     // enable all added hooks
     BOOL EnableAllHooks();
@@ -97,6 +115,14 @@ public:
     char* TrampHook(char* src, char* dst, short len);
 #pragma endregion Hook using inline patching
 
+#pragma region TRUSTEDMODULE
+    int GetCodeCaveSize() {
+        return cCodeCaves.size();
+    }
+    uintptr_t GetCodeCaveAddr(int index) {
+        return cCodeCaves.at(index).pAddr;
+    }
+
     MODULEINFO GetModuleInfo(const char* szModule) {
         MODULEINFO modInfo = { 0 };
         HMODULE hModule = GetModuleHandle(szModule);
@@ -107,9 +133,8 @@ public:
         return modInfo;
     }
 
-    uintptr_t FindCodeCave(const char* cModuleName, size_t iSize = 6);
-
-    LPVOID HookVMT(LPVOID lpVirtualTable, PVOID phkFunction, UINT16 nIndex);
+    uintptr_t FindCodeCave(const char* cModuleName, size_t iSize);
+#pragma endregion
 
     // functions to debug, only works if hook placed via VEH
     HookStatus GetHookInfo(const char* sName, int ind = NOT_FOUND);
