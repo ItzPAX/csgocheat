@@ -1,5 +1,9 @@
 #pragma once
 
+namespace NetvarOffsets
+{
+	inline uintptr_t iHealth = 0;
+};
 // forward declaration
 class RecvTable;
 
@@ -59,11 +63,14 @@ public:
 
 class NetVars {
 private:
-	uintptr_t GetOffset(RecvTable* table, const char* tablename, const char* netvarname);
 	uintptr_t GetNetvarOffset(const char* tablename, const char* netvarname, ClientClass* clientclass); // wrapper for GetOffsetFunction
+	uintptr_t GetOffset(RecvTable* table, const char* tablename, const char* netvarname);
 public:
 	template<typename T, typename U>
 	T GetNetvar(const char* tablename, const char* netvarname, U base); // function to call to get netvar
+
+	template<typename T>
+	uintptr_t GetOffsetDirect(const char* tablename, const char* netvarname, T base);
 };
 
 template<typename T, typename U>
@@ -72,6 +79,14 @@ inline T NetVars::GetNetvar(const char* tablename, const char* netvarname, U bas
 	uintptr_t offset = GetNetvarOffset(tablename, netvarname, clientclass);
 
 	return *reinterpret_cast<T*>( uintptr_t(base) + offset);
+}
+
+template<typename T>
+inline uintptr_t NetVars::GetOffsetDirect(const char* tablename, const char* netvarname, T base) {
+	ClientClass* clientclass = g_Interface.pClient->GetAllClasses();
+	uintptr_t offset = GetNetvarOffset(tablename, netvarname, clientclass);
+
+	return offset;
 }
 
 extern NetVars g_NetVars;

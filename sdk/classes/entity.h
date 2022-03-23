@@ -168,7 +168,14 @@ public:
 	}
 
 	bool bIsEnemy(Player* to) { return this->iTeamNum() != to->iTeamNum(); }
-	bool bIsAlive() { return iHealth() > 0; }
+
+	bool bIsAlive() { 
+		if (NetvarOffsets::iHealth == 0)
+			return iHealth() > 0;
+
+		return *reinterpret_cast<int*>(uintptr_t(this) + NetvarOffsets::iHealth) > 0;
+		//return iHealth() > 0; 
+	}
 
 	Vec3D vGetVelocity() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecVelocity[0]"), this); }
 	Vec3D vGetViewOffset() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecViewOffset[0]"), this); }

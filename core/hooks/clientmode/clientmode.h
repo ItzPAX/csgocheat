@@ -20,6 +20,9 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	if (!Game::g_pLocal)
 		return;
 
+	if (NetvarOffsets::iHealth == 0)
+		NetvarOffsets::iHealth = g_NetVars.GetOffsetDirect(XOR("DT_BasePlayer"), XOR("m_iHealth"), Game::g_pLocal);
+
 	// thirdperson
 	g_Visuals.ThirdPerson();
 
