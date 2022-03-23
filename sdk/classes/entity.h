@@ -182,7 +182,12 @@ public:
 	Vec3D vGetAimPunchAngle() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_aimPunchAngle"), this); }
 	float flSimTime() { return g_NetVars.GetNetvar<float>(XOR("DT_CSPlayer"), XOR("m_flSimulationTime"), this); }
 	int iGetHitboxSet() { return g_NetVars.GetNetvar<int>(XOR("DT_BasePlayer"), XOR("m_nHitboxSet"), this); }
-	int iHealth() { return g_NetVars.GetNetvar<int>(XOR("DT_BasePlayer"), XOR("m_iHealth"), this); }
+	int iHealth() { 
+		if (NetvarOffsets::iHealth == 0)
+			return  g_NetVars.GetNetvar<int>(XOR("DT_BasePlayer"), XOR("m_iHealth"), this);
+
+		return *reinterpret_cast<int*>(uintptr_t(this) + NetvarOffsets::iHealth);
+	}
 	Vec3D vEyeAngles() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_CSPlayer"), XOR("m_angEyeAngles"), this); }
 	int iShotsFired() { return g_NetVars.GetNetvar<int>(XOR("DT_CSPlayer"), XOR("m_iShotsFired"), this); }
 	int iFlags() { return g_NetVars.GetNetvar<int>(XOR("DT_CSPlayer"), XOR("m_fFlags"), this); }
