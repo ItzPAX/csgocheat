@@ -94,6 +94,9 @@
     <Filter Include="utilities\structs\vecaligned">
       <UniqueIdentifier>{e647e043-78bb-4aa6-9418-c78bfbd8850b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="syswhispers">
+      <UniqueIdentifier>{d0768da2-86eb-4347-b492-4d61cbe20bde}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dllentry.cpp" />
@@ -171,6 +174,9 @@
     </ClCompile>
     <ClCompile Include="..\core\features\source\antiaim.cpp">
       <Filter>core\features\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Syscalls.c">
+      <Filter>syswhispers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -391,8 +397,16 @@
     <ClInclude Include="..\sdk\manager\interface\classes\IInput.h">
       <Filter>sdk\manager\interface\classes</Filter>
     </ClInclude>
+    <ClInclude Include="Syscalls.h">
+      <Filter>syswhispers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="syscallsstubs.asm">
+      <Filter>syswhispers</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

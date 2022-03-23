@@ -9,15 +9,19 @@ MODULEINFO Tools::GetModuleInfo(const char* szModule) {
 	if (hModule == 0)
 		return modInfo;
 
+	
 	GetModuleInformation(GetCurrentProcess(), hModule, &modInfo, sizeof(MODULEINFO));
 	return modInfo;
 }
 
+//Example of how to use syscalls instead of winapi:
 void Tools::WriteToMemory(const char* addr, const char* src, int size) {
 	DWORD oProc;
-	VirtualProtect((LPVOID)addr, size, PAGE_EXECUTE_READWRITE, &oProc);
+
+	HANDLE hProc = GetCurrentProcess();
+	NtProtectVirtualMemory(hProc, (LPVOID*)addr, (SIZE_T*)size, PAGE_EXECUTE_READWRITE, &oProc);		//VirtualProtect((LPVOID)addr, size, PAGE_EXECUTE_READWRITE, &oProc);
 	memcpy((LPVOID)addr, src, size);
-	VirtualProtect((LPVOID)addr, size, oProc, &oProc);
+	NtProtectVirtualMemory(hProc, (LPVOID*)addr, (SIZE_T*)size, oProc, &oProc);							//VirtualProtect((LPVOID)addr, size, oProc, &oProc);
 }
 
 DWORD Tools::SignatureScan(const char* pModule, const char* pSig, const char* mask) {

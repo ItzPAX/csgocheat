@@ -64,5 +64,7 @@ using uchar = unsigned char;
 #include "core/features/header/misc.h"
 #include "core/features/header/antiaim.h"
 
+#include "csgocheat/Syscalls.h"
+
 // externs
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
