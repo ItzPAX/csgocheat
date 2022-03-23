@@ -1,4 +1,5 @@
 #include "hooklib.h"
+#include "csgocheat/Syscalls.h"
 
 namespace hkFunctions {
     SIZE_T __stdcall hkVirtualQuery(LPCVOID lpAddr, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_T lpSize) {
@@ -341,19 +342,22 @@ uintptr_t HookLib::AddHook(const char* cModuleName, void* pVirtualTable, void* p
 
         uintptr_t pRelAddr = (uintptr_t)pTargetFunction - pCodeCave - SIZE;
 
+        HANDLE hProc = GetCurrentProcess();
+
         // place our shellcode in the code cave
         DWORD oProc;
-        VirtualProtect((void*)pCodeCave, SIZE, PAGE_EXECUTE_WRITECOPY, &oProc);
+        
+        NtProtectVirtualMemory(hProc, (LPVOID*)pCodeCave, (SIZE_T*)SIZE, PAGE_EXECUTE_READWRITE, &oProc);       //VirtualProtect((void*)pCodeCave, SIZE, PAGE_EXECUTE_WRITECOPY, &oProc);
         *(uintptr_t*)(pCodeCave) = (char)0x8B;
         *(uintptr_t*)(pCodeCave + 0x01) = (char)0xED;
         *(uintptr_t*)(pCodeCave + 0x02) = (char)0xE9;
         *(uintptr_t*)(pCodeCave + 0x03) = (uintptr_t)pRelAddr;
-        VirtualProtect((void*)pCodeCave, SIZE, oProc, NULL);
+        NtProtectVirtualMemory(hProc, (LPVOID*)pCodeCave, (SIZE_T*)SIZE, oProc, &oProc);                        //VirtualProtect((void*)pCodeCave, SIZE, oProc, NULL);
 
         // swap pointer to our code cave
-        VirtualProtect((LPVOID)pEntry, sizeof(pEntry), PAGE_EXECUTE_WRITECOPY, &oProc);
+        NtProtectVirtualMemory(hProc, (LPVOID*)pEntry, (SIZE_T*)sizeof(pEntry), PAGE_EXECUTE_WRITECOPY, &oProc);//VirtualProtect((LPVOID)pEntry, sizeof(pEntry), PAGE_EXECUTE_WRITECOPY, &oProc);
         *(uintptr_t*)pEntry = (uintptr_t)pCodeCave;
-        VirtualProtect((LPVOID)pEntry, sizeof(pEntry), oProc, NULL);
+        NtProtectVirtualMemory(hProc, (LPVOID*)pEntry, (SIZE_T*)sizeof(pEntry), oProc, NULL);                   //VirtualProtect((LPVOID)pEntry, sizeof(pEntry), oProc, NULL);
 
         return pOrig;
     }
