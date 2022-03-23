@@ -4,6 +4,8 @@
 
 Init g_Init{ };
 
+extern "C" void* internal_cleancall_wow64_gate = 0;
+
 ulong __stdcall Init::InitAll(void* p) {
 	// injection started, allocate a console
 	AllocConsole(); FILE* f; freopen_s(&f, XOR("CONOUT$"), XOR("w"), stdout);
@@ -13,6 +15,8 @@ ulong __stdcall Init::InitAll(void* p) {
 		//std::cout << XOR("[ RAYBOT ] Waiting for serverbrowser.dll...\n");
 		Sleep(200);
 	}
+
+	internal_cleancall_wow64_gate = (void*)__readfsdword(0xC0);
 
 	// find all interfaces
 	std::cout << XOR("[ RAYBOT ] Bruteforcing Interfaces...\n");

@@ -65,9 +65,9 @@ BOOL HookLib::OverrideACHooks() {
     memcpy(wHookedBytes, VirtualProtect, 5);
 
     // override the ac hook with original bytes, since vac is stupid they dont scan for writecopy
-    VirtualProtect(VirtualProtect, 5, PAGE_EXECUTE_WRITECOPY, &oProc);
-    memcpy(VirtualProtect, wOrigBytes, 5);
-    VirtualProtect(VirtualProtect, 5, oProc, &oProc);
+    //VirtualProtect(VirtualProtect, 5, PAGE_EXECUTE_WRITECOPY, &oProc);
+    //memcpy(VirtualProtect, wOrigBytes, 5);
+    //VirtualProtect(VirtualProtect, 5, oProc, &oProc);
 
     // hook virtualquery func and return false info
     oVirtualQuery = (tVirtualQuery)TrampHook((char*)VirtualQuery, (char*)hkFunctions::hkVirtualQuery, 5);
@@ -87,9 +87,9 @@ BOOL HookLib::RestoreACHooks() {
     // restore the virtualprotect hook, we aren't hooked rn so this call is fine
     DWORD oProc;
 
-    VirtualProtect(VirtualProtect, 5, PAGE_EXECUTE_WRITECOPY, &oProc);
+   /* VirtualProtect(VirtualProtect, 5, PAGE_EXECUTE_WRITECOPY, &oProc);
     memcpy(VirtualProtect, wHookedBytes, 5);
-    VirtualProtect(VirtualProtect, 5, oProc, &oProc);
+    VirtualProtect(VirtualProtect, 5, oProc, &oProc);*/
 
     bACHooksOverwritten = false;
 
@@ -234,23 +234,24 @@ VOID HookLib::DisableAllHooks() {
 #pragma endregion
 
 #pragma region TrampHook
-VOID HookLib::Patch(char* dst, char* src, short len) {
+VOID HookLib::Patch(char* dst, char* src, SIZE_T len) {
+    //NtProtectVirtualMemory(hProc, &ppCodeCave, (PSIZE_T)&size, PAGE_EXECUTE_READWRITE, &oProc);
     DWORD oProc;
-    VirtualProtect(dst, len, PAGE_EXECUTE_READWRITE, &oProc);
+    NtProtectVirtualMemory(hProc, (LPVOID*)&dst, &len, PAGE_EXECUTE_READWRITE, &oProc); //VirtualProtect(dst, len, PAGE_EXECUTE_READWRITE, &oProc);
     memcpy(dst, src, len);
-    VirtualProtect(dst, len, oProc, &oProc);
+    NtProtectVirtualMemory(hProc, (LPVOID*)&dst, &len, oProc, &oProc);                  //VirtualProtect(dst, len, oProc, &oProc);
 }
 
-BOOL HookLib::Hook(char* src, char* dst, short len) {
+BOOL HookLib::Hook(char* src, char* dst, SIZE_T len) {
     if (len < 5) return false;
 
     DWORD oProc;
-    VirtualProtect(src, len, PAGE_EXECUTE_READWRITE, &oProc);
+    NtProtectVirtualMemory(hProc, (LPVOID*)&dst, &len, PAGE_EXECUTE_READWRITE, &oProc); //VirtualProtect(src, len, PAGE_EXECUTE_READWRITE, &oProc);
     memset(src, 0x90, len);
     uintptr_t relAddy = (uintptr_t)(dst - src - 5);
     *src = (char)0xE9;
     *(uintptr_t*)(src + 1) = (uintptr_t)relAddy;
-    VirtualProtect(src, len, oProc, &oProc);
+    NtProtectVirtualMemory(hProc, (LPVOID*)&dst, &len, oProc, &oProc);
 
     return true;
 }
@@ -258,7 +259,10 @@ BOOL HookLib::Hook(char* src, char* dst, short len) {
 char* HookLib::TrampHook(char* src, char* dst, short len) {
     if (len < 5) return 0;
 
-    char* gateway = (char*)VirtualAlloc(0, len + 5, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    SIZE_T allocateLen = len + 5;
+
+    LPVOID x = nullptr;
+    char* gateway = (char*)NtAllocateVirtualMemory(hProc, &x, 0, (PULONG)&allocateLen, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);    //VirtualAlloc(0, len + 5, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
     if (!gateway)
         return nullptr;
 
@@ -307,7 +311,7 @@ uintptr_t HookLib::FindCodeCave(const char* cModuleName, size_t iSize) {
 
     memcpy(moduleContent, moduleInfo.lpBaseOfDll, moduleInfo.SizeOfImage - 1);
 
-    for (int i = 0; i < moduleInfo.SizeOfImage; i++)
+    for (int i = 1000; i < moduleInfo.SizeOfImage; i++)
     {
         bool found = true;
         for (int j = 0; j < iSize + 1; j++)
@@ -342,22 +346,26 @@ uintptr_t HookLib::AddHook(const char* cModuleName, void* pVirtualTable, void* p
 
         uintptr_t pRelAddr = (uintptr_t)pTargetFunction - pCodeCave - SIZE;
 
-        HANDLE hProc = GetCurrentProcess();
-
         // place our shellcode in the code cave
         DWORD oProc;
+
+        int sizeOfEntry = sizeof(pEntry);
+        int size = SIZE;
+
+        LPVOID ppCodeCave = (LPVOID)pCodeCave;
+        LPVOID ppEntry = (LPVOID)pEntry;
         
-        NtProtectVirtualMemory(hProc, (LPVOID*)pCodeCave, (SIZE_T*)SIZE, PAGE_EXECUTE_READWRITE, &oProc);       //VirtualProtect((void*)pCodeCave, SIZE, PAGE_EXECUTE_WRITECOPY, &oProc);
+        NtProtectVirtualMemory(hProc, &ppCodeCave, (PSIZE_T)&size, PAGE_EXECUTE_READWRITE, &oProc);       //VirtualProtect((void*)pCodeCave, SIZE, PAGE_EXECUTE_WRITECOPY, &oProc);
         *(uintptr_t*)(pCodeCave) = (char)0x8B;
         *(uintptr_t*)(pCodeCave + 0x01) = (char)0xED;
         *(uintptr_t*)(pCodeCave + 0x02) = (char)0xE9;
         *(uintptr_t*)(pCodeCave + 0x03) = (uintptr_t)pRelAddr;
-        NtProtectVirtualMemory(hProc, (LPVOID*)pCodeCave, (SIZE_T*)SIZE, oProc, &oProc);                        //VirtualProtect((void*)pCodeCave, SIZE, oProc, NULL);
+        NtProtectVirtualMemory(hProc, &ppCodeCave, (PSIZE_T)&size, oProc, &oProc);                        //VirtualProtect((void*)pCodeCave, SIZE, oProc, NULL);
 
         // swap pointer to our code cave
-        NtProtectVirtualMemory(hProc, (LPVOID*)pEntry, (SIZE_T*)sizeof(pEntry), PAGE_EXECUTE_WRITECOPY, &oProc);//VirtualProtect((LPVOID)pEntry, sizeof(pEntry), PAGE_EXECUTE_WRITECOPY, &oProc);
+        NtProtectVirtualMemory(hProc, &ppEntry, (PSIZE_T)&sizeOfEntry, PAGE_EXECUTE_WRITECOPY, &oProc);//VirtualProtect((LPVOID)pEntry, sizeof(pEntry), PAGE_EXECUTE_WRITECOPY, &oProc);
         *(uintptr_t*)pEntry = (uintptr_t)pCodeCave;
-        NtProtectVirtualMemory(hProc, (LPVOID*)pEntry, (SIZE_T*)sizeof(pEntry), oProc, NULL);                   //VirtualProtect((LPVOID)pEntry, sizeof(pEntry), oProc, NULL);
+        NtProtectVirtualMemory(hProc, &ppEntry, (PSIZE_T)&sizeOfEntry, oProc, &oProc);                   //VirtualProtect((LPVOID)pEntry, sizeof(pEntry), oProc, NULL);
 
         return pOrig;
     }

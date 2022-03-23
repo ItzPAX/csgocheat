@@ -1,5 +1,7 @@
 #pragma once
 
+
+
 // globally available shit
 class CUserCmd;
 class Player;

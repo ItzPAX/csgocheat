@@ -59,6 +59,7 @@ private:
 
     // global vars
 public:
+    HANDLE hProc;
     tVirtualQuery oVirtualQuery;
     tRtlAddVectoredHandler RtlAddVectoredHandler;
 
@@ -73,6 +74,7 @@ public:
         pVEHHandle = NULL; 
         pVTableAddr = NULL; 
         RtlAddVectoredHandler = reinterpret_cast<tRtlAddVectoredHandler>(GetProcAddress(GetModuleHandle("ntdll.dll"), "RtlAddVectoredExceptionHandler"));
+        hProc = GetCurrentProcess();
     } // constructor
 
     // If hooking where an ac is present, call this BEFORE hooking everything
@@ -110,8 +112,8 @@ public:
 
 #pragma region TrampHook
     // hooks function and returns pointer to the original function, works on all functions
-    VOID Patch(char* dst, char* src, short len);
-    BOOL Hook(char* src, char* dst, short len);
+    VOID Patch(char* dst, char* src, SIZE_T len);
+    BOOL Hook(char* src, char* dst, SIZE_T len);
     char* TrampHook(char* src, char* dst, short len);
 #pragma endregion Hook using inline patching
 

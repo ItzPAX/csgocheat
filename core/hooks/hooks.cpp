@@ -73,7 +73,7 @@ namespace LockCursor {
 
 bool HookManager::AddAllHooks() {
 	// override hooks placed by vac
-	if (!g_HookLib.OverrideACHooks())
+	if (!g_HookLib.OverrideACHooks()) 
 		return false;
 
 	// hook directx
