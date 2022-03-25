@@ -15,24 +15,24 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="NoHookInjector.cpp">
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="hooks.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="syscalls.asm">
+    <ClInclude Include="detours.h">
       <Filter>Headerdateien</Filter>
-    </MASM>
+    </ClInclude>
+    <ClInclude Include="hooks.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="syscalls.h">
+    <Text Include="obsolete.txt">
       <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="RemoteOps.cpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="RemoteOps.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
+    </Text>
   </ItemGroup>
 </Project>

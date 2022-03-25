@@ -76,6 +76,7 @@ bool HookManager::AddAllHooks() {
 	if (!g_HookLib.OverrideACHooks()) 
 		return false;
 
+	return true;
 	// hook directx
 	if (g_DirectX.GetD3D9Device(HkDirectX::pD3D9Device, sizeof(HkDirectX::pD3D9Device))) {
 		memcpy(HkDirectX::pEndSceneBytes, (char*)HkDirectX::pD3D9Device[HkDirectX::iEndScene], 7);
@@ -94,7 +95,11 @@ bool HookManager::AddAllHooks() {
 	DrawModel::oDrawModel = (DrawModel::tDrawModel)g_HookLib.AddHook(XOR("client.dll"), g_Interface.pStudioRender, DrawModel::hkDrawModel, DrawModel::iIndex);
 	HudUpdate::oHudUpdate = (HudUpdate::tHudUpdate)g_HookLib.AddHook(XOR("engine.dll"), g_Interface.pClient, HudUpdate::hkHudUpdate, HudUpdate::iIndex);
 	LockCursor::oLockCursor = (LockCursor::tLockCursor)g_HookLib.AddHook(XOR("client.dll"), g_Interface.pSurface, LockCursor::hkLockCursor, LockCursor::iIndex);
-
+	
+	if (g_HookLib.criticalNotSet) {
+		std::cout << "[ERROR] One or more hooks were not set correctly! Aborting..." << std::endl;
+		return false;
+	}
 	// forward original func pointer to different classes
 	g_Chams.c_oDrawModel = DrawModel::oDrawModel;
 

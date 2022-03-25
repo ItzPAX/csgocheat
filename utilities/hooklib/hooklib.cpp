@@ -2,6 +2,15 @@
 #include "csgocheat/Syscalls.h"
 
 namespace hkFunctions {
+	
+    FARPROC __stdcall hkGetProcAddress(HMODULE hMod, LPCSTR name)
+    {
+        std::cout << "[GetProcAddress] " << name << std::endl;
+        return NULL;
+		//return g_HookLib.oGetProcAddress(hMod, name);
+    }
+	
+	
     SIZE_T __stdcall hkVirtualQuery(LPCVOID lpAddr, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_T lpSize) {
         SIZE_T sReturnVal = g_HookLib.oVirtualQuery(lpAddr, lpBuffer, lpSize);
         bool bTamper = false;
@@ -57,17 +66,29 @@ LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
 }
 #pragma endregion
 
+void HookLib::PlaceInspectionHooks()
+{
+    bool gpa_hook = true;
+    oGetProcAddress = (tGetProcAddress)MarlinHook((uintptr_t)&GetProcAddress, (uintptr_t)&hkFunctions::hkGetProcAddress, &gpa_hook);
+    std::cout << std::hex <<oGetProcAddress << std::endl;
+
+    //oGetProcAddress = (tGetProcAddress)TrampHook((char*)GetProcAddress, (char*)hkFunctions::hkGetProcAddress, 5);
+}
+
 #pragma region VEHHook
 BOOL HookLib::OverrideACHooks() {
+	
+    g_HookLib.PlaceInspectionHooks();
+	
     DWORD oProc;
 
     // copy the old bytes to restore the hook later
     memcpy(wHookedBytes, VirtualProtect, 5);
 
-    // override the ac hook with original bytes, since vac is stupid they dont scan for writecopy
-    //VirtualProtect(VirtualProtect, 5, PAGE_EXECUTE_WRITECOPY, &oProc);
-    //memcpy(VirtualProtect, wOrigBytes, 5);
-    //VirtualProtect(VirtualProtect, 5, oProc, &oProc);
+    //override the ac hook with original bytes, since vac is stupid they dont scan for writecopy
+    VirtualProtect(VirtualProtect, 5, PAGE_EXECUTE_WRITECOPY, &oProc);
+    memcpy(VirtualProtect, wOrigBytes, 5);
+    VirtualProtect(VirtualProtect, 5, oProc, &oProc);
 
     // hook virtualquery func and return false info
     oVirtualQuery = (tVirtualQuery)TrampHook((char*)VirtualQuery, (char*)hkFunctions::hkVirtualQuery, 5);
@@ -239,19 +260,21 @@ VOID HookLib::Patch(char* dst, char* src, SIZE_T len) {
     DWORD oProc;
     NtProtectVirtualMemory(hProc, (LPVOID*)&dst, &len, PAGE_EXECUTE_READWRITE, &oProc); //VirtualProtect(dst, len, PAGE_EXECUTE_READWRITE, &oProc);
     memcpy(dst, src, len);
-    NtProtectVirtualMemory(hProc, (LPVOID*)&dst, &len, oProc, &oProc);                  //VirtualProtect(dst, len, oProc, &oProc);
+    //NtProtectVirtualMemory(hProc, (LPVOID*)&dst, &len, oProc, &oProc);                  //VirtualProtect(dst, len, oProc, &oProc);
 }
 
 BOOL HookLib::Hook(char* src, char* dst, SIZE_T len) {
     if (len < 5) return false;
 
     DWORD oProc;
-    NtProtectVirtualMemory(hProc, (LPVOID*)&dst, &len, PAGE_EXECUTE_READWRITE, &oProc); //VirtualProtect(src, len, PAGE_EXECUTE_READWRITE, &oProc);
+    LPVOID _src = src;
+    //NtProtectVirtualMemory(hProc, &_src, &len, PAGE_EXECUTE_READWRITE, &oProc); 
+    VirtualProtect(src, len, PAGE_EXECUTE_READWRITE, &oProc);
     memset(src, 0x90, len);
     uintptr_t relAddy = (uintptr_t)(dst - src - 5);
     *src = (char)0xE9;
     *(uintptr_t*)(src + 1) = (uintptr_t)relAddy;
-    NtProtectVirtualMemory(hProc, (LPVOID*)&dst, &len, oProc, &oProc);
+    //NtProtectVirtualMemory(hProc, (LPVOID*)&dst, &len, oProc, &oProc);
 
     return true;
 }
@@ -261,8 +284,7 @@ char* HookLib::TrampHook(char* src, char* dst, short len) {
 
     SIZE_T allocateLen = len + 5;
 
-    LPVOID x = nullptr;
-    char* gateway = (char*)NtAllocateVirtualMemory(hProc, &x, 0, (PULONG)&allocateLen, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);    //VirtualAlloc(0, len + 5, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    char* gateway = (char*)VirtualAlloc(0, len + 5, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);//(char*)NtAllocateVirtualMemory(hProc, &x, 0, (PULONG)&allocateLen, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
     if (!gateway)
         return nullptr;
 
@@ -311,7 +333,7 @@ uintptr_t HookLib::FindCodeCave(const char* cModuleName, size_t iSize) {
 
     memcpy(moduleContent, moduleInfo.lpBaseOfDll, moduleInfo.SizeOfImage - 1);
 
-    for (int i = 1000; i < moduleInfo.SizeOfImage; i++)
+    for (int i = 0; i < moduleInfo.SizeOfImage; i++)
     {
         bool found = true;
         for (int j = 0; j < iSize + 1; j++)
@@ -320,19 +342,24 @@ uintptr_t HookLib::FindCodeCave(const char* cModuleName, size_t iSize) {
                 found = false;
         }
 
-        uintptr_t pCodeCave = ((uintptr_t)moduleInfo.lpBaseOfDll + i);
-        CodeCave cave{ pCodeCave, iSize };
-        cCodeCaves.push_back(cave);
-
         if (found == true)
+        {
+            uintptr_t pCodeCave = ((uintptr_t)moduleInfo.lpBaseOfDll + i);
+            CodeCave cave{ pCodeCave, iSize };
+            cCodeCaves.push_back(cave);
             return ((uintptr_t)moduleInfo.lpBaseOfDll + i);
+        }
     }
 
     return 0x0;
 }
 
-uintptr_t HookLib::AddHook(const char* cModuleName, void* pVirtualTable, void* pTargetFunction, size_t iIndex) {
-    if (iMode == MODE_TRUSTEDMODULE) {
+char* HookLib::AddHook(const char* cModuleName, void* pVirtualTable, void* pTargetFunction, size_t iIndex) {
+	return TrampHook((char*)pVirtualTable, (char*)pTargetFunction, 7);
+    if (iMode == MODE_NORMAL) {
+       
+    }
+    else if (iMode == MODE_TRUSTEDMODULE) {
         // get addr of the VTableEntry
         uintptr_t pVTable = *((uintptr_t*)pVirtualTable);
         uintptr_t pEntry = pVTable + (sizeof(uintptr_t) * iIndex);
@@ -340,7 +367,11 @@ uintptr_t HookLib::AddHook(const char* cModuleName, void* pVirtualTable, void* p
 
         uintptr_t pCodeCave = FindCodeCave(cModuleName, SIZE);
         if (!pCodeCave)
+        {
+            if (criticalHook)
+                criticalNotSet = true;
             return NULL;
+        }
 
         std::cout << pCodeCave << std::endl;
 
@@ -354,20 +385,52 @@ uintptr_t HookLib::AddHook(const char* cModuleName, void* pVirtualTable, void* p
 
         LPVOID ppCodeCave = (LPVOID)pCodeCave;
         LPVOID ppEntry = (LPVOID)pEntry;
-        
+
         NtProtectVirtualMemory(hProc, &ppCodeCave, (PSIZE_T)&size, PAGE_EXECUTE_READWRITE, &oProc);       //VirtualProtect((void*)pCodeCave, SIZE, PAGE_EXECUTE_WRITECOPY, &oProc);
         *(uintptr_t*)(pCodeCave) = (char)0x8B;
         *(uintptr_t*)(pCodeCave + 0x01) = (char)0xED;
         *(uintptr_t*)(pCodeCave + 0x02) = (char)0xE9;
         *(uintptr_t*)(pCodeCave + 0x03) = (uintptr_t)pRelAddr;
-        NtProtectVirtualMemory(hProc, &ppCodeCave, (PSIZE_T)&size, oProc, &oProc);                        //VirtualProtect((void*)pCodeCave, SIZE, oProc, NULL);
+        //NtProtectVirtualMemory(hProc, &ppCodeCave, (PSIZE_T)&size, oProc, &oProc);                        //VirtualProtect((void*)pCodeCave, SIZE, oProc, NULL);
 
         // swap pointer to our code cave
         NtProtectVirtualMemory(hProc, &ppEntry, (PSIZE_T)&sizeOfEntry, PAGE_EXECUTE_WRITECOPY, &oProc);//VirtualProtect((LPVOID)pEntry, sizeof(pEntry), PAGE_EXECUTE_WRITECOPY, &oProc);
         *(uintptr_t*)pEntry = (uintptr_t)pCodeCave;
-        NtProtectVirtualMemory(hProc, &ppEntry, (PSIZE_T)&sizeOfEntry, oProc, &oProc);                   //VirtualProtect((LPVOID)pEntry, sizeof(pEntry), oProc, NULL);
+        //NtProtectVirtualMemory(hProc, &ppEntry, (PSIZE_T)&sizeOfEntry, oProc, &oProc);                   //VirtualProtect((LPVOID)pEntry, sizeof(pEntry), oProc, NULL);
 
-        return pOrig;
+        return (char*)pOrig;
     }
     return NULL;
+}
+
+
+
+uintptr_t HookLib::MarlinHook(uintptr_t target, uintptr_t trampoline, bool* enabled)
+{
+    DWORD oProt;
+
+    uintptr_t gateway = (uintptr_t)VirtualAlloc(0, 24, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    VirtualProtect((LPVOID)target, 12, PAGE_EXECUTE_READWRITE, &oProt);
+    uintptr_t _gateway = gateway - target - 5;
+
+    uintptr_t targetptr = target + (*(uintptr_t*)(target + 0x1) + 5);
+    uintptr_t trampolineptr = trampoline + (*(uintptr_t*)(trampoline + 0x1) + 5);
+
+    //jump to gateway
+    *(char*)(target) = (char)0xE9;
+    *(uintptr_t*)((uintptr_t)target + 1) = (uintptr_t)_gateway;
+
+    //gateway
+    *(char*)((int)gateway) = (char)0x80;
+    *(char*)((int)gateway + 1) = (char)0x3D;
+    *(uintptr_t*)((int)gateway + 2) = (uintptr_t)enabled;
+    *(char*)((int)gateway + 6) = (char)0x01;
+    *(char*)((int)gateway + 7) = (char)0x74;
+    *(char*)((int)gateway + 8) = (char)5;
+    *(char*)((int)gateway + 9) = (char)0xE9;
+    *(uintptr_t*)((int)gateway + 10) = (uintptr_t)targetptr - gateway - 14;
+    *(char*)((int)gateway + 14) = (char)0xE9;
+    *(uintptr_t*)((int)gateway + 15) = (uintptr_t)trampolineptr - gateway - 19;
+
+    return targetptr;
 }

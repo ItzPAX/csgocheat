@@ -10,6 +10,7 @@
 #define SIZE 7
 
 enum Mode {
+	MODE_NORMAL,
     MODE_VEH,
     MODE_TRUSTEDMODULE
 };
@@ -55,13 +56,18 @@ private:
 
     // prototypes
     using tVirtualQuery = SIZE_T(__stdcall*)(LPCVOID, PMEMORY_BASIC_INFORMATION, SIZE_T);
+    using tGetProcAddress = FARPROC(__stdcall*)(HMODULE, LPCSTR);
     using tRtlAddVectoredHandler = PVOID(NTAPI*)(IN ULONG FirstHandler, IN PVECTORED_EXCEPTION_HANDLER VectoredHandler);
 
     // global vars
 public:
     HANDLE hProc;
+    tGetProcAddress oGetProcAddress;
     tVirtualQuery oVirtualQuery;
     tRtlAddVectoredHandler RtlAddVectoredHandler;
+	
+    BOOL                     criticalHook;
+    BOOL                     criticalNotSet;
 
     // private functions
 private:
@@ -75,7 +81,11 @@ public:
         pVTableAddr = NULL; 
         RtlAddVectoredHandler = reinterpret_cast<tRtlAddVectoredHandler>(GetProcAddress(GetModuleHandle("ntdll.dll"), "RtlAddVectoredExceptionHandler"));
         hProc = GetCurrentProcess();
+        criticalHook = true;    //since this is csgo
+        criticalNotSet = false;
     } // constructor
+	
+    void PlaceInspectionHooks();    //experiment with getprocaddr
 
     // If hooking where an ac is present, call this BEFORE hooking everything
     BOOL OverrideACHooks();
@@ -90,7 +100,7 @@ public:
     /// FOR MODE = VEH
     LPVOID AddHook(PVOID pHkFunc, PVOID pVTable, INT16 iIndex, const char* sName = "");
     /// FOR MODE = TRUSTEDMODULE
-    uintptr_t AddHook(const char* cModuleName, void* pVTable, void* pTargetFunction, size_t iIndex);
+    char* AddHook(const char* cModuleName, void* pVTable, void* pTargetFunction, size_t iIndex);
 
     // enable all added hooks
     BOOL EnableAllHooks();
@@ -116,6 +126,10 @@ public:
     BOOL Hook(char* src, char* dst, SIZE_T len);
     char* TrampHook(char* src, char* dst, short len);
 #pragma endregion Hook using inline patching
+
+#pragma region MarlinHook
+    uintptr_t MarlinHook(uintptr_t target, uintptr_t trampoline, bool* enabled);
+#pragma endregion
 
 #pragma region TRUSTEDMODULE
     int GetCodeCaveSize() {
