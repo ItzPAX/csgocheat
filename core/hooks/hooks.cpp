@@ -76,95 +76,50 @@ bool HookManager::AddAllHooks() {
 	if (!g_HookLib.OverrideACHooks()) 
 		return false;
 
-	return true;
 	// hook directx
 	if (g_DirectX.GetD3D9Device(HkDirectX::pD3D9Device, sizeof(HkDirectX::pD3D9Device))) {
 		memcpy(HkDirectX::pEndSceneBytes, (char*)HkDirectX::pD3D9Device[HkDirectX::iEndScene], 7);
-		HkDirectX::oEndScene = (HkDirectX::tEndScene)g_HookLib.TrampHook((char*)HkDirectX::pD3D9Device[HkDirectX::iEndScene], (char*)HkDirectX::hkEndScene, 7);
+		g_HookLib.AddHook(HookEntry((char*)HkDirectX::pD3D9Device[HkDirectX::iEndScene], (char*)HkDirectX::hkEndScene, 7, (PVOID*) & HkDirectX::oEndScene));
 	}
-
-	// hook svcheats
-	ConVar* pSvCheats = g_Interface.pICVar->FindVar(XOR("sv_cheats"));
-	SvCheats::oSvCheats = (SvCheats::tSvCheats)g_HookLib.AddHook(XOR("client.dll"), pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex);
 
 	// hook windows functions
 	WndProc::oWndProc = (WndProc::tWndProc)SetWindowLong(g_DirectX.window, GWL_WNDPROC, (LONG)WndProc::hkWndProc);
 
 	// grab original function address and add hook to the queue
-	CreateMove::oCreateMove = (CreateMove::tCreateMove)g_HookLib.AddHook(XOR("engine.dll"), g_Interface.pClientMode, CreateMove::hkCreateMove, CreateMove::iIndex);
-	DrawModel::oDrawModel = (DrawModel::tDrawModel)g_HookLib.AddHook(XOR("client.dll"), g_Interface.pStudioRender, DrawModel::hkDrawModel, DrawModel::iIndex);
-	HudUpdate::oHudUpdate = (HudUpdate::tHudUpdate)g_HookLib.AddHook(XOR("engine.dll"), g_Interface.pClient, HudUpdate::hkHudUpdate, HudUpdate::iIndex);
-	LockCursor::oLockCursor = (LockCursor::tLockCursor)g_HookLib.AddHook(XOR("client.dll"), g_Interface.pSurface, LockCursor::hkLockCursor, LockCursor::iIndex);
-	
-	if (g_HookLib.criticalNotSet) {
-		std::cout << "[ERROR] One or more hooks were not set correctly! Aborting..." << std::endl;
-		return false;
-	}
-	// forward original func pointer to different classes
-	g_Chams.c_oDrawModel = DrawModel::oDrawModel;
+	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pClientMode, CreateMove::hkCreateMove, CreateMove::iIndex, (PVOID*) & CreateMove::oCreateMove));
+	g_HookLib.AddHook(HookEntry("client.dll", g_Interface.pStudioRender, DrawModel::hkDrawModel, DrawModel::iIndex, (PVOID*) & DrawModel::oDrawModel));
+	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pClient, HudUpdate::hkHudUpdate, HudUpdate::iIndex, (PVOID*) & HudUpdate::oHudUpdate));
+	g_HookLib.AddHook(HookEntry("client.dll", g_Interface.pSurface, LockCursor::hkLockCursor, LockCursor::iIndex, (PVOID*) & LockCursor::oLockCursor));
+	ConVar* pSvCheats = g_Interface.pICVar->FindVar(XOR("sv_cheats"));
+	g_HookLib.AddHook(HookEntry("client.dll", pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex, (PVOID*)&SvCheats::oSvCheats));
 
 	g_HookManager.bHooksAdded = true;
-	g_HookManager.iCounter = g_HookLib.GetCounter();
 	return true;
 }
 
 bool HookManager::InitAllHooks() {
-	// we have not yet successfully called AddAllHooks
+	// we have not yet successfully added all hooks
 	if (!g_HookManager.bHooksAdded)
 		return false;
 
-	bool bStatus = g_HookLib.EnableAllHooks();
+	bool bStatus = g_HookLib.EnableAll();
+
+	// forward original func pointer to different classes after hooks have been enabled
+	g_Chams.c_oDrawModel = DrawModel::oDrawModel;
+
+	g_HookLib.RestoreACHooks();
 
 	// restore hooks placed by vac
-	g_HookLib.RestoreACHooks();
 	return bStatus;
 }
 
 bool HookManager::ReleaseAll() {
-	// check if there are any hooks to release
-	if (g_HookManager.iCounter <= 0)
-		return false;
+	// do some checks for tramp hooks, we need to patch original bytes
+	
+	// disable all hooks
+	g_HookLib.DisableAll();
 
-	// manually remove the trampoline hook
-	g_HookLib.Patch((char*)HkDirectX::pD3D9Device[42], (char*)HkDirectX::pEndSceneBytes, 7);
-
-	// we have hooks to release, lets call the function
-	g_HookLib.DisableAllHooks();
 	return true;
-}
-
-IHookStatus HookManager::GetHookInfo(const char* sName) {
-	// check if a name has been entered
-	if (sName == "")
-		return IHookStatus();
-
-	// create both structs
-	IHookStatus ihs = IHookStatus();
-	HookStatus hs = g_HookLib.GetHookInfo(sName);
-
-	// copy hs struct to ihs struct
-	ihs.iIndex = hs.iIndex;
-	ihs.pBaseFnc = hs.pBaseFnc;
-	ihs.pHkAddr = hs.pHkAddr;
-	for (int i = 0; i < sName[i] != 0; i++)
-		ihs.name += sName[i];
-
-	return ihs;
-}
-
-void HookManager::LogHookStatus(IHookStatus ihs) {
-	if (ihs.name->empty())
-		return;
-
-	ihs.name->append(XOR(".txt"));
-	auto outFile = std::ofstream(ihs.name->c_str());
-	outFile << XOR("[INDEX] ") << ihs.iIndex << std::endl;
-	outFile << XOR("[HKFNC] ") << ihs.pHkAddr << std::endl;
-	outFile << XOR("[BASE] ") << ihs.pBaseFnc << std::endl;
-
-	std::cout << XOR("[INDEX] ") << ihs.iIndex << std::endl;
-	std::cout << XOR("[HKFNC] ") << ihs.pHkAddr << std::endl;
-	std::cout << XOR("[BASE] ") << ihs.pBaseFnc << std::endl;
 }
 
 #pragma region HkFunctions

@@ -12,11 +12,11 @@ void Chams::OverrideMaterial(int iMatIndex, bool bIgnoreZ, Color col) {
 }
 
 void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags) {
-	g_Interface.pModelRender->OverrideMaterial(nullptr); // change overwritten material to default
-
 	if (!Game::g_pLocal || !info.m_pRenderable)
 		return;
 	
+	g_Interface.pModelRender->OverrideMaterial(nullptr); // change overwritten material to default
+
 	Entity* pEntity = info.m_pRenderable->GetIClientUnknown()->GetBaseEntity();
 	// we have a valid player
 	if (!pEntity || !pEntity->bIsPlayer() || pEntity->iIndex() > g_Interface.pGlobalVars->iMaxClients || pEntity->iTeamNum() < 2)

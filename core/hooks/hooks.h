@@ -13,17 +13,12 @@ struct IHookStatus {
 class HookManager {
 private:
 	bool bHooksAdded;
-	int  iCounter;
 
 public:
-	HookManager() { bHooksAdded = false; iCounter = 0; } // constructor
+	HookManager() { bHooksAdded = false; } // constructor
 	bool AddAllHooks();
 	bool InitAllHooks();
 	bool ReleaseAll();
-
-	// debug functions, only works if hook has been placed via VEH
-	IHookStatus GetHookInfo(const char* sName);
-	void LogHookStatus(IHookStatus ihs);
 };
 
 extern HookManager g_HookManager;

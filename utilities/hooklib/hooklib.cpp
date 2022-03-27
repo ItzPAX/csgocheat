@@ -1,56 +1,73 @@
 #include "hooklib.h"
 #include "csgocheat/Syscalls.h"
 
+HookLib g_HookLib{ };
+
 namespace hkFunctions {
-	
-    FARPROC __stdcall hkGetProcAddress(HMODULE hMod, LPCSTR name)
-    {
-        std::cout << "[GetProcAddress] " << name << std::endl;
-        return NULL;
-		//return g_HookLib.oGetProcAddress(hMod, name);
-    }
-	
-	
     SIZE_T __stdcall hkVirtualQuery(LPCVOID lpAddr, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_T lpSize) {
         SIZE_T sReturnVal = g_HookLib.oVirtualQuery(lpAddr, lpBuffer, lpSize);
         bool bTamper = false;
 
         // we finished hooking, or havent started yet
-        if (!g_HookLib.GetACHookStatus())
+        if (!g_HookLib._GetACHookStatus())
             return sReturnVal;
 
         // tamper with return vals only if function has been hooked by us
-        if (lpAddr == VirtualProtect) bTamper = true;
-        for (int i = 0; i < g_HookLib.GetCounter(); i++) {
-            if (lpAddr == g_HookLib.GetBasePointer(i))
+        for (int i = 0; i < g_HookLib._GetCounter(); i++) {
+            if (lpAddr == g_HookLib._GetBasePointer(i))
                 bTamper = true;
         }
-        for (int i = 0; i < g_HookLib.GetCodeCaveSize(); i++) {
-            if (lpAddr == (void*)g_HookLib.GetCodeCaveAddr(i))
+        for (int i = 0; i < g_HookLib._GetCodeCaveSize(); i++) {
+            if (lpAddr == (void*)g_HookLib._GetCodeCaveAddr(i))
                 bTamper = true;
         }
 
         if (lpBuffer && bTamper) {
-            lpBuffer->AllocationProtect = PAGE_EXECUTE_READ;
-            lpBuffer->Protect = PAGE_EXECUTE_READ;
+            lpBuffer->AllocationProtect = PAGE_READWRITE;
+            lpBuffer->Protect = PAGE_READWRITE;
         }
 
         return sReturnVal;
-    } 
+    }
 }
+// The API to interact with the lib
+#pragma region HookLibAPI
+BOOL HookLib::EnableAll() {
+    for (auto entry : hookEntries) {
+        switch (entry.iMode) {
+        case MODE_NONE:
+            // someone pushed back an empty struct :(
+            return false;
+            break;
+        case MODE_VEH:
+            // we have a VEH Entry, init the handler once
+            if (!pVEHHandle)
+                pVEHHandle = RtlAddVectoredHandler(true, VEHHandler);
+            *entry.oFunc = AddHook(entry.pHkFunc, entry.pVTable, entry.iIndex, entry.sName);
+            break;
+        case MODE_TRUSTEDMODULE:
+            *entry.oFunc = AddHook(entry.cModuleName, entry.pVirtualTable, entry.pTargetFunction, entry.iInd);
+            break;
+        case MODE_MARLIN:
+            *entry.oFunc = AddHook(entry.psrc, entry.pdst, entry.ilen);
+            break;
+        default:
+            return false;
+        }
+    }
+    return true;
+}
+#pragma endregion
 
-HookLib g_HookLib{ };
-
-// The VEHHandler, it will change EIP accordingly to the hooked function we added
 #pragma region VEHHandler
 LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
     DWORD dwAddr = NOT_FOUND;
     PVOID pExceptAddr = pExceptionInfo->ExceptionRecord->ExceptionAddress;
 
     // Find the address that triggered the error
-    for (int i = 0; i < g_HookLib.GetCounter(); i++) {
-        if (g_HookLib.GetPointerDestructor(i) == pExceptAddr) {
-            dwAddr = (DWORD)g_HookLib.GetHkFnc(i);
+    for (int i = 0; i < g_HookLib._GetCounter(); i++) {
+        if (g_HookLib._GetPointerDestructor(i) == pExceptAddr) {
+            dwAddr = (DWORD)g_HookLib._GetHkFnc(i);
             break;
         }
     }
@@ -65,33 +82,11 @@ LONG __stdcall VEHHandler(EXCEPTION_POINTERS* pExceptionInfo) {
     return EXCEPTION_CONTINUE_SEARCH;
 }
 #pragma endregion
-
-void HookLib::PlaceInspectionHooks()
-{
-    bool gpa_hook = true;
-    oGetProcAddress = (tGetProcAddress)MarlinHook((uintptr_t)&GetProcAddress, (uintptr_t)&hkFunctions::hkGetProcAddress, &gpa_hook);
-    std::cout << std::hex <<oGetProcAddress << std::endl;
-
-    //oGetProcAddress = (tGetProcAddress)TrampHook((char*)GetProcAddress, (char*)hkFunctions::hkGetProcAddress, 5);
-}
-
-#pragma region VEHHook
+#pragma region ACStuff
 BOOL HookLib::OverrideACHooks() {
-	
-    g_HookLib.PlaceInspectionHooks();
-	
-    DWORD oProc;
-
-    // copy the old bytes to restore the hook later
-    memcpy(wHookedBytes, VirtualProtect, 5);
-
-    //override the ac hook with original bytes, since vac is stupid they dont scan for writecopy
-    VirtualProtect(VirtualProtect, 5, PAGE_EXECUTE_WRITECOPY, &oProc);
-    memcpy(VirtualProtect, wOrigBytes, 5);
-    VirtualProtect(VirtualProtect, 5, oProc, &oProc);
-
     // hook virtualquery func and return false info
-    oVirtualQuery = (tVirtualQuery)TrampHook((char*)VirtualQuery, (char*)hkFunctions::hkVirtualQuery, 5);
+    memcpy(wOrigBytes, VirtualQuery, 5);
+    oVirtualQuery = (tVirtualQuery)AddHook((char*)VirtualQuery, (char*)hkFunctions::hkVirtualQuery, 5);
 
     bACHooksOverwritten = true;
 
@@ -103,36 +98,42 @@ BOOL HookLib::RestoreACHooks() {
     if (!bACHooksOverwritten)
         return false;
 
-    // dont restore the virtualquery hook, since we just overwrote the hook from vac
-
-    // restore the virtualprotect hook, we aren't hooked rn so this call is fine
     DWORD oProc;
-
-   /* VirtualProtect(VirtualProtect, 5, PAGE_EXECUTE_WRITECOPY, &oProc);
-    memcpy(VirtualProtect, wHookedBytes, 5);
-    VirtualProtect(VirtualProtect, 5, oProc, &oProc);*/
+    PVOID pVirtualQuery = VirtualQuery;
+    SIZE_T iSize = 5;
+    NtProtectVirtualMemory(hProc, &pVirtualQuery, &iSize, PAGE_EXECUTE_READWRITE, &oProc);
+    memcpy(VirtualQuery, wOrigBytes, 5);
+    NtProtectVirtualMemory(hProc, &pVirtualQuery, &iSize, oProc, &oProc);
 
     bACHooksOverwritten = false;
 
     return true;
 }
 
+#pragma endregion
+#pragma region VEHHook
 // This function will break all the pointers to trigger an excpetion and call the VEHHandler
 BOOL HookLib::DestroyPointers(int index) {
+    // no index, destroy all pointer stored
     if (index == NOT_FOUND) {
         for (int i = 0; i < iCounter; i++) {
-            DWORD dwOProc;
-            VirtualProtect((LPVOID)(pBaseFnc.at(i)), sizeof((pBaseFnc.at(i))), PAGE_EXECUTE_READWRITE, &dwOProc); // override protection
+            DWORD oProc;
+            LPVOID ppBaseFnc = (LPVOID)pBaseFnc.at(i);
+            SIZE_T pSize = sizeof(pBaseFnc.at(i));
+            NtProtectVirtualMemory(hProc, &ppBaseFnc, &pSize, PAGE_EXECUTE_READWRITE, &oProc);
             *((uintptr_t*)pBaseFnc.at(i)) = (uintptr_t)pPointerDestructor.at(i); // break pointer
-            VirtualProtect((LPVOID)(pBaseFnc.at(i)), sizeof((pBaseFnc.at(i))), dwOProc, &dwOProc); // override to old protection
+            NtProtectVirtualMemory(hProc, &ppBaseFnc, &pSize, oProc, &oProc);
         }
     }
 
+    // destroy pointer of index
     else {
-        DWORD dwOProc;
-        VirtualProtect((LPVOID)(pBaseFnc.at(index)), sizeof((pBaseFnc.at(index))), PAGE_EXECUTE_READWRITE, &dwOProc); // override protection
+        DWORD oProc;
+        LPVOID ppBaseFnc = (LPVOID)pBaseFnc.at(index);
+        SIZE_T pSize = sizeof(pBaseFnc.at(index));
+        NtProtectVirtualMemory(hProc, &ppBaseFnc, &pSize, PAGE_EXECUTE_READWRITE, &oProc);
         *((uintptr_t*)pBaseFnc.at(index)) = (uintptr_t)pPointerDestructor.at(index); // break pointer
-        VirtualProtect((LPVOID)(pBaseFnc.at(index)), sizeof((pBaseFnc.at(index))), dwOProc, &dwOProc); // override to old protection
+        NtProtectVirtualMemory(hProc, &ppBaseFnc, &pSize, oProc, &oProc);
     }
 
     // if we arrive here all hooks have successfully been placed
@@ -140,120 +141,27 @@ BOOL HookLib::DestroyPointers(int index) {
 }
 
 LPVOID HookLib::AddHook(PVOID pHkFunc, PVOID pVTable, INT16 iIndex, const char* sName) {
-    if (iMode == MODE_VEH) {
-        // push back new hook values
-        pName.push_back(sName);
-        pVTableAddr = pVTable;
-        nIndex.push_back(iIndex);
-        pHkFnc.push_back(pHkFunc);
-        pBaseFnc.push_back(*((uintptr_t*)pVTableAddr) + (sizeof(uintptr_t) * nIndex.at(iCounter)));
-        pOrigFncAddr.push_back(*((uintptr_t*)(pBaseFnc.at(iCounter))));
-        (nIndex.at(iCounter) > 0) ? pPointerDestructor.push_back(*((uintptr_t*)pVTableAddr) - 1) : pPointerDestructor.push_back(*((uintptr_t*)pVTableAddr) + 1);
+    // push back new hook values
+    pName.push_back(sName);
+    pVTableAddr = pVTable;
+    nIndex.push_back(iIndex);
+    pHkFnc.push_back(pHkFunc);
+    pBaseFnc.push_back(*((uintptr_t*)pVTableAddr) + (sizeof(uintptr_t) * nIndex.at(iCounter)));
+    pOrigFncAddr.push_back(*((uintptr_t*)(pBaseFnc.at(iCounter))));
+    (nIndex.at(iCounter) > 0) ? pPointerDestructor.push_back(*((uintptr_t*)pVTableAddr) - 1) : pPointerDestructor.push_back(*((uintptr_t*)pVTableAddr) + 1);
 
-        // get original function address
-        uintptr_t pRetVal = pOrigFncAddr.at(iCounter);
+    // get original function address
+    uintptr_t pRetVal = pOrigFncAddr.at(iCounter);
 
-        // increment hook counter
-        iCounter++;
-        return (LPVOID)pRetVal;
-    }
-    return nullptr;
-}
-
-BOOL HookLib::EnableAllHooks() {
-    if (iMode == MODE_VEH) {
-        if (!bVehInit)
-            g_HookLib.pVEHHandle = RtlAddVectoredHandler(true, (PVECTORED_EXCEPTION_HANDLER)VEHHandler);
-
-        // we didnt manage to register a handler
-        if (!pVEHHandle)
-            return false;
-
-        // Something went wrong when trying to trigger the exception
-        if (!DestroyPointers())
-            return false;
-
-        return true;
-    }
-    return false;
-}
-
-BOOL HookLib::EnableHook(const char* sName, int ind) {
-    if (iMode == MODE_VEH) {
-        int index = NOT_FOUND;
-
-        for (int i = 0; i < iCounter; i++) {
-            if (pName[i] == sName) {
-                index = i;
-            }
-        }
-
-        // check if given ind is in bounds and only assign if we didnt find a matching name
-        bool bIndIsOk = ind < iCounter&& ind != NOT_FOUND;
-        if (bIndIsOk && index == NOT_FOUND)
-            index = ind;
-
-        // add the handler
-        if (!bVehInit)
-            g_HookLib.pVEHHandle = RtlAddVectoredHandler(true, (PVECTORED_EXCEPTION_HANDLER)VEHHandler);
-
-        // we didnt manage to register a handler
-        if (!pVEHHandle)
-            return false;
-
-        // Something went wrong when trying to trigger the exception
-        if (index == NOT_FOUND || !DestroyPointers(index))
-            return false;
-
-        return true;
-    }
-    return false;
-}
-
-VOID HookLib::DisableHook(const char* sName, int ind) {
-    if (iMode == MODE_VEH) {
-        int index = NOT_FOUND;
-
-        // find index based on name
-        for (int i = 0; i < iCounter; i++) {
-            if (pName[i] == sName) {
-                index = i;
-            }
-        }
-
-        // check if given ind is in bounds and only assign if we didnt find a matching name
-        bool bIndIsOk = ind < iCounter&& ind != NOT_FOUND;
-        if (bIndIsOk && index == NOT_FOUND)
-            index = ind;
-
-        // name and/or index not found
-        if (index == NOT_FOUND)
-            return;
-
-        // unhook
-        DWORD dwOProc;
-        VirtualProtect((LPVOID)(pBaseFnc.at(index)), sizeof((pBaseFnc.at(index))), PAGE_EXECUTE_READWRITE, &dwOProc); // override protection
-        *((uintptr_t*)pBaseFnc.at(index)) = (uintptr_t)pOrigFncAddr.at(index); // restore pointer
-        VirtualProtect((LPVOID)(pBaseFnc.at(index)), sizeof((pBaseFnc.at(index))), dwOProc, &dwOProc); // override to old protection
-    }
-}
-
-VOID HookLib::DisableAllHooks() {
-    if (iMode == MODE_VEH) {
-        for (int i = 0; i < iCounter; i++) {
-            DWORD dwOProc;
-            VirtualProtect((LPVOID)(pBaseFnc.at(i)), sizeof((pBaseFnc.at(i))), PAGE_EXECUTE_READWRITE, &dwOProc); // override protection
-            *((uintptr_t*)pBaseFnc.at(i)) = (uintptr_t)pOrigFncAddr.at(i); // restore pointer
-            VirtualProtect((LPVOID)(pBaseFnc.at(i)), sizeof((pBaseFnc.at(i))), dwOProc, &dwOProc); // override to old protection
-        }
-
-        // remove vectored exceptionhandler
-        RemoveVectoredExceptionHandler(pVEHHandle);
-        pVEHHandle = NULL;
-    }
+    // activate the hook
+    DestroyPointers(iCounter);
+    // increment hook counter
+    iCounter++;
+    return (LPVOID)pRetVal;
 }
 #pragma endregion
 
+/*REPLACE WITH MARLIN HOOK*/
 #pragma region TrampHook
 VOID HookLib::Patch(char* dst, char* src, SIZE_T len) {
     //NtProtectVirtualMemory(hProc, &ppCodeCave, (PSIZE_T)&size, PAGE_EXECUTE_READWRITE, &oProc);
@@ -279,12 +187,13 @@ BOOL HookLib::Hook(char* src, char* dst, SIZE_T len) {
     return true;
 }
 
-char* HookLib::TrampHook(char* src, char* dst, short len) {
+void* HookLib::AddHook(char* src, char* dst, short len) {
     if (len < 5) return 0;
 
     SIZE_T allocateLen = len + 5;
+    char* gateway = 0;
 
-    char* gateway = (char*)VirtualAlloc(0, len + 5, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);//(char*)NtAllocateVirtualMemory(hProc, &x, 0, (PULONG)&allocateLen, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    NtAllocateVirtualMemory(hProc, (PVOID*)&gateway, 0, &allocateLen, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
     if (!gateway)
         return nullptr;
 
@@ -298,32 +207,7 @@ char* HookLib::TrampHook(char* src, char* dst, short len) {
     return nullptr;
 }
 #pragma endregion
-
-HookStatus HookLib::GetHookInfo(const char* sName, int ind) {
-    // loop through hooks and search for name match
-    int index = NOT_FOUND;
-
-    for (int i = 0; i < iCounter; i++) {
-        if (pName.at(i) == sName)
-            index = i;
-    }
-
-    if (index == NOT_FOUND) {
-        index = ind;
-    }
-
-    if (index != NOT_FOUND) {
-        HookStatus hs;
-        hs.iIndex = index;
-        hs.pBaseFnc = pBaseFnc.at(index);
-        hs.pHkAddr = pHkFnc.at(index);
-
-        return hs;
-    }
-
-    return HookStatus();
-}
-
+#pragma region TrustedModule
 uintptr_t HookLib::FindCodeCave(const char* cModuleName, size_t iSize) {
     MODULEINFO moduleInfo = GetModuleInfo(cModuleName);
     uintptr_t pFinalAddr = 0x00;
@@ -354,60 +238,53 @@ uintptr_t HookLib::FindCodeCave(const char* cModuleName, size_t iSize) {
     return 0x0;
 }
 
-char* HookLib::AddHook(const char* cModuleName, void* pVirtualTable, void* pTargetFunction, size_t iIndex) {
-	return TrampHook((char*)pVirtualTable, (char*)pTargetFunction, 7);
-    if (iMode == MODE_NORMAL) {
-       
-    }
-    else if (iMode == MODE_TRUSTEDMODULE) {
-        // get addr of the VTableEntry
-        uintptr_t pVTable = *((uintptr_t*)pVirtualTable);
-        uintptr_t pEntry = pVTable + (sizeof(uintptr_t) * iIndex);
-        uintptr_t pOrig = *((uintptr_t*)pEntry);
+void* HookLib::AddHook(const char* cModuleName, void* pVirtualTable, void* pTargetFunction, size_t iIndex) {
+    // get addr of the VTableEntry
+    uintptr_t pVTable = *((uintptr_t*)pVirtualTable);
+    uintptr_t pEntry = pVTable + (sizeof(uintptr_t) * iIndex);
+    uintptr_t pOrig = *((uintptr_t*)pEntry);
 
-        uintptr_t pCodeCave = FindCodeCave(cModuleName, SIZE);
-        if (!pCodeCave)
-        {
-            if (criticalHook)
-                criticalNotSet = true;
-            return NULL;
-        }
+    uintptr_t pCodeCave = FindCodeCave(cModuleName, SIZE);
 
-        std::cout << pCodeCave << std::endl;
+    uintptr_t pRelAddr = (uintptr_t)pTargetFunction - pCodeCave - SIZE;
 
-        uintptr_t pRelAddr = (uintptr_t)pTargetFunction - pCodeCave - SIZE;
+    // place our shellcode in the code cave
+    DWORD oProc;
 
-        // place our shellcode in the code cave
-        DWORD oProc;
+    int sizeOfEntry = sizeof(pEntry);
+    int size = SIZE;
 
-        int sizeOfEntry = sizeof(pEntry);
-        int size = SIZE;
+    LPVOID ppCodeCave = (LPVOID)pCodeCave;
+    LPVOID ppEntry = (LPVOID)pEntry;
 
-        LPVOID ppCodeCave = (LPVOID)pCodeCave;
-        LPVOID ppEntry = (LPVOID)pEntry;
+    NtProtectVirtualMemory(hProc, &ppCodeCave, (PSIZE_T)&size, PAGE_EXECUTE_READWRITE, &oProc);
+    *(uintptr_t*)(pCodeCave) = (char)0x8B;
+    *(uintptr_t*)(pCodeCave + 0x01) = (char)0xED;
+    *(uintptr_t*)(pCodeCave + 0x02) = (char)0xE9;
+    *(uintptr_t*)(pCodeCave + 0x03) = (uintptr_t)pRelAddr;
+    // dont restore to keep execute priviliges
 
-        NtProtectVirtualMemory(hProc, &ppCodeCave, (PSIZE_T)&size, PAGE_EXECUTE_READWRITE, &oProc);       //VirtualProtect((void*)pCodeCave, SIZE, PAGE_EXECUTE_WRITECOPY, &oProc);
-        *(uintptr_t*)(pCodeCave) = (char)0x8B;
-        *(uintptr_t*)(pCodeCave + 0x01) = (char)0xED;
-        *(uintptr_t*)(pCodeCave + 0x02) = (char)0xE9;
-        *(uintptr_t*)(pCodeCave + 0x03) = (uintptr_t)pRelAddr;
-        //NtProtectVirtualMemory(hProc, &ppCodeCave, (PSIZE_T)&size, oProc, &oProc);                        //VirtualProtect((void*)pCodeCave, SIZE, oProc, NULL);
 
-        // swap pointer to our code cave
-        NtProtectVirtualMemory(hProc, &ppEntry, (PSIZE_T)&sizeOfEntry, PAGE_EXECUTE_WRITECOPY, &oProc);//VirtualProtect((LPVOID)pEntry, sizeof(pEntry), PAGE_EXECUTE_WRITECOPY, &oProc);
-        *(uintptr_t*)pEntry = (uintptr_t)pCodeCave;
-        //NtProtectVirtualMemory(hProc, &ppEntry, (PSIZE_T)&sizeOfEntry, oProc, &oProc);                   //VirtualProtect((LPVOID)pEntry, sizeof(pEntry), oProc, NULL);
+    // swap pointer to our code cave
+    NtProtectVirtualMemory(hProc, &ppEntry, (PSIZE_T)&sizeOfEntry, PAGE_EXECUTE_WRITECOPY, &oProc);
+    *(uintptr_t*)pEntry = (uintptr_t)pCodeCave;
+    // dont restore to keep execute priviliges
 
-        return (char*)pOrig;
-    }
-    return NULL;
+    return (char*)pOrig;
 }
+#pragma endregion
 
-
-
-uintptr_t HookLib::MarlinHook(uintptr_t target, uintptr_t trampoline, bool* enabled)
+/*TODO:*/
+uintptr_t HookLib::MarlinHook(uintptr_t target, uintptr_t trampoline, size_t iSize, bool* enabled)
 {
     DWORD oProt;
+
+    // copy stolen bytes
+    BYTE* bStolenBytes = (BYTE*)malloc(iSize);
+    memcpy((void*)target, bStolenBytes, iSize);
+
+    // clear memory
+    ZeroMemory((void*)target, iSize);
 
     uintptr_t gateway = (uintptr_t)VirtualAlloc(0, 24, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
     VirtualProtect((LPVOID)target, 12, PAGE_EXECUTE_READWRITE, &oProt);
@@ -415,6 +292,9 @@ uintptr_t HookLib::MarlinHook(uintptr_t target, uintptr_t trampoline, bool* enab
 
     uintptr_t targetptr = target + (*(uintptr_t*)(target + 0x1) + 5);
     uintptr_t trampolineptr = trampoline + (*(uintptr_t*)(trampoline + 0x1) + 5);
+
+    std::cout << targetptr << std::endl;
+    std::cout << trampolineptr << std::endl;
 
     //jump to gateway
     *(char*)(target) = (char)0xE9;
