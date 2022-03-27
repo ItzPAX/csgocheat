@@ -60,7 +60,10 @@ void Backtrack::RecordData() {
 	}
 }
 
-LagRecord* Backtrack::Lagcompensation(CUserCmd* cmd) {
+LagRecord* Backtrack::Lagcompensation() {
+	if (!Variables::bLagcomp)
+		return nullptr;
+
 	int iBestPlayerInd = INVALID;
 	Player* pBestPlayer = nullptr;
 	float flBestDelta = FLOAT_MAX;
@@ -77,6 +80,7 @@ LagRecord* Backtrack::Lagcompensation(CUserCmd* cmd) {
 	// get local aimpunchangle
 	Vec3D vAimPunchAngle = Game::g_pLocal->vGetAimPunchAngle();
 
+	// get best player
 	for (int i = 1; i <= g_Interface.pGlobalVars->iMaxClients; i++) {
 		// get entity and validate it
 		Player* pPlayer = reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntity(i));
@@ -85,7 +89,7 @@ LagRecord* Backtrack::Lagcompensation(CUserCmd* cmd) {
 
 		Vec3D vAngle;
 
-		Vec3D vHitboxPos = pPlayer->vGetHitboxPos(HitboxHead);
+		Vec3D vHitboxPos = pPlayer->vGetHitboxPos(HitboxChest);
 
 		g_Math.CalcAngle(vEyeOrigin, vHitboxPos, vAngle);
 		vAngle.Clamp();
@@ -101,6 +105,7 @@ LagRecord* Backtrack::Lagcompensation(CUserCmd* cmd) {
 	if (iBestPlayerInd == INVALID || !pBestPlayer || deqLagRecords[iBestPlayerInd].size() <= 3)
 		return nullptr;
 
+	// get best record
 	for (int i = 0; i < deqLagRecords[iBestPlayerInd].size(); i++) {
 		LagRecord record = deqLagRecords[iBestPlayerInd][i];
 		if (!ValidTick(record))
@@ -112,7 +117,7 @@ LagRecord* Backtrack::Lagcompensation(CUserCmd* cmd) {
 
 				Vec3D vHitboxPos = record.GetHitboxPos(Variables::iAllowedHitboxes[j]);
 
-				g_Math.CalcAngle(vEyeOrigin, vHitboxPos - (Game::g_pLocal->vGetAimPunchAngle() * 2.f), vAngle);
+				g_Math.CalcAngle(vEyeOrigin, vHitboxPos + (Game::g_pLocal->vGetAimPunchAngle() * 2.f), vAngle);
 				vAngle.Clamp();
 
 				float flCurrDelta = (vAngle - vAimPunchAngle - vViewAngles).Clamped().Length();
@@ -127,7 +132,7 @@ LagRecord* Backtrack::Lagcompensation(CUserCmd* cmd) {
 
 			Vec3D vHitboxPos = record.GetHitboxPos(HitboxHead);
 
-			g_Math.CalcAngle(vEyeOrigin, vHitboxPos - (Game::g_pLocal->vGetAimPunchAngle() * 2.f), vAngle);
+			g_Math.CalcAngle(vEyeOrigin, vHitboxPos + (Game::g_pLocal->vGetAimPunchAngle() * 2.f), vAngle);
 			vAngle.Clamp();
 
 			float flCurrDelta = (vAngle - vAimPunchAngle - vViewAngles).Clamped().Length();
@@ -145,7 +150,10 @@ LagRecord* Backtrack::Lagcompensation(CUserCmd* cmd) {
 
 void Backtrack::ApplyRecord(CUserCmd* cmd, LagRecord* record) {
 	// apply tickount to cmd
-	if (cmd->buttons & InAttack && record) {
-		cmd->tick_count = TIME_TO_TICKS(record->flSimTime + GetLerpTime());
+	if (!cmd || !record)
+		return;
+
+	if (cmd->buttons & InAttack) {
+		cmd->tick_count = TIME_TO_TICKS(record->flSimTime);
 	}
 }

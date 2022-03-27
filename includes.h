@@ -1,10 +1,10 @@
 #pragma once
 
-
-
 // globally available shit
 class CUserCmd;
 class Player;
+struct LagRecord;
+
 namespace Game {
 	inline CUserCmd* g_pCmd;
 	inline Player* g_pLocal;

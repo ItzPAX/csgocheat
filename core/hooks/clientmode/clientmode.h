@@ -23,40 +23,18 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	if (NetvarOffsets::iHealth == 0)
 		NetvarOffsets::iHealth = g_NetVars.GetOffsetDirect(XOR("DT_BasePlayer"), XOR("m_iHealth"), Game::g_pLocal);
 
-	// thirdperson
-	g_Visuals.ThirdPerson();
-
 	// lagcomp stuff
 	if (!bBacktrackInit) {
 		g_Backtrack.Init();
 		bBacktrackInit = true;
 	}
-	{
-		{
-			{
-				{
-					{
-						{
-							{
-								{
-									{
-										g_Backtrack.RecordData();
-										LagRecord* pRecord = g_Backtrack.Lagcompensation(cmd);
 
-										// call aimbot with best record
-										if (Game::g_pLocal->bIsAlive())
-											g_LegitBot.AimAtBestPlayer(pRecord);
+	g_Backtrack.pBestRecord = g_Backtrack.Lagcompensation();
+	// call aimbot with best record
+	if (Game::g_pLocal->bIsAlive())
+		g_LegitBot.AimAtBestPlayer(g_Backtrack.pBestRecord);
 
-										g_Backtrack.ApplyRecord(cmd, pRecord);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+	g_Backtrack.ApplyRecord(Game::g_pCmd, g_Backtrack.pBestRecord);
 
 	g_Misc.BunnyHop(cmd);
 

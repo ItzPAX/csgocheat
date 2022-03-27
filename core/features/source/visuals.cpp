@@ -6,11 +6,11 @@ Visuals g_Visuals;
 void Visuals::ThirdPerson() {
 	static bool bInThirdPerson = false;
 
-	if (GetAsyncKeyState(VK_MBUTTON) & 0x01)
+	if (GetAsyncKeyState(VK_MBUTTON) & 1)
 		bInThirdPerson = !bInThirdPerson;
 
-	if (g_Interface.pInput->bCameraInThirdperson = bInThirdPerson)
-		g_Interface.pInput->vCameraOffset.z = 100.f;
+	g_Interface.pInput->bCameraInThirdperson = bInThirdPerson;
+	g_Interface.pInput->vCameraOffset.z = 100.f;
 }
 
 void Visuals::UpdatePlayerRects() {

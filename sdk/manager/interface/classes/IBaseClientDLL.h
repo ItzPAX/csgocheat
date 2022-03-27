@@ -1,5 +1,25 @@
 #pragma once
 
+enum ClientFrameStage_t {
+	FRAME_UNDEFINED = -1,			// (haven't run any frames yet)
+	FRAME_START,
+
+	// A network packet is being recieved
+	FRAME_NET_UPDATE_START,
+	// Data has been received and we're going to start calling PostDataUpdate
+	FRAME_NET_UPDATE_POSTDATAUPDATE_START,
+	// Data has been received and we've called PostDataUpdate on all data recipients
+	FRAME_NET_UPDATE_POSTDATAUPDATE_END,
+	// We've received all packets, we can now do interpolation, prediction, etc..
+	FRAME_NET_UPDATE_END,
+
+	// We're about to start rendering the scene
+	FRAME_RENDER_START,
+	// We've finished rendering the scene.
+	FRAME_RENDER_END
+};
+
+
 // forward declaration
 class ClientClass;
 
@@ -110,7 +130,7 @@ public:
 	virtual void			InstallStringTableCallback(char const* tableName) = 0;
 
 	// Notification that we're moving into another stage during the frame.
-	virtual void			PadFn6() = 0;
+	virtual void			FrameStageNotify(ClientFrameStage_t curStage) = 0;
 
 	// The engine has received the specified user message, this code is used to dispatch the message handler
 	virtual void			PadFn7() = 0;

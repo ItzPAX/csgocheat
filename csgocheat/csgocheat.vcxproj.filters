@@ -400,6 +400,9 @@
     <ClInclude Include="Syscalls.h">
       <Filter>syswhispers</Filter>
     </ClInclude>
+    <ClInclude Include="..\core\hooks\client\framestagenotify.h">
+      <Filter>core\hooks\client</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />

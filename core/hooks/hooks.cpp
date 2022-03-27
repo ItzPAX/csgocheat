@@ -7,15 +7,22 @@
 #include "studiorender/studiorender.h"
 #include "sdk/manager/interface/interface.h"
 #include "client/hudupdate.h"
+#include "client/framestagenotify.h"
 
 HookManager g_HookManager{ };
 
 #pragma region HookDefs
+namespace FSN {
+	using tFrameStageNotify = void(__thiscall*)(void*, ClientFrameStage_t);
+	tFrameStageNotify oFrameStageNotify = nullptr;
+
+	int iIndex = 37;
+	__forceinline void __stdcall hkFrameStageNotfy(ClientFrameStage_t curStage);
+}
+
 namespace SvCheats {
 	using tSvCheats = bool(__thiscall*)(void*);
 	tSvCheats oSvCheats = nullptr;
-
-	BYTE pOrigBytes[7] = {0};
 
 	int iIndex = 13;
 	__forceinline bool __fastcall hkSvCheats(void* ConVar, int edx);
@@ -86,12 +93,13 @@ bool HookManager::AddAllHooks() {
 	WndProc::oWndProc = (WndProc::tWndProc)SetWindowLong(g_DirectX.window, GWL_WNDPROC, (LONG)WndProc::hkWndProc);
 
 	// grab original function address and add hook to the queue
-	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pClientMode, CreateMove::hkCreateMove, CreateMove::iIndex, (PVOID*) & CreateMove::oCreateMove));
-	g_HookLib.AddHook(HookEntry("client.dll", g_Interface.pStudioRender, DrawModel::hkDrawModel, DrawModel::iIndex, (PVOID*) & DrawModel::oDrawModel));
-	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pClient, HudUpdate::hkHudUpdate, HudUpdate::iIndex, (PVOID*) & HudUpdate::oHudUpdate));
-	g_HookLib.AddHook(HookEntry("client.dll", g_Interface.pSurface, LockCursor::hkLockCursor, LockCursor::iIndex, (PVOID*) & LockCursor::oLockCursor));
+	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pClientMode, CreateMove::hkCreateMove, CreateMove::iIndex, (PVOID*)&CreateMove::oCreateMove));
+	g_HookLib.AddHook(HookEntry("client.dll", g_Interface.pStudioRender, DrawModel::hkDrawModel, DrawModel::iIndex, (PVOID*)&DrawModel::oDrawModel));
+	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pClient, HudUpdate::hkHudUpdate, HudUpdate::iIndex, (PVOID*)&HudUpdate::oHudUpdate));
+	g_HookLib.AddHook(HookEntry("client.dll", g_Interface.pSurface, LockCursor::hkLockCursor, LockCursor::iIndex, (PVOID*)&LockCursor::oLockCursor));
 	ConVar* pSvCheats = g_Interface.pICVar->FindVar(XOR("sv_cheats"));
 	g_HookLib.AddHook(HookEntry("client.dll", pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex, (PVOID*)&SvCheats::oSvCheats));
+	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pClient, FSN::hkFrameStageNotfy, FSN::iIndex, (PVOID*)&FSN::oFrameStageNotify));
 
 	g_HookManager.bHooksAdded = true;
 	return true;
@@ -123,6 +131,14 @@ bool HookManager::ReleaseAll() {
 }
 
 #pragma region HkFunctions
+void __stdcall FSN::hkFrameStageNotfy(ClientFrameStage_t curStage) {
+	if (!Game::g_pLocal)
+		oFrameStageNotify(g_Interface.pClient, curStage);
+
+	cFrameStageNotify(curStage);
+	oFrameStageNotify(g_Interface.pClient, curStage);
+}
+
 bool __fastcall SvCheats::hkSvCheats(void* ConVar, int edx) {
 	static auto pCamThink = reinterpret_cast<void*>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x85\xC0\x75\x30\x38\x86"), XOR("xxxxxx")));
 	

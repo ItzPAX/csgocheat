@@ -259,6 +259,7 @@
     <ClInclude Include="..\core\features\header\visuals.h" />
     <ClInclude Include="..\core\features\variables\variables.h" />
     <ClInclude Include="..\core\hooks\clientmode\clientmode.h" />
+    <ClInclude Include="..\core\hooks\client\framestagenotify.h" />
     <ClInclude Include="..\core\hooks\client\hudupdate.h" />
     <ClInclude Include="..\core\hooks\directx\directx.h" />
     <ClInclude Include="..\core\hooks\directx\endscene.h" />

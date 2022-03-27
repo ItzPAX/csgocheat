@@ -57,11 +57,12 @@ private:
 
 public:
 	std::deque<LagRecord> deqLagRecords[MAX_PLAYERS];
+	LagRecord* pBestRecord;
 
 	bool ValidTick(LagRecord& pRecord);
 	float GetLerpTime();
 	void RecordData();
-	LagRecord* Lagcompensation(CUserCmd* cmd);
+	LagRecord* Lagcompensation();
 	void ApplyRecord(CUserCmd* cmd, LagRecord* record);
 
 	__forceinline void Init() {
