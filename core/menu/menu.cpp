@@ -116,7 +116,8 @@ void Menu::Draw() {
 		ImGui::SliderFloat(XOR("RCS Correction"), &Variables::flCorrecting, 0.f, 100.f, "%.0f%", 1.f);
 		ImGui::Checkbox(XOR("Standalone RCS"), &Variables::bStandaloneRCS);
 		ImGui::SliderFloat(XOR("Aimbot FOV"), &Variables::flFov, 0.f, 180.f, "%.0f%", 1.f);
-		DrawAimbotGraph();
+		Vec2D bezier[100];
+		DrawAimbotGraph(Variables::flSmoothing, bezier);
 		ImGui::EndChild();
 	}
 		  break;

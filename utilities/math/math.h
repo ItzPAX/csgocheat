@@ -23,6 +23,8 @@ public:
 
 	void AngleVector2(const Vec3D& angles, Vec3D& forward);
 	float GetFOV(const Vec3D& viewAngle, const Vec3D& aimAngle);
+
+	bool IsInRect(ImVec2 pos, ImVec2 size);
 };
 
 extern Math g_Math;

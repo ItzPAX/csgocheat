@@ -94,3 +94,7 @@ float Math::GetFOV(const Vec3D& viewAngle, const Vec3D& aimAngle) {
 
 	return RAD2DEG(acos(vAim.Dot(vAim) / vAim.LengthSqr()));
 }
+
+bool Math::IsInRect(ImVec2 pos, ImVec2 size) {
+	return ImGui::GetMousePos().x > pos.x && ImGui::GetMousePos().x < pos.x + size.x && ImGui::GetMousePos().y > pos.y && ImGui::GetMousePos().y < pos.y + size.y;
+}
