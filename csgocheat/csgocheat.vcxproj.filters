@@ -178,6 +178,12 @@
     <ClCompile Include="Syscalls.c">
       <Filter>syswhispers</Filter>
     </ClCompile>
+    <ClCompile Include="..\core\imgui\implot.cpp">
+      <Filter>core\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\core\imgui\implot_items.cpp">
+      <Filter>core\imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes.h" />
@@ -402,6 +408,15 @@
     </ClInclude>
     <ClInclude Include="..\core\hooks\client\framestagenotify.h">
       <Filter>core\hooks\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\imgui\implot.h">
+      <Filter>core\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\imgui\implot_internal.h">
+      <Filter>core\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\menu\graph.h">
+      <Filter>core\menu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

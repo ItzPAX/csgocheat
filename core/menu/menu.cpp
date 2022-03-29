@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "includes.h"
+#include "graph.h"
 
 Menu g_Menu;
 
@@ -115,6 +116,7 @@ void Menu::Draw() {
 		ImGui::SliderFloat(XOR("RCS Correction"), &Variables::flCorrecting, 0.f, 100.f, "%.0f%", 1.f);
 		ImGui::Checkbox(XOR("Standalone RCS"), &Variables::bStandaloneRCS);
 		ImGui::SliderFloat(XOR("Aimbot FOV"), &Variables::flFov, 0.f, 180.f, "%.0f%", 1.f);
+		DrawAimbotGraph();
 		ImGui::EndChild();
 	}
 		  break;
@@ -160,6 +162,8 @@ void Menu::Draw() {
 void Menu::Init() {
 	// init imgui
 	ImGui::CreateContext();
+	ImPlot::CreateContext();
+	
 	ImGuiIO& io = ImGui::GetIO();
 
 	io.MouseDrawCursor = true;
@@ -168,5 +172,5 @@ void Menu::Init() {
 	ImGui_ImplDX9_Init(g_DirectX.pDevice);
 
 	bInitialized = true;
-	std::cout << XOR("[ RAYBOT ] Successfully Initialized ImGui\n");
+	std::cout << XOR("[ RAYBOT ] Successfully Initialized ImGui/ImPlot\n");
 }

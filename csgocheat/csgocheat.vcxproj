@@ -224,6 +224,12 @@
     <ClCompile Include="..\core\imgui\imgui_widgets.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\core\imgui\implot.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\core\imgui\implot_items.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\core\init\init.cpp" />
     <ClCompile Include="..\core\menu\menu.cpp" />
     <ClCompile Include="..\dllentry.cpp" />
@@ -270,11 +276,14 @@
     <ClInclude Include="..\core\imgui\imgui_impl_dx9.h" />
     <ClInclude Include="..\core\imgui\imgui_impl_win32.h" />
     <ClInclude Include="..\core\imgui\imgui_internal.h" />
+    <ClInclude Include="..\core\imgui\implot.h" />
+    <ClInclude Include="..\core\imgui\implot_internal.h" />
     <ClInclude Include="..\core\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\core\imgui\imstb_textedit.h" />
     <ClInclude Include="..\core\imgui\imstb_truetype.h" />
     <ClInclude Include="..\core\init\convar.h" />
     <ClInclude Include="..\core\init\init.h" />
+    <ClInclude Include="..\core\menu\graph.h" />
     <ClInclude Include="..\core\menu\menu.h" />
     <ClInclude Include="..\includes.h" />
     <ClInclude Include="..\pch\pch.h" />

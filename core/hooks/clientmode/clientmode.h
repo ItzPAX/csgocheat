@@ -30,6 +30,7 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	}
 
 	g_Backtrack.pBestRecord = g_Backtrack.Lagcompensation();
+
 	// call aimbot with best record
 	if (Game::g_pLocal->bIsAlive())
 		g_LegitBot.AimAtBestPlayer(g_Backtrack.pBestRecord);
