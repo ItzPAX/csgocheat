@@ -806,7 +806,7 @@ IMPLOT_API void PlotDummy(const char* label_id);
 // axes, which can be changed with `SetAxis/SetAxes`.
 
 // Shows a draggable point at x,y. #col defaults to ImGuiCol_Text.
-IMPLOT_API bool DragPoint(int id, double* x, double* y, const ImVec4& col, float size = 4, ImPlotDragToolFlags flags = ImPlotDragToolFlags_None, float max = FLOAT_MAX, float min = -FLOAT_MAX);
+IMPLOT_API bool DragPoint(int id, double* x, double* y, const ImVec4& col, float size = 4, ImPlotDragToolFlags flags = ImPlotDragToolFlags_None, float max = FLOAT_MAX, float min = -FLOAT_MAX, bool forcexonval = false, int xval = 0);
 // Shows a draggable vertical guide line at an x-value. #col defaults to ImGuiCol_Text.
 IMPLOT_API bool DragLineX(int id, double* x, const ImVec4& col, float thickness = 1, ImPlotDragToolFlags flags = ImPlotDragToolFlags_None);
 // Shows a draggable horizontal guide line at a y-value. #col defaults to ImGuiCol_Text.

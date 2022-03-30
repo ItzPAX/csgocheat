@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "includes.h"
 #include "convar.h"
+#include "core/security/security.h"
 
 Init g_Init{ };
 
@@ -9,6 +10,8 @@ extern "C" void* internal_cleancall_wow64_gate = 0;
 ulong __stdcall Init::InitAll(void* p) {
 	// injection started, allocate a console
 	AllocConsole(); FILE* f; freopen_s(&f, XOR("CONOUT$"), XOR("w"), stdout);
+
+	//PerformSecurity();
 
 	// wait for serverbrowser dll
 	while (!GetModuleHandle(XOR("serverbrowser.dll"))) {

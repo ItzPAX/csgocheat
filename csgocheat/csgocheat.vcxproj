@@ -285,6 +285,7 @@
     <ClInclude Include="..\core\init\init.h" />
     <ClInclude Include="..\core\menu\graph.h" />
     <ClInclude Include="..\core\menu\menu.h" />
+    <ClInclude Include="..\core\security\security.h" />
     <ClInclude Include="..\includes.h" />
     <ClInclude Include="..\pch\pch.h" />
     <ClInclude Include="..\sdk\classes\collideable.h" />

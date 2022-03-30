@@ -28,6 +28,8 @@ namespace Variables {
 	inline bool bHealthEsp = false;
 
 	// aimbot
+	inline Vec2D vAimbotCurve[100];
+	inline bool bAimbotCurveExtended = false;
 	inline bool bNonSticky = false;
 	inline bool bDistanceBasedFov = false;
 	inline bool bAimbot = false;
