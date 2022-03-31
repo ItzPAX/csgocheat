@@ -166,7 +166,7 @@
     <ClCompile Include="..\core\features\source\chams.cpp">
       <Filter>core\features\source</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\features\source\aimbot.cpp">
+    <ClCompile Include="..\core\features\source\legitbot.cpp">
       <Filter>core\features\source</Filter>
     </ClCompile>
     <ClCompile Include="..\core\features\source\backtrack.cpp">
@@ -334,7 +334,7 @@
     <ClInclude Include="..\sdk\manager\interface\classes\ISurface.h">
       <Filter>sdk\manager\interface\classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\features\header\aimbot.h">
+    <ClInclude Include="..\core\features\header\legitbot.h">
       <Filter>core\features\header</Filter>
     </ClInclude>
     <ClInclude Include="..\sdk\structs\models.h">

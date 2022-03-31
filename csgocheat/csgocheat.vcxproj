@@ -187,7 +187,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\core\features\source\aimbot.cpp">
+    <ClCompile Include="..\core\features\source\legitbot.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\core\features\source\antiaim.cpp">
@@ -257,7 +257,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\core\features\header\aimbot.h" />
+    <ClInclude Include="..\core\features\header\legitbot.h" />
     <ClInclude Include="..\core\features\header\antiaim.h" />
     <ClInclude Include="..\core\features\header\backtrack.h" />
     <ClInclude Include="..\core\features\header\chams.h" />

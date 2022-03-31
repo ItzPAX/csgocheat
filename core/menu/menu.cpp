@@ -109,14 +109,13 @@ void Menu::Draw() {
 		ImGui::BeginChild(XOR("Main-Aimbot"), ImVec2(0.f, 0.f), true);
 		ImGui::Checkbox(XOR("Aimbot"), &Variables::bAimbot);
 		ImGui::Checkbox(XOR("Non-Sticky Aimbot"), &Variables::bNonSticky);
-		ImGui::Checkbox(XOR("Distance Based FOV"), &Variables::bDistanceBasedFov);
-		ImGui::Checkbox(XOR("Wait after locked"), &Variables::bWaitAfterTargetting);
+		ImGui::Checkbox(XOR("Wait after retargetting"), &Variables::bWaitAfterRetargetting);
 		ImGui::SliderFloat(XOR("Aimbot ReactionTime"), &Variables::flReactionTime, 0.f, 4.f, "%.2fs", 0.25f);
 		ImGui::SliderFloat(XOR("Aimbot Smoothing"), &Variables::flSmoothing, 1.f, 100.f, "%.0f%", 1.f);
 		ImGui::SliderFloat(XOR("RCS Correction"), &Variables::flCorrecting, 0.f, 100.f, "%.0f%", 1.f);
 		ImGui::Checkbox(XOR("Standalone RCS"), &Variables::bStandaloneRCS);
 		ImGui::SliderFloat(XOR("Aimbot FOV"), &Variables::flFov, 0.f, 180.f, "%.0f%", 1.f);
-		DrawExtendableGraph(XOR("[Extended] AimbotCurve"), XOR("Time"), XOR("Speed"), XOR("AimbotCurve"), Variables::bAimbotCurveExtended, Variables::vAimbotCurve);
+		DrawExtendableGraph(XOR("[Extended] AimbotCurve"), XOR("Distance"), XOR("Speed"), XOR("AimbotCurve"), Variables::bAimbotCurveExtended, Variables::vAimbotCurve);
 		ImGui::EndChild();
 	}
 		  break;

@@ -31,9 +31,8 @@ namespace Variables {
 	inline Vec2D vAimbotCurve[100];
 	inline bool bAimbotCurveExtended = false;
 	inline bool bNonSticky = false;
-	inline bool bDistanceBasedFov = false;
 	inline bool bAimbot = false;
-	inline bool bWaitAfterTargetting = false;
+	inline bool bWaitAfterRetargetting = false;
 	inline bool bStandaloneRCS = false;
 	inline float flSmoothing = 10.f;
 	inline float flCorrecting = 40.f;

@@ -15,21 +15,21 @@ void DrawGraph(const char* graphname, const char* xname, const char* yname, bool
 	if (ImPlot::BeginPlot(graphname, size, ImPlotFlags_NoTitle | ImPlotFlags_NoMenus | ImPlotFlags_NoBoxSelect | ImPlotFlags_NoMouseText | ImPlotSubplotFlags_NoResize)) {
 		ImPlot::SetupAxes(xname, yname, ax_flags, ax_flags);
 
-		ImPlot::SetupAxesLimits(0, 1, 0, 1, ImPlotCond_Always);
-		static ImPlotPoint P[] = { ImPlotPoint(0.f,0.f), ImPlotPoint(0.25f,0.5f),  ImPlotPoint(0.75f,0.5f),  ImPlotPoint(1.f,0.f) };
+		ImPlot::SetupAxesLimits(0, 1, 0, 2, ImPlotCond_Always);
+		static ImPlotPoint P[] = { ImPlotPoint(0.f,1.f), ImPlotPoint(0.25f,1.f),  ImPlotPoint(0.75f,1.f),  ImPlotPoint(1.f,1.f) };
 		static ImPlotPoint PCached[] = { P[0], P[1], P[2], P[3] };
 
 		if (extended) {
-			if (ImPlot::DragPoint(1, &P[0].x, &P[0].y, ImVec4(0.1f, 0.9f, 0.1f, 1), 4, flags, 1, 0, true, 0)) {
+			if (ImPlot::DragPoint(1, &P[0].x, &P[0].y, ImVec4(0.1f, 0.9f, 0.1f, 1), 4, flags, 2, 0, true, 0)) {
 				PCached[0] = P[0];
 			}
-			if (ImPlot::DragPoint(2, &P[1].x, &P[1].y, ImVec4(1, 0.5f, 1, 1), 4, flags, 1, 0)) {
+			if (ImPlot::DragPoint(2, &P[1].x, &P[1].y, ImVec4(1, 0.5f, 1, 1), 4, flags, 2, 0)) {
 				PCached[1] = P[1];
 			}
-			if (ImPlot::DragPoint(3, &P[2].x, &P[2].y, ImVec4(0, 0.5f, 1, 1), 4, flags, 1, 0)) {
+			if (ImPlot::DragPoint(3, &P[2].x, &P[2].y, ImVec4(0, 0.5f, 1, 1), 4, flags, 2, 0)) {
 				PCached[2] = P[2];
 			}
-			if (ImPlot::DragPoint(4, &P[3].x, &P[3].y, ImVec4(0.1f, 0.9f, 0.1f, 1), 4, flags, 1, 0, true, 1)) {
+			if (ImPlot::DragPoint(4, &P[3].x, &P[3].y, ImVec4(0.1f, 0.9f, 0.1f, 1), 4, flags, 2, 0, true, 1)) {
 				PCached[3] = P[3];
 			}
 		}

@@ -62,7 +62,7 @@ using uchar = unsigned char;
 #include "core/menu/menu.h"
 #include "core/features/header/visuals.h"
 #include "core/features/header/chams.h"
-#include "core/features/header/aimbot.h"
+#include "core/features/header/legitbot.h"
 #include "core/features/header/misc.h"
 #include "core/features/header/antiaim.h"
 
