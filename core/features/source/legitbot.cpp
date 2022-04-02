@@ -23,15 +23,15 @@ void LegitBot::SmoothAim(Vec3D& vViewAngles, Vec3D& vAngle, float flSmoothingVal
 	vAngle = (vViewAngles + (vAngle - vViewAngles).Clamped() / flSmoothing).Clamped();
 }
 
-float LegitBot::ApplyBezierValues(Vec3D& vViewAngles, Vec3D& vAngle, Vec2D* pBezierVals) {
+float LegitBot::ApplyBezierSmoothingValues(Vec3D& vViewAngles, Vec3D& vAngle, Vec2D* pBezierVals) {
 	// get the delta angle and scale it into our spline range
 	Vec3D vDelta = (vAngle - vViewAngles).Clamped();
 	float flDeltaLength = vDelta.Length2D();
-	int iScaledNum = (int)g_Math.ScaleNumber(flDeltaLength, Variables::flFov, 0.f, 99.f, 0.f);
+	// max angle distance can be 180 degrees
+	int iScaledNum = (int)g_Math.ScaleNumber(flDeltaLength, 180.f, 0.f, 99.f, 0.f);
 	int iIndex = 99 - iScaledNum;
 
 	// adjust smoothing value based on spline
-	std::cout << pBezierVals[iIndex].y << std::endl;
 	return Variables::flSmoothing * (2 - pBezierVals[iIndex].y);
 }
 
@@ -111,6 +111,65 @@ bool LegitBot::WaitAfterRetargetting(Vec3D vViewAngles, Vec3D vEyeOrigin, Player
 	return true;
 }
 
+bool LegitBot::GetExtendedHitboxPos(Player* pPlayer, LagRecord* pRecord, int iHitbox, Vec3D& vNewPoint) {
+	if (!pPlayer || iHitbox == HitboxNone) {
+		return false;
+	}
+
+	LagRecord restoreRecord = LagRecord(pPlayer);
+	if (pRecord)
+		pRecord->ApplyToPlayer(pPlayer);
+
+	// store bone matrix
+	std::array< Matrix, 128 > cCachedBones;
+	if (!pPlayer->SetupBones(cCachedBones.data(), cCachedBones.size(), BONE_USED_BY_HITBOX, 0.f)) {
+		return false;
+	}
+
+	const Model* pModel = pPlayer->mGetModel();
+
+	if (!pModel) {
+		return false;
+	}
+
+	StudioHDR* pStudioHdr = g_Interface.pModelInfo->GetStudioModel(pModel);
+	if (!pStudioHdr) {
+		return false;
+	}
+
+	StudioBox* pHitbox = pStudioHdr->Hitbox(iHitbox, 0);
+	if (!pHitbox) {
+		return false;
+	}
+
+	// create matrix with bone position stored
+	Matrix& mat = cCachedBones.at(pHitbox->iBone);
+
+	// fix capsule -> aabb
+	float mod = pHitbox->flRadius != -1.f ? pHitbox->flRadius : 0.f;
+	Vec3D vecMins, vecMaxs;
+
+	// transform vector, important step
+	g_Math.TransformVector(pHitbox->vMins, mat, vecMins);
+	g_Math.TransformVector(pHitbox->vMaxs, mat, vecMaxs);
+
+	// calculate center and how much one percent would equal (for scaling ofc)
+	Vec3D vCenter = (vecMins + vecMaxs) / 2.f;
+	float flOnePerc = pHitbox->flRadius / 100.f;
+
+	vNewPoint = vCenter;
+
+	// overshoot is dependant on the adjusted smoothing
+	srand(time(0));
+	if (rand() % 2 == 0)
+		vNewPoint[0] += (flOnePerc * (100 - flAdjustedSmoothing) * 2) * (rand() % 5 - 2);
+	else
+		vNewPoint[2] += (flOnePerc * (100 - flAdjustedSmoothing) * 2) * (rand() % 5 - 2);
+	restoreRecord.ApplyToPlayer(pPlayer);
+
+	return true;
+}
+
 AimPlayer LegitBot::GetClosestEnemyToCrosshair(LagRecord* pRecord, float flFov, Vec3D& vViewAngles, Vec3D vAimPunchAngle, Vec3D vEyeOrigin) {
 	Player* pBestPlayer = nullptr;
 	int iBestHitbox = Hitboxes::HitboxNone;
@@ -147,9 +206,13 @@ AimPlayer LegitBot::GetClosestEnemyToCrosshair(LagRecord* pRecord, float flFov, 
 	}
 
 	if (!pBestPlayer)
-		return AimPlayer{ nullptr, Hitboxes::HitboxNone };
+		return AimPlayer{ nullptr, Vec3D() };
 
-	return AimPlayer{ pBestPlayer, iBestHitbox, flBestDelta };
+	Vec3D OvershootPos;
+	if (GetExtendedHitboxPos(pBestPlayer, pRecord, iBestHitbox, OvershootPos))
+		return AimPlayer{ pBestPlayer, OvershootPos, flBestDelta };
+		
+	return AimPlayer{ nullptr, Vec3D() };
 }
 
 void LegitBot::CompensateRecoil(Vec3D& vAngle, Vec3D vAimPunchAngle, float flCorrection) {
@@ -186,13 +249,13 @@ bool LegitBot::AimAtBestPlayer(LagRecord* pRecord) {
 
 	// calc viewangles to shoot at enemy
 	Vec3D vAngle;
-	Vec3D vHitboxPos = pRecord != nullptr ? pRecord->GetHitboxPos(pAimPlayer.iHitbox) : pPlayer->vGetHitboxPos(pAimPlayer.iHitbox);
+	Vec3D vHitboxPos = pAimPlayer.vHitboxPos;
 	g_Math.CalcAngle(vEyeOrigin, vHitboxPos, vAngle);
 
 	if (!Variables::bStandaloneRCS)
 		CompensateRecoil(vAngle, vAimPunchAngle, Variables::flCorrecting);
 
-	float flAdjustedSmoothing = ApplyBezierValues(vViewAngles, vAngle, Variables::vAimbotCurve);
+	flAdjustedSmoothing = ApplyBezierSmoothingValues(vViewAngles, vAngle, Variables::vAimbotCurve);
 	SmoothAim(vViewAngles, vAngle, flAdjustedSmoothing);
 
 	// if Non Sticky extra calculation
@@ -202,6 +265,6 @@ bool LegitBot::AimAtBestPlayer(LagRecord* pRecord) {
 	// Non Sticky is off just set the angles
 	vAngle.Clamp();
 	g_Interface.pEngine->SetViewAngles(vAngle);
-
+	
 	return true;
 }
