@@ -76,7 +76,7 @@ FARPROC __stdcall hkGetProcAddress(HMODULE hMod, LPCSTR name)
 	//return result;
 }
 
-//selfmade by Emlin
+//selfmade by Emlin (will block vac, not bypass it)
 void patch_vac(void* DllImageBase)
 {
 	//this will make steamservice.dll return (by chaning je->jb) and unload the vac-module when trying to load vac
@@ -103,7 +103,7 @@ bool InitVACHooks(void* DllImageBase) {
 	pFn6 = (tFn6)DetourFunction((PBYTE)PatternScan(DllImageBase, "55 8B EC 83 EC ? 56 8B F1 C7 06 ? ? ? ?"), (PBYTE)hkTfn6);
 	pFn7 = (tFn7)DetourFunction((PBYTE)PatternScan(DllImageBase, "55 8B EC 81 EC ? ? ? ? 53 8B D9 32 C0"), (PBYTE)hkTfn7);
 	
-	patch_vac(DllImageBase);
+	//patch_vac(DllImageBase);
 
 	HMODULE kernelModule = GetModuleHandleA("kernel32.dll");
 	if (!kernelModule)
