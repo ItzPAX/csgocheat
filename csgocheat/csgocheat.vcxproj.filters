@@ -97,6 +97,9 @@
     <Filter Include="syswhispers">
       <UniqueIdentifier>{d0768da2-86eb-4347-b492-4d61cbe20bde}</UniqueIdentifier>
     </Filter>
+    <Filter Include="core\security">
+      <UniqueIdentifier>{080c16ab-52d0-4ed5-b8d4-c0a6b90bce6b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dllentry.cpp" />
@@ -163,7 +166,7 @@
     <ClCompile Include="..\core\features\source\chams.cpp">
       <Filter>core\features\source</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\features\source\aimbot.cpp">
+    <ClCompile Include="..\core\features\source\legitbot.cpp">
       <Filter>core\features\source</Filter>
     </ClCompile>
     <ClCompile Include="..\core\features\source\backtrack.cpp">
@@ -331,7 +334,7 @@
     <ClInclude Include="..\sdk\manager\interface\classes\ISurface.h">
       <Filter>sdk\manager\interface\classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\features\header\aimbot.h">
+    <ClInclude Include="..\core\features\header\legitbot.h">
       <Filter>core\features\header</Filter>
     </ClInclude>
     <ClInclude Include="..\sdk\structs\models.h">
@@ -417,6 +420,9 @@
     </ClInclude>
     <ClInclude Include="..\core\menu\graph.h">
       <Filter>core\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\security\security.h">
+      <Filter>core\security</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

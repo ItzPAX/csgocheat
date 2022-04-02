@@ -39,6 +39,6 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 
 	g_Misc.BunnyHop(cmd);
 
-	if (Variables::bStandaloneRCS)
-		g_LegitBot.StandaloneRCS(cmd);
+	//if (Variables::bStandaloneRCS)
+		//g_LegitBot.StandaloneRCS(cmd);
 }

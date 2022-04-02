@@ -3671,7 +3671,7 @@ IMPLOT_API void TagYV(double y, const ImVec4& color, const char* fmt, va_list ar
 
 static const float DRAG_GRAB_HALF_SIZE = 4.0f;
 
-bool DragPoint(int n_id, double* x, double* y, const ImVec4& col, float radius, ImPlotDragToolFlags flags, float max, float min) {
+bool DragPoint(int n_id, double* x, double* y, const ImVec4& col, float radius, ImPlotDragToolFlags flags, float max, float min, bool forcexonval, int xval) {
     ImGui::PushID("#IMPLOT_DRAG_POINT");
     IM_ASSERT_USER_ERROR(GImPlot->CurrentPlot != NULL, "DragPoint() needs to be called between BeginPlot() and EndPlot()!");
     SetupLock();
@@ -3715,6 +3715,10 @@ bool DragPoint(int n_id, double* x, double* y, const ImVec4& col, float radius, 
 
     *x = std::clamp(*x, (double)min, 1.0);
     *y = std::clamp(*y, (double)min, (double)max);
+
+    if (forcexonval)
+        *x = xval;
+
     return dragging;
 }
 
