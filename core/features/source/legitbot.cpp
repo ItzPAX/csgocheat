@@ -206,13 +206,19 @@ AimPlayer LegitBot::GetClosestEnemyToCrosshair(LagRecord* pRecord, float flFov, 
 	}
 
 	if (!pBestPlayer)
-		return AimPlayer{ nullptr, Vec3D() };
+		return AimPlayer{ };
 
-	Vec3D OvershootPos;
-	if (GetExtendedHitboxPos(pBestPlayer, pRecord, iBestHitbox, OvershootPos))
-		return AimPlayer{ pBestPlayer, OvershootPos, flBestDelta };
+	Vec3D vOvershootPos;
+	Vec3D vHitboxPos;
+	if (pRecord)
+		vHitboxPos = pRecord->GetHitboxPos(iBestHitbox);
+	else
+		vHitboxPos = pBestPlayer->vGetHitboxPos(iBestHitbox);
+
+	if (GetExtendedHitboxPos(pBestPlayer, pRecord, iBestHitbox, vOvershootPos))
+		return AimPlayer{ pBestPlayer, vOvershootPos, vHitboxPos, flBestDelta };
 		
-	return AimPlayer{ nullptr, Vec3D() };
+	return AimPlayer{ };
 }
 
 void LegitBot::CompensateRecoil(Vec3D& vAngle, Vec3D vAimPunchAngle, float flCorrection) {
@@ -248,9 +254,36 @@ bool LegitBot::AimAtBestPlayer(LagRecord* pRecord) {
 		return false;
 
 	// calc viewangles to shoot at enemy
+	Vec3D vExtendedAngle;
+	Vec3D vExtendedHitboxPos = pAimPlayer.vExtendedHitboxPos;
+	g_Math.CalcAngle(vEyeOrigin, vExtendedHitboxPos, vExtendedAngle);
+
+	Vec3D vRealAngle;
+	Vec3D vActualHitboxPos = pAimPlayer.vActualHitboxPos;
+	g_Math.CalcAngle(vEyeOrigin, vActualHitboxPos, vRealAngle);
+
+	// go to actual hitbox after "overshooting"
 	Vec3D vAngle;
-	Vec3D vHitboxPos = pAimPlayer.vHitboxPos;
-	g_Math.CalcAngle(vEyeOrigin, vHitboxPos, vAngle);
+	static Vec3D vDelta;
+	static float flTimeReached = 0.f;
+	static bool bTimeSet = false;
+
+	if (vDelta.Length2D() < 1.f) {
+		if (!bTimeSet) {
+			bTimeSet = true;
+			flTimeReached = g_Interface.pGlobalVars->flCurTime;
+		}
+		if (flTimeReached < g_Interface.pGlobalVars->flCurTime + Variables::flReactionTime) {
+			return false;
+		}
+
+		bTimeSet = false;
+		vAngle = vRealAngle;
+	}
+	else {
+		vAngle = vExtendedAngle;
+		vDelta = vExtendedAngle - Game::g_pCmd->viewangles;
+	}
 
 	if (!Variables::bStandaloneRCS)
 		CompensateRecoil(vAngle, vAimPunchAngle, Variables::flCorrecting);

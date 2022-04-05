@@ -6,7 +6,8 @@ struct LagRecord;
 
 struct AimPlayer {
 	Player* pPlayer;
-	Vec3D vHitboxPos;
+	Vec3D vExtendedHitboxPos;
+	Vec3D vActualHitboxPos;
 	float flFov;
 };
 
