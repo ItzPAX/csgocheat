@@ -1,21 +1,25 @@
 #pragma once
 
-enum Materials {
-	DEFAULT,
-	FLAT
-};
-
 class Chams {
 private:
 	friend class HookManager;
 
 private:
+	inline static std::vector<IMaterial*> pMats;
+
 	// original drawmodel function
 	using tDrawModel = void(__fastcall*)(void*, void*, DrawModelResults*, const DrawModelInfo&, Matrix*, float*, float*, const Vec3D&, int);
 	tDrawModel c_oDrawModel = nullptr;
 
 public:
-	inline static std::vector<IMaterial*> pMats;
+	Color cEnemyVisColor;
+	Color cEnemyInvisColor;
+
+	enum Materials {
+		DEFAULT,
+		FLAT
+	};
+
 	inline static bool bMatsInit = false;
 
 	bool InitMaterials() {

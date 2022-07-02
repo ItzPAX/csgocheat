@@ -7,41 +7,61 @@
 
 #define INVALID -1
 
-enum entity_flags {
-	FL_ONGROUND= (1 << 0),
-	FL_DUCKING = (1 << 1),
-	FL_WATERJUMP = (1 << 2),
-	FL_ONTRAIN = (1 << 3),
-	FL_INRAIN = (1 << 4),
-	FL_FROZEN = (1 << 5),
-	FL_ATCONTROLS = (1 << 6),
-	FL_CLIENT = (1 << 7),
-	FL_FAKECLIENT = (1 << 8),
-	FL_INWATER = (1 << 9),
-	FL_FLY = (1 << 10),
-	FL_SWIM = (1 << 11),
-	FL_CONVEYOR = (1 << 12),
-	FL_NPC = (1 << 13),
-	FL_GODMODE = (1 << 14),
-	FL_NOTARGET = (1 << 15),
-	FL_AIMTARGET = (1 << 16),
-	FL_PARTIALGROUND = (1 << 17),
-	FL_STATICPROP = (1 << 18),
-	FL_GRAPHED = (1 << 19),
-	FL_GRENADE = (1 << 20),
-	FL_STEPMOVEMENT = (1 << 21),
-	FL_DONTTOUCH = (1 << 22),
-	FL_BASEVELOCITY = (1 << 23),
-	FL_WORLDBRUSH = (1 << 24),
-	FL_OBJECT = (1 << 25),
-	FL_KILLME = (1 << 26),
-	FL_ONFIRE = (1 << 27),
-	FL_DISSOLVING = (1 << 28),
-	FL_TRANSRAGDOLL = (1 << 29),
-	FL_UNBLOCKABLEBYPLAYER = (1 << 30)
-};
-
 class Entity {
+public:
+	enum EntityFlags {
+		FL_ONGROUND = (1 << 0),
+		FL_DUCKING = (1 << 1),
+		FL_WATERJUMP = (1 << 2),
+		FL_ONTRAIN = (1 << 3),
+		FL_INRAIN = (1 << 4),
+		FL_FROZEN = (1 << 5),
+		FL_ATCONTROLS = (1 << 6),
+		FL_CLIENT = (1 << 7),
+		FL_FAKECLIENT = (1 << 8),
+		FL_INWATER = (1 << 9),
+		FL_FLY = (1 << 10),
+		FL_SWIM = (1 << 11),
+		FL_CONVEYOR = (1 << 12),
+		FL_NPC = (1 << 13),
+		FL_GODMODE = (1 << 14),
+		FL_NOTARGET = (1 << 15),
+		FL_AIMTARGET = (1 << 16),
+		FL_PARTIALGROUND = (1 << 17),
+		FL_STATICPROP = (1 << 18),
+		FL_GRAPHED = (1 << 19),
+		FL_GRENADE = (1 << 20),
+		FL_STEPMOVEMENT = (1 << 21),
+		FL_DONTTOUCH = (1 << 22),
+		FL_BASEVELOCITY = (1 << 23),
+		FL_WORLDBRUSH = (1 << 24),
+		FL_OBJECT = (1 << 25),
+		FL_KILLME = (1 << 26),
+		FL_ONFIRE = (1 << 27),
+		FL_DISSOLVING = (1 << 28),
+		FL_TRANSRAGDOLL = (1 << 29),
+		FL_UNBLOCKABLEBYPLAYER = (1 << 30)
+	};
+
+	enum WeaponType {
+		WEAPONTYPE_KNIFE = 0,
+		WEAPONTYPE_PISTOL = 1,
+		WEAPONTYPE_SUBMACHINEGUN = 2,
+		WEAPONTYPE_RIFLE = 3,
+		WEAPONTYPE_SHOTGUN = 4,
+		WEAPONTYPE_SNIPER = 5,
+		WEAPONTYPE_MACHINEGUN = 6,
+		WEAPONTYPE_C4 = 7,
+		WEAPONTYPE_PLACEHOLDER = 8,
+		WEAPONTYPE_GRENADE = 9,
+		WEAPONTYPE_HEALTHSHOT = 11,
+		WEAPONTYPE_FISTS = 12,
+		WEAPONTYPE_BREACHCHARGE = 13,
+		WEAPONTYPE_BUMPMINE = 14,
+		WEAPONTYPE_TABLET = 15,
+		WEAPONTYPE_MELEE = 16
+	};
+
 public:
 	void* pRenderable() { return reinterpret_cast<void*>(uintptr_t(this) + 0x4); }
 	void* pNetworkable() { return reinterpret_cast<void*>(uintptr_t(this) + 0x8); }
@@ -91,9 +111,15 @@ public:
 		return tTrace.m_pEnt == this;
 	}
 
+	int iGetWeaponType() {
+		using original_fn = int (__thiscall*)(void*);
+		return (*(original_fn**)this)[455](this);
+	}
+
 	bool bDormant() { using tOriginalFn = bool(__thiscall*)(void*); return (*static_cast<tOriginalFn**>(pNetworkable()))[9](pNetworkable()); }
 	Vec3D vOrigin() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecOrigin"), this); }
-	int iTeamNum() { return g_NetVars.GetNetvar<int>(XOR("DT_CSPlayer"), XOR("m_iTeamNum"), this); };
+	int iTeamNum() { return g_NetVars.GetNetvar<int>(XOR("DT_CSPlayer"), XOR("m_iTeamNum"), this); }
+	int iClip() { return g_NetVars.GetNetvar<int>(XOR("DT_CBaseCombatWeapon"), XOR("m_iClip1"), this); }
 };
 
 class Player : public Entity {
@@ -156,6 +182,11 @@ public:
 		return vEyeOrig;
 	}
 
+	Entity* pGetActiveWeapon() {
+		using original_fn = Entity* (__thiscall*)(void*);
+		return (*(original_fn**)this)[268](this);
+	}
+
 	void SetAngles(Vec3D vAngles) {
 		using original_fn = void(__thiscall*)(void*, const Vec3D&);
 		static original_fn set_angles_fn = (original_fn)((DWORD)g_Tools.SignatureScan(XOR("client.dll"), XOR("\x55\x8B\xEC\x83\xE4\xF8\x83\xEC\x64\x53\x56\x57\x8B\xF1"), XOR("xxxxxxxxxxxxxx")));
@@ -182,6 +213,9 @@ public:
 	Vec3D vGetAimPunchAngle() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_aimPunchAngle"), this); }
 	float flSimTime() { return g_NetVars.GetNetvar<float>(XOR("DT_CSPlayer"), XOR("m_flSimulationTime"), this); }
 	int iGetHitboxSet() { return g_NetVars.GetNetvar<int>(XOR("DT_BasePlayer"), XOR("m_nHitboxSet"), this); }
+	bool bIsDefusing() { return g_NetVars.GetNetvar<bool>(XOR("DT_CSPlayer"), XOR("m_bIsDefusing"), this); }
+	bool bIsScoped() { return g_NetVars.GetNetvar<bool>(XOR("DT_CSPlayer"), XOR("m_bIsScoped"), this); }
+	bool bHasGunGameImmunity() { return g_NetVars.GetNetvar<bool>(XOR("DT_CSPlayer"), XOR("m_bGunGameImmunity"), this); }
 	int iHealth() { 
 		if (NetvarOffsets::iHealth == 0)
 			return  g_NetVars.GetNetvar<int>(XOR("DT_BasePlayer"), XOR("m_iHealth"), this);

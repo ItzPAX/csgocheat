@@ -2,7 +2,13 @@
 #include "includes.h"
 #include "pch.h"
 
-void DrawGraph(const char* graphname, const char* xname, const char* yname, bool& extended, Vec2D* pBezierVals) {
+void UpdateGraph(ImPlotPoint* p, float* cfgp, int size) {
+	for (int i = 0; i < size; i++) {
+
+	}
+}
+
+void DrawGraph(const char* graphname, const char* xname, const char* yname, bool& extended, Vec2D* pBezierVals, double* points) {
 	static ImPlotDragToolFlags flags = ImPlotDragToolFlags_None;
 	ImPlotAxisFlags ax_flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoTickMarks;
 
@@ -16,34 +22,27 @@ void DrawGraph(const char* graphname, const char* xname, const char* yname, bool
 		ImPlot::SetupAxes(xname, yname, ax_flags, ax_flags);
 
 		ImPlot::SetupAxesLimits(0, 1, 0, 2, ImPlotCond_Always);
-		static ImPlotPoint P[] = { ImPlotPoint(0.f,1.f), ImPlotPoint(0.25f,1.f),  ImPlotPoint(0.75f,1.f),  ImPlotPoint(1.f,1.f) };
-		static ImPlotPoint PCached[] = { P[0], P[1], P[2], P[3] };
-
 		if (extended) {
-			if (ImPlot::DragPoint(1, &P[0].x, &P[0].y, ImVec4(0.1f, 0.9f, 0.1f, 1), 4, flags, 2, 0, true, 0)) {
-				PCached[0] = P[0];
-			}
-			if (ImPlot::DragPoint(2, &P[1].x, &P[1].y, ImVec4(1, 0.5f, 1, 1), 4, flags, 2, 0)) {
-				PCached[1] = P[1];
-			}
-			if (ImPlot::DragPoint(3, &P[2].x, &P[2].y, ImVec4(0, 0.5f, 1, 1), 4, flags, 2, 0)) {
-				PCached[2] = P[2];
-			}
-			if (ImPlot::DragPoint(4, &P[3].x, &P[3].y, ImVec4(0.1f, 0.9f, 0.1f, 1), 4, flags, 2, 0, true, 1)) {
-				PCached[3] = P[3];
-			}
+			ImPlot::DragPoint(1, &points[0], &points[1], ImVec4(0.1f, 0.9f, 0.1f, 1), 4, flags, 2, 0, true, 0);
+			ImPlot::DragPoint(2, &points[2], &points[3], ImVec4(1, 0.5f, 1, 1), 4, flags, 2, 0);
+			ImPlot::DragPoint(3, &points[4], &points[5], ImVec4(0, 0.5f, 1, 1), 4, flags, 2, 0);
+			ImPlot::DragPoint(4, &points[6], &points[7], ImVec4(0.1f, 0.9f, 0.1f, 1), 4, flags, 2, 0, true, 1);
 		}
 
 		ImVec2 size = ImPlot::GetPlotSize();
 		ImVec2 pos = ImPlot::GetPlotPos();
 
-		if (g_Math.IsInRect(pos, size) && !extended) {
-			if (GetAsyncKeyState(VK_LBUTTON) & 0x01)
-				extended = !extended;
+		static bool bPressed = false;
+		if (GetAsyncKeyState(VK_LBUTTON) != 0)
+			bPressed = true;
+		else if (bPressed) {
+			bPressed = false;
+			if (g_Math.IsInRect(pos, size) && !extended)
+				extended = true;
 		}
 		if (extended) {
 			if (GetAsyncKeyState(VK_RBUTTON) & 0x01 || GetAsyncKeyState(VK_ESCAPE) & 0x01)
-				extended = !extended;
+				extended = false;
 		}
 
 		// Bezier spline
@@ -55,16 +54,16 @@ void DrawGraph(const char* graphname, const char* xname, const char* yname, bool
 			double w2 = 3 * u * u * t;
 			double w3 = 3 * u * t * t;
 			double w4 = t * t * t;
-			B[i] = ImPlotPoint(w1 * PCached[0].x + w2 * PCached[1].x + w3 * PCached[2].x + w4 * PCached[3].x, w1 * PCached[0].y + w2 * PCached[1].y + w3 * PCached[2].y + w4 * PCached[3].y);
+			B[i] = ImPlotPoint(w1 * points[0] + w2 * points[2] + w3 * points[4] + w4 * points[6], w1 * points[1] + w2 * points[3] + w3 * points[5] + w4 * points[7]);
 			pBezierVals[i].x = B[i].x;
 			pBezierVals[i].y = B[i].y;
 		}
 
 		if (extended) {
 			ImPlot::SetNextLineStyle(ImVec4(1, 0.5f, 1, 1));
-			ImPlot::PlotLine("##h1", &P[0].x, &P[0].y, 2, 0, sizeof(ImPlotPoint));
+			ImPlot::PlotLine("##h1", &points[0], &points[1], 2, 0, sizeof(ImPlotPoint));
 			ImPlot::SetNextLineStyle(ImVec4(0, 0.5f, 1, 1));
-			ImPlot::PlotLine("##h2", &P[2].x, &P[2].y, 2, 0, sizeof(ImPlotPoint));
+			ImPlot::PlotLine("##h2", &points[4], &points[5], 2, 0, sizeof(ImPlotPoint));
 		}
 		ImPlot::SetNextLineStyle(ImVec4(0, 0.9f, 0, 1), 2);
 		ImPlot::PlotLine("##graph", &B[0].x, &B[0].y, 100, 0, sizeof(ImPlotPoint));
@@ -74,16 +73,17 @@ void DrawGraph(const char* graphname, const char* xname, const char* yname, bool
 }
 
 ImVec2 PopupSize = { 500,600 };
-void DrawExtendableGraph(const char* windowName, const char* xname, const char* yname, const char* graphname, bool& bextended, Vec2D* pBezierVals) {
+void DrawExtendableGraph(const char* windowName, const char* xname, const char* yname, const char* graphname, bool& bextended, Vec2D* pBezierVals, double* points) {
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.06f, 0.05f, 0.07f, 1.00f));
+	
 	if (bextended) {
 		ImGui::SetNextWindowSize(PopupSize, ImGuiCond_Once);
-		ImGui::Begin(windowName, nullptr);
-		DrawGraph(graphname, xname, yname, bextended, pBezierVals);
+		ImGui::Begin(windowName, &bextended);
+		DrawGraph(graphname, xname, yname, bextended, pBezierVals, points);
 		ImGui::End();
 	}
 	else {
-		DrawGraph(graphname, xname, yname, bextended, pBezierVals);
+		DrawGraph(graphname, xname, yname, bextended, pBezierVals, points);
 	}
 	ImGui::PopStyleColor();
 }

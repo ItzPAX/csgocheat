@@ -82,9 +82,6 @@
     <Filter Include="core\hooks\studiorender">
       <UniqueIdentifier>{8321e80a-e2ad-41c9-8cd9-03d6e8d4a387}</UniqueIdentifier>
     </Filter>
-    <Filter Include="core\features\variables">
-      <UniqueIdentifier>{0c91149a-cba2-4a1c-a3a0-bf1f51fea784}</UniqueIdentifier>
-    </Filter>
     <Filter Include="core\hooks\client">
       <UniqueIdentifier>{3dc32654-a82a-4962-81fa-f730aa34f91a}</UniqueIdentifier>
     </Filter>
@@ -99,6 +96,9 @@
     </Filter>
     <Filter Include="core\security">
       <UniqueIdentifier>{080c16ab-52d0-4ed5-b8d4-c0a6b90bce6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\features\config">
+      <UniqueIdentifier>{03802dfa-b442-4d24-af8c-e998203697f1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -186,6 +186,9 @@
     </ClCompile>
     <ClCompile Include="..\core\imgui\implot_items.cpp">
       <Filter>core\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\core\features\config\config.cpp">
+      <Filter>core\features\config</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -325,9 +328,6 @@
     <ClInclude Include="..\sdk\classes\entityclass.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\features\variables\variables.h">
-      <Filter>core\features\variables</Filter>
-    </ClInclude>
     <ClInclude Include="..\core\hooks\client\hudupdate.h">
       <Filter>core\hooks\client</Filter>
     </ClInclude>
@@ -423,6 +423,9 @@
     </ClInclude>
     <ClInclude Include="..\core\security\security.h">
       <Filter>core\security</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\config\config.h">
+      <Filter>core\features\config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

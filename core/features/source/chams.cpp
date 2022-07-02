@@ -22,12 +22,6 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 	if (!pEntity || !pEntity->bIsPlayer() || pEntity->iIndex() > g_Interface.pGlobalVars->iMaxClients || pEntity->iTeamNum() < 2)
 		return;
 
-	if (pEntity->bIsBaseCombatWeapon()) {
-		OverrideMaterial(Variables::iChamType, false, Variables::cInvisColor.ToPercent());
-		c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
-		return;
-	}
-
 	Player* pPlayer = reinterpret_cast<Player*>(pEntity);
 
 	// the player is alive
@@ -40,25 +34,25 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 	if (bEnemy) {
 
 		// backtrack chams
-		if (Variables::bLagcompChams) {
+		if (g_Config.ints["lagcompchams"].val) {
 			for (int i = 0; i < g_Backtrack.deqLagRecords[pPlayer->iIndex()].size(); i++) {
 				if (!g_Backtrack.ValidTick(g_Backtrack.deqLagRecords[pPlayer->iIndex()][i]) || !g_Backtrack.deqLagRecords[pPlayer->iIndex()][i].boneMat)
 					continue;
-				OverrideMaterial(Variables::iChamType, false, Color(255 - (i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size())), i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size()), 255, 30).ToPercent());
+				OverrideMaterial(g_Config.ints["chamtype"].val, false, Color(255 - (i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size())), i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size()), 255, 30).ToPercent());
 				c_oDrawModel(pEcx, pEdx, pResults, info, g_Backtrack.deqLagRecords[pPlayer->iIndex()][i].boneMat, pFlexWeights, pFlexDelayedWeights, g_Backtrack.deqLagRecords[pPlayer->iIndex()][i].vOrigin, flags);
 			}
 		}
 
 		// xqz chams
-		if (Variables::bEnemyChamsInvis) {
-			OverrideMaterial(Variables::iChamType, true, Variables::cInvisColor.ToPercent());
+		if (g_Config.ints["enemychamsinvis"].val) {
+			OverrideMaterial(g_Config.ints["chamtype"].val, true, cEnemyInvisColor.ToPercent());
 			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 		}
 
 		g_Interface.pModelRender->OverrideMaterial(nullptr); // change overwritten material to default
 
-		if (Variables::bEnemyChamsVis) {
-			OverrideMaterial(Variables::iChamType, false, Variables::cVisColor.ToPercent());
+		if (g_Config.ints["enemychamsvis"].val) {
+			OverrideMaterial(g_Config.ints["chamtype"].val, false, cEnemyVisColor.ToPercent());
 			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 		}
 	}

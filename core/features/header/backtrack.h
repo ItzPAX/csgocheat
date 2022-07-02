@@ -6,7 +6,7 @@ struct LagRecord {
 	Player* pTargetPlayer;
 	Matrix boneMat[MAXSTUDIOBONES], tempMat[MAXSTUDIOBONES];
 	Vec3D vAbsOrigin, vAbsAngles, vOrigin, vAngles;
-	Vec3D vHitBoxPos[HitboxMax];
+	Vec3D vHitBoxPos[HITBOX_MAX];
 	float flSimTime;
 
 	// overload constructor
@@ -16,7 +16,7 @@ struct LagRecord {
 		pTargetPlayer = pPlayer;
 		pPlayer->SetupBones(boneMat, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, 0.f);
 
-		for (int i = 0; i < HitboxMax; i++) {
+		for (int i = 0; i < HITBOX_MAX; i++) {
 			vHitBoxPos[i] = pPlayer->vGetHitboxPos(i);
 		}
 
@@ -57,12 +57,10 @@ private:
 
 public:
 	std::deque<LagRecord> deqLagRecords[MAX_PLAYERS];
-	LagRecord* pBestRecord;
 
 	bool ValidTick(LagRecord& pRecord);
 	float GetLerpTime();
 	void RecordData();
-	LagRecord* Lagcompensation();
 	void ApplyRecord(CUserCmd* cmd, LagRecord* record);
 
 	__forceinline void Init() {

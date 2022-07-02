@@ -1,5 +1,8 @@
 #pragma once
 
+// Windows API
+#include <Windows.h>
+
 // Other libs
 #include <iostream>
 #include <algorithm>
@@ -7,6 +10,7 @@
 #include <stdio.h>
 #include <cmath>
 #include <intrin.h>
+#include <ShlObj.h>
 
 // File Managment
 #include <fstream>
@@ -20,9 +24,6 @@
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
-
-// Windows API
-#include <Windows.h>
 
 // DirectX
 #include <d3d9.h>

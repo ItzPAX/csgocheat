@@ -76,46 +76,46 @@ enum DrawModelFlags {
 };
 
 enum Hitgroups {
-	HitgroupGeneric = 0,
-	HitgroupHead = 1,
-	HitgroupChest = 2,
-	HitgroupStomach = 3,
-	HitgroupLeftarm = 4,
-	HitgroupRightarm = 5,
-	HitgroupLeftleg = 6,
-	HitgroupRightleg = 7,
-	HitgroupGear = 10
+	HITGROUP_GENERIC = 0,
+	HITGROUP_HEAD = 1,
+	HITGROUP_CHEST = 2,
+	HITGROUP_STOMACH = 3,
+	HITGROUP_LEFTARN = 4,
+	HITGROUP_RIGHTARM = 5,
+	HITGROUP_LEFTLEG = 6,
+	HITGROUP_RIGHTLEG = 7,
+	HITGROUP_GEAR = 10
 };
 
 enum Modtypes {
-	ModBad = 0,
-	ModBrush,
-	ModSprite,
-	ModStudio
+	MOD_BAD = 0,
+	MOD_BRUSH,
+	MOD_SPRITE,
+	MOD_STUDIO
 };
 
 enum Hitboxes {
-	HitboxHead,
-	HitboxNeck,
-	HitboxPelvis,
-	HitboxStomach,
-	HitboxLowerChest,
-	HitboxChest,
-	HitboxUpperChest,
-	HitboxRightThigh,
-	HitboxLeftThigh,
-	HitboxRightCalf,
-	HitboxLeftCalf,
-	HitboxRightFoot,
-	HitboxLeftFoot,
-	HitboxRightHand,
-	HitboxLeftHand,
-	HitboxRightUpperArm,
-	HitboxRightForearm,
-	HitboxLeftUpper_arm,
-	HitboxLeftForearm,
-	HitboxMax,
-	HitboxNone
+	HITBOX_HEAD,
+	HITBOX_NECK,
+	HITBOX_PELVIS,
+	HITBOX_STOMACH,
+	HITBOX_LOWER_CHEST,
+	HITBOX_CHEST,
+	HITBOX_UPPER_CHEST,
+	HITBOX_RIGHT_THIGH,
+	HITBOX_LEFT_THIGH,
+	HITBOX_RIGHT_CALF,
+	HITBOX_LEFT_CALF,
+	HITBOX_RIGHT_FOOT,
+	HITBOX_LEFT_FOOT,
+	HITBOX_RIGHT_HAND,
+	HITBOX_LEFT_HAND,
+	HITBOX_RIGHT_UPPER_ARM,
+	HITBOX_RIGHT_FOREARM,
+	HITBOX_LEFT_UPPER_ARM,
+	HITBOX_LEFT_FOREARM,
+	HITBOX_MAX,
+	HITBOX_NONE
 };
 
 struct DrawModelResults {

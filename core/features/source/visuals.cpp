@@ -5,11 +5,24 @@ Visuals g_Visuals;
 
 void Visuals::ThirdPerson() {
 	static bool bInThirdPerson = false;
+	static bool bStateSwapped = false;
+	static bool bJustPressed = false;
 
-	if (GetAsyncKeyState(VK_MBUTTON) & 1)
+	if (GetAsyncKeyState(VK_MBUTTON) & 0x8000 && !bJustPressed)
+	{
+		bJustPressed = true;
 		bInThirdPerson = !bInThirdPerson;
+	}
+	else if (!(GetAsyncKeyState(VK_MBUTTON) & 0x8000)) 
+	{
+		bJustPressed = false;
+	}
 
-	g_Interface.pInput->bCameraInThirdperson = bInThirdPerson;
+	if (bInThirdPerson)
+		g_Interface.pInput->CAM_ToThirdPerson();
+	else
+		g_Interface.pInput->CAM_ToFirstPerson();
+
 	g_Interface.pInput->vCameraOffset.z = 100.f;
 }
 
@@ -114,9 +127,9 @@ void Visuals::DrawDormant(Player* pPlayer, RECT rPlayerRect) {
 
 	float flpAlpha = 0xFF * flEntOpacity[pPlayer->iIndex()];
 
-	if (Variables::bBoxEsp) DrawBox(rPlayerRect, Color(120, 120, 120, flpAlpha));
-	if (Variables::bNameEsp) DrawName(rPlayerRect, pPlayer, Color(120, 120, 120, flpAlpha), playerInfo);
-	if (Variables::bHealthEsp) DrawHealth(rPlayerRect, pPlayer, Color(120, 120, 120, flpAlpha), playerInfo);
+	if (g_Config.ints["boxesp"].val) DrawBox(rPlayerRect, Color(120, 120, 120, flpAlpha));
+	if (g_Config.ints["nameesp"].val) DrawName(rPlayerRect, pPlayer, Color(120, 120, 120, flpAlpha), playerInfo);
+	if (g_Config.ints["healthesp"].val) DrawHealth(rPlayerRect, pPlayer, Color(120, 120, 120, flpAlpha), playerInfo);
 }
 
 void Visuals::DrawPlayer(Player* pPlayer, RECT rPlayerRect) {
@@ -139,9 +152,9 @@ void Visuals::DrawPlayer(Player* pPlayer, RECT rPlayerRect) {
 	PlayerInfo playerInfo;
 	g_Interface.pEngine->GetPlayerInfo(pPlayer->iIndex(), &playerInfo);
 
-	if (Variables::bBoxEsp) DrawBox(rPlayerRect, cHealthCol);
-	if (Variables::bNameEsp) DrawName(rPlayerRect, pPlayer, Color::White(), playerInfo);
-	if (Variables::bHealthEsp) DrawHealth(rPlayerRect, pPlayer, cHealthCol, playerInfo);
+	if (g_Config.ints["boxesp"].val) DrawBox(rPlayerRect, cHealthCol);
+	if (g_Config.ints["nameesp"].val) DrawName(rPlayerRect, pPlayer, Color::White(), playerInfo);
+	if (g_Config.ints["healthesp"].val) DrawHealth(rPlayerRect, pPlayer, cHealthCol, playerInfo);
 }
 
 void Visuals::OnEndScene() {

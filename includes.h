@@ -57,8 +57,8 @@ using uchar = unsigned char;
 #include "sdk/manager/netvars/netvars.h"
 
 // features
+#include "core/features/config/config.h"
 #include "core/features/header/backtrack.h"
-#include "core/features/variables/variables.h"
 #include "core/menu/menu.h"
 #include "core/features/header/visuals.h"
 #include "core/features/header/chams.h"

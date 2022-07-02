@@ -76,81 +76,73 @@ void Menu::Draw() {
 	if (!style)
 		ImGui::Render();
 
-	if (g_Menu.iCurrentTab == 0) {
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.54f, 0.2f, 0.89f, 1.00f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.64f, 0.27f, 0.99f, 1.00f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.84f, 0.47f, 1.f, 1.00f));
-	}
-	if (ImGui::Button(XOR("Aimbot"), ImVec2((vSize.x / 3) - style->WindowPadding.x, 25))) g_Menu.iCurrentTab = 0;
-	if (g_Menu.iCurrentTab == 0) ImGui::PopStyleColor(3);
-	ImGui::SameLine();
-	if (g_Menu.iCurrentTab == 1) {
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.54f, 0.2f, 0.89f, 1.00f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.64f, 0.27f, 0.99f, 1.00f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.84f, 0.47f, 1.f, 1.00f));
-	}
-	if (ImGui::Button(XOR("ESP"), ImVec2((vSize.x / 3) - style->WindowPadding.x, 25))) g_Menu.iCurrentTab = 1;
-	if (g_Menu.iCurrentTab == 1) ImGui::PopStyleColor(3);
-	ImGui::SameLine();
-	if (g_Menu.iCurrentTab == 2) {
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.54f, 0.2f, 0.89f, 1.00f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.64f, 0.27f, 0.99f, 1.00f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.84f, 0.47f, 1.f, 1.00f));
-	}
-	if (ImGui::Button(XOR("Misc"), ImVec2((vSize.x / 3) - style->WindowPadding.x, 25))) g_Menu.iCurrentTab = 2;
-	if (g_Menu.iCurrentTab == 2) ImGui::PopStyleColor(3);
-
+	RenderClickableButtons({ XOR("Legitbot"), XOR("ESP"), XOR("Misc") }, &g_Menu.iCurrentTab, vSize, style->WindowPadding.x);
 	ImGui::NewLine();
 
 	switch (g_Menu.iCurrentTab) {
 		//AIMBOT
 	case 0: {
-		ImGui::Text(XOR("Main Aimbot"));
-		ImGui::BeginChild(XOR("Main-Aimbot"), ImVec2(0.f, 0.f), true);
-		ImGui::Checkbox(XOR("Aimbot"), &Variables::bAimbot);
-		ImGui::Checkbox(XOR("Non-Sticky Aimbot"), &Variables::bNonSticky);
-		ImGui::Checkbox(XOR("Wait after retargetting"), &Variables::bWaitAfterRetargetting);
-		ImGui::SliderFloat(XOR("Aimbot ReactionTime"), &Variables::flReactionTime, 0.f, 4.f, "%.2fs", 0.25f);
-		ImGui::SliderFloat(XOR("Aimbot Smoothing"), &Variables::flSmoothing, 1.f, 100.f, "%.0f%", 1.f);
-		ImGui::SliderFloat(XOR("RCS Correction"), &Variables::flCorrecting, 0.f, 100.f, "%.0f%", 1.f);
-		ImGui::Checkbox(XOR("Standalone RCS"), &Variables::bStandaloneRCS);
-		ImGui::SliderFloat(XOR("Aimbot FOV"), &Variables::flFov, 0.f, 180.f, "%.0f%", 1.f);
-		DrawExtendableGraph(XOR("[Extended] AimbotCurve"), XOR("Distance"), XOR("Speed"), XOR("AimbotCurve"), Variables::bAimbotCurveExtended, Variables::vAimbotCurve);
+		ImGui::BeginChild(XOR("Main-Legitbot"), ImVec2(vSize.x / 2 - style->WindowPadding.x - style->FramePadding.x, 0.f), true);
+		ImGui::Text(XOR("Main Legitbot"));
+		ImGui::Checkbox(XOR("Legitbot"), (bool*)&g_Config.ints["legitbot"].val);
+		DrawExtendableGraph(XOR("[Extended] AimbotCurve"), XOR("Distance"), XOR("Speed"), XOR("AimbotCurve"), g_LegitBot.bGraphExtended, g_LegitBot.vAimbotCurve, g_Config.graphs["legitgraph"].val);
+		ImGui::EndChild();
+
+		ImGui::SameLine();
+		ImGui::BeginChild(XOR("Weapon-Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - style->FramePadding.x, 0.f), true);
+		ImGui::Text(XOR("Weapon-Config"));
+		RenderClickableButtons({ XOR("Sniper"), XOR("Rifle"), XOR("Pistol") }, &g_LegitBot.iSelWeapon, ImVec2{vSize.x / 2, vSize.y}, style->WindowPadding.x + style->FramePadding.x);
+		ImGui::SliderFloat(XOR("Legitbot Smoothing"), &g_Config.arrfloats["legitsmoothing"].val[g_LegitBot.iSelWeapon], 1.f, 100.f, "%.0f%", 1.f);
+		ImGui::SliderFloat(XOR("Legitbot FOV"), &g_Config.arrfloats["legitfov"].val[g_LegitBot.iSelWeapon], 0.f, 180.f, "%.0f%", 1.f);
+		if (g_LegitBot.iSelWeapon != 0)
+			ImGui::SliderFloat(XOR("Legitbot RCS"), &g_Config.arrfloats["legitrcs"].val[g_LegitBot.iSelWeapon], 0.f, 100.f, "%.0f%", 1.f);
 		ImGui::EndChild();
 	}
 		  break;
 		  //ESP
 	case 1: {
-		ImGui::Text(XOR("Main ESP"));
 		ImGui::BeginChild(XOR("Main-ESP"), ImVec2(0.f, 0.f), true);
-		ImGui::Checkbox(XOR("Box ESP"), &Variables::bBoxEsp);
-		ImGui::Checkbox(XOR("Name ESP"), &Variables::bNameEsp);
-		ImGui::Checkbox(XOR("Health ESP"), &Variables::bHealthEsp);
+		ImGui::Text(XOR("Main ESP"));
+		ImGui::Checkbox(XOR("Box ESP"), (bool*)&g_Config.ints["boxesp"].val);
+		ImGui::Checkbox(XOR("Name ESP"), (bool*)&g_Config.ints["nameesp"].val);
+		ImGui::Checkbox(XOR("Health ESP"), (bool*)&g_Config.ints["healthesp"].val);
 
-		static const char* pChamTypes[] = { "Material", "Flat" };
-		ImGui::Combo(XOR("Chams Type"), &Variables::iChamType, pChamTypes, IM_ARRAYSIZE(pChamTypes));
+		static const char* pChamTypes[] = { "debugambientcube", "debugdrawflat" };
+		ImGui::Combo(XOR("Chams Type"), &g_Config.ints["chamtype"].val, pChamTypes, IM_ARRAYSIZE(pChamTypes));
 
-		ImGui::Checkbox(XOR("Enemy Chams Vis		  "), &Variables::bEnemyChamsVis);
+		ImGui::Checkbox(XOR("Enemy Chams Vis		  "), (bool*)&g_Config.ints["enemychamsvis"].val);
 		ImGui::SameLine();
-		ImGui::ColorEdit4(XOR("Vis Col"), Variables::flVisCol, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
-		Variables::cVisColor.SetFromPercent(Variables::flVisCol);
+		ImGui::ColorEdit4(XOR("Vis Col"), g_Config.arrfloats["enemyviscol"].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+		g_Chams.cEnemyVisColor.SetFromPercent(g_Config.arrfloats["enemyviscol"].val);
 
-		ImGui::Checkbox(XOR("Enemy Chams Invis		"), &Variables::bEnemyChamsInvis);
+		ImGui::Checkbox(XOR("Enemy Chams Invis		"), (bool*)&g_Config.ints["enemychamsinvis"].val);
 		ImGui::SameLine();
-		ImGui::ColorEdit4(XOR("Invis Col"), Variables::flInvisCol, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
-		Variables::cInvisColor.SetFromPercent(Variables::flInvisCol);
+		ImGui::ColorEdit4(XOR("Invis Col"), g_Config.arrfloats["enemyinviscol"].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+		g_Chams.cEnemyInvisColor.SetFromPercent(g_Config.arrfloats["enemyinviscol"].val);
 
-		ImGui::Checkbox(XOR("Lagcomp Chams"), &Variables::bLagcompChams);
+		ImGui::Checkbox(XOR("Lagcomp Chams"), (bool*)&g_Config.ints["lagcompchams"].val);
 
 		ImGui::EndChild();
 	}
 		  break;
+		  //MISC
 	case 2: {
+		ImGui::BeginChild(XOR("Main-Misc"), ImVec2(vSize.x / 2 - style->WindowPadding.x - style->FramePadding.x, 0.f), true);
 		ImGui::Text(XOR("Main Misc"));
-		ImGui::BeginChild(XOR("Main-Misc"), ImVec2(0.f, 0.f), true);
-		ImGui::Checkbox(XOR("Bunnyhop"), &Variables::bBunnyHop);
-		ImGui::Checkbox(XOR("Lagcompensation"), &Variables::bLagcomp);
-		ImGui::Checkbox(XOR("Accurate Lagcomp"), &Variables::bAccurateLagcomp);
+		ImGui::Checkbox(XOR("Bunnyhop"), (bool*)&g_Config.ints["bunnyhop"].val);
+		ImGui::Checkbox(XOR("Lagcompensation"), (bool*)&g_Config.ints["lagcomp"].val);
+		ImGui::EndChild();
+
+		ImGui::SameLine();
+		ImGui::BeginChild(XOR("Weapon-Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - style->FramePadding.x, 0.f), true);
+		ImGui::Text(XOR("Config"));
+		static const char* pConfigSlot[] = { "Slot1", "Slot2", "Slot3", "Slot4" };
+		ImGui::Combo(XOR("Config Slot"), &g_Config.iSelConfig, pConfigSlot, IM_ARRAYSIZE(pConfigSlot));
+		if (ImGui::Button("Save", ImVec2(vSize.x / 4 - style->WindowPadding.x - style->FramePadding.x - style->CellPadding.x, 25.f)))
+			g_Config.Save(pConfigSlot[g_Config.iSelConfig]);
+		ImGui::SameLine();
+		if (ImGui::Button("Load", ImVec2(vSize.x / 4 - style->WindowPadding.x - style->FramePadding.x - style->CellPadding.x, 25.f)))
+			g_Config.Load(pConfigSlot[g_Config.iSelConfig]);
 		ImGui::EndChild();
 	}
 

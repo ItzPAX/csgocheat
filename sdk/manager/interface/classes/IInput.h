@@ -17,4 +17,14 @@ public:
 		using fn = CUserCmd * (__thiscall*)(void*, int, int);
 		return (*(fn**)this)[8](this, slot, sequence_num);
 	}
+
+	void CAM_ToFirstPerson() {
+		using fn = void* (__thiscall*)(void*);
+		(*(fn**)this)[36](this);
+	}
+
+	void CAM_ToThirdPerson() {
+		using fn = void* (__thiscall*)(void*);
+		(*(fn**)this)[35](this);
+	}
 };

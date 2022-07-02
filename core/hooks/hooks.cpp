@@ -13,11 +13,11 @@ HookManager g_HookManager{ };
 
 #pragma region HookDefs
 namespace FSN {
-	using tFrameStageNotify = void(__thiscall*)(void*, ClientFrameStage_t);
+	using tFrameStageNotify = void(__thiscall*)(void*, IBaseClientDLL::ClientFrameStage_t);
 	tFrameStageNotify oFrameStageNotify = nullptr;
 
 	int iIndex = 37;
-	__forceinline void __stdcall hkFrameStageNotfy(ClientFrameStage_t curStage);
+	__forceinline void __stdcall hkFrameStageNotfy(IBaseClientDLL::ClientFrameStage_t curStage);
 }
 
 namespace SvCheats {
@@ -131,15 +131,18 @@ bool HookManager::ReleaseAll() {
 }
 
 #pragma region HkFunctions
-void __stdcall FSN::hkFrameStageNotfy(ClientFrameStage_t curStage) {
+void __stdcall FSN::hkFrameStageNotfy(IBaseClientDLL::ClientFrameStage_t curStage) {
 	if (!Game::g_pLocal)
-		oFrameStageNotify(g_Interface.pClient, curStage);
+		return oFrameStageNotify(g_Interface.pClient, curStage);
 
 	cFrameStageNotify(curStage);
 	oFrameStageNotify(g_Interface.pClient, curStage);
 }
 
 bool __fastcall SvCheats::hkSvCheats(void* ConVar, int edx) {
+	if (!Game::g_pLocal)
+		return oSvCheats(ConVar);
+
 	static auto pCamThink = reinterpret_cast<void*>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x85\xC0\x75\x30\x38\x86"), XOR("xxxxxx")));
 	
 	if (!ConVar)
@@ -151,17 +154,28 @@ bool __fastcall SvCheats::hkSvCheats(void* ConVar, int edx) {
 }
 
 void __stdcall HudUpdate::hkHudUpdate(bool bActive) {
+	if (!Game::g_pLocal)
+		return oHudUpdate(bActive);
+
 	// do worldtoscreen here (only once per frame)
-	if (Game::g_pLocal)
-		cHudUpdate();
+	cHudUpdate();
 	oHudUpdate(bActive);
 }
 void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags = STUDIORENDER_DRAW_ENTIRE_MODEL) {
-	if (Game::g_pLocal)
-		cDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
-	DrawModel::oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+	if (!Game::g_pLocal)
+		return oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+
+	cDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+	oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 }	
 bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {
+	Game::g_pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
+	if (!Game::g_pLocal)
+		return false;
+	
+	if (!cmd || !cmd->command_number)
+		return false;
+
 	// relay function
 	cCreateMove(flInputSampleTime, cmd);
 	return false;

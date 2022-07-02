@@ -107,6 +107,14 @@ public:
 		return res;
 	}
 
+	bool Approx(Vec3D& other, float factor) {
+		bool xacc = x > other.x - factor && x < other.x + factor;
+		bool yacc = y > other.y - factor && y < other.y + factor;
+		bool zacc = z > other.z - factor && z < other.z + factor;
+
+		return xacc && yacc && zacc;
+	}
+
 	void Init(float ix, float iy, float iz);
 	void Clamp();
 	Vec3D Clamped();
