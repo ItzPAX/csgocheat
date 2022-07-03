@@ -76,73 +76,124 @@ void Menu::Draw() {
 	if (!style)
 		ImGui::Render();
 
-	RenderClickableButtons({ XOR("Legitbot"), XOR("ESP"), XOR("Misc") }, &g_Menu.iCurrentTab, vSize, style->WindowPadding.x);
+	RenderClickableButtons({ XOR("Ragebot"), XOR("Legitbot"), XOR("ESP"), XOR("Misc")}, &g_Menu.iCurrentTab, vSize, style->WindowPadding.x - 3);
 	ImGui::NewLine();
 
 	switch (g_Menu.iCurrentTab) {
-		//AIMBOT
+		// RAGEBOT
 	case 0: {
-		ImGui::BeginChild(XOR("Main-Legitbot"), ImVec2(vSize.x / 2 - style->WindowPadding.x - style->FramePadding.x, 0.f), true);
-		ImGui::Text(XOR("Main Legitbot"));
-		ImGui::Checkbox(XOR("Legitbot"), (bool*)&g_Config.ints["legitbot"].val);
-		DrawExtendableGraph(XOR("[Extended] AimbotCurve"), XOR("Distance"), XOR("Speed"), XOR("AimbotCurve"), g_LegitBot.bGraphExtended, g_LegitBot.vAimbotCurve, g_Config.graphs["legitgraph"].val);
+		ImGui::BeginChild(XOR("Main-Ragebot"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
+		ImGui::Text(XOR("Main Ragebot"));
 		ImGui::EndChild();
 
 		ImGui::SameLine();
-		ImGui::BeginChild(XOR("Weapon-Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - style->FramePadding.x, 0.f), true);
+		ImGui::BeginChild(XOR("Weapon-Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Weapon-Config"));
-		RenderClickableButtons({ XOR("Sniper"), XOR("Rifle"), XOR("Pistol") }, &g_LegitBot.iSelWeapon, ImVec2{vSize.x / 2, vSize.y}, style->WindowPadding.x + style->FramePadding.x);
-		ImGui::SliderFloat(XOR("Legitbot Smoothing"), &g_Config.arrfloats["legitsmoothing"].val[g_LegitBot.iSelWeapon], 1.f, 100.f, "%.0f%", 1.f);
-		ImGui::SliderFloat(XOR("Legitbot FOV"), &g_Config.arrfloats["legitfov"].val[g_LegitBot.iSelWeapon], 0.f, 180.f, "%.0f%", 1.f);
-		if (g_LegitBot.iSelWeapon != 0)
-			ImGui::SliderFloat(XOR("Legitbot RCS"), &g_Config.arrfloats["legitrcs"].val[g_LegitBot.iSelWeapon], 0.f, 100.f, "%.0f%", 1.f);
+		ImGui::EndChild();
+	}
+		break;
+		//LEGITBOT
+	case 1: {
+		ImGui::BeginChild(XOR("Main-Legitbot"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
+		ImGui::Text(XOR("Main Legitbot"));
+		ImGui::Checkbox(XOR("Legitbot"), (bool*)&g_Config.ints[XOR("legitbot")].val);
+		DrawExtendableGraph(XOR("[Extended] AimbotCurve"), XOR("Distance"), XOR("Speed"), XOR("AimbotCurve"), g_LegitBot.bGraphExtended, g_LegitBot.vAimbotCurve, g_Config.graphs["legitgraph"].val);
+		MultiSelectCombo(XOR("Hitboxes"), { XOR("Head"), XOR("Chest"), XOR("Stomach"), XOR("Legs") }, (bool*)g_Config.arrints[XOR("legithitboxes")].val, 4);
+		
+		static const char* pLagRecordSelection[] = { "Closest", "First", "Last" };
+		ImGui::Combo(XOR("Lagcomp Mode"), &g_Config.ints[XOR("legitlagcompmode")].val, pLagRecordSelection, IM_ARRAYSIZE(pLagRecordSelection));
+		ImGui::EndChild();
+
+		ImGui::SameLine();
+		ImGui::BeginChild(XOR("Weapon-Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
+		ImGui::Text(XOR("Weapon-Config"));
+		RenderClickableButtons({ XOR("Sniper"), XOR("Rifle"), XOR("Pistol") }, &g_LegitBot.iMenuWeapon, ImVec2{vSize.x / 2, vSize.y}, style->WindowPadding.x + 5);
+		ImGui::SliderFloat(XOR("Legitbot Smoothing"), &g_Config.arrfloats[XOR("legitsmoothing")].val[g_LegitBot.iMenuWeapon], 1.f, 100.f, "%.0f%", 1.f);
+		ImGui::SliderFloat(XOR("Legitbot FOV"), &g_Config.arrfloats[XOR("legitfov")].val[g_LegitBot.iMenuWeapon], 0.f, 180.f, "%.0f%", 1.f);
+		if (g_LegitBot.iMenuWeapon != 0)
+			ImGui::SliderFloat(XOR("Legitbot RCS"), &g_Config.arrfloats[XOR("legitrcs")].val[g_LegitBot.iMenuWeapon], 0.f, 100.f, "%.0f%", 1.f);
 		ImGui::EndChild();
 	}
 		  break;
 		  //ESP
-	case 1: {
-		ImGui::BeginChild(XOR("Main-ESP"), ImVec2(0.f, 0.f), true);
+	case 2: {
+		ImGui::BeginChild(XOR("Main-ESP"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Main ESP"));
-		ImGui::Checkbox(XOR("Box ESP"), (bool*)&g_Config.ints["boxesp"].val);
-		ImGui::Checkbox(XOR("Name ESP"), (bool*)&g_Config.ints["nameesp"].val);
-		ImGui::Checkbox(XOR("Health ESP"), (bool*)&g_Config.ints["healthesp"].val);
+		ImGui::Checkbox(XOR("Box ESP"), (bool*)&g_Config.ints[XOR("boxesp")].val);
+		ImGui::Checkbox(XOR("Name ESP"), (bool*)&g_Config.ints[XOR("nameesp")].val);
+		ImGui::Checkbox(XOR("Health ESP"), (bool*)&g_Config.ints[XOR("healthesp")].val);
+		ImGui::EndChild();
+
+		ImGui::SameLine();
+		ImGui::BeginChild(XOR("Chams"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
+		ImGui::Text(XOR("Chams"));
+		static const char* pChamMode[] = { "Enemy", "Local", "Friendly" };
+		ImGui::Combo(XOR("Cham Mode"), &g_Chams.iChamsMode, pChamMode, IM_ARRAYSIZE(pChamMode));
 
 		static const char* pChamTypes[] = { "debugambientcube", "debugdrawflat" };
-		ImGui::Combo(XOR("Chams Type"), &g_Config.ints["chamtype"].val, pChamTypes, IM_ARRAYSIZE(pChamTypes));
+		ImGui::Combo(XOR("Chams Type"), &g_Config.ints[XOR("chamtype")].val, pChamTypes, IM_ARRAYSIZE(pChamTypes));
 
-		ImGui::Checkbox(XOR("Enemy Chams Vis		  "), (bool*)&g_Config.ints["enemychamsvis"].val);
-		ImGui::SameLine();
-		ImGui::ColorEdit4(XOR("Vis Col"), g_Config.arrfloats["enemyviscol"].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
-		g_Chams.cEnemyVisColor.SetFromPercent(g_Config.arrfloats["enemyviscol"].val);
+		switch(g_Chams.iChamsMode) {
+		case 0: {
+			ImGui::Checkbox(XOR("Enemy Chams Vis		  "), (bool*)&g_Config.ints[XOR("enemychamsvis")].val);
+			ImGui::SameLine();
+			ImGui::ColorEdit4(XOR("Vis Col"), g_Config.arrfloats[XOR("enemyviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 
-		ImGui::Checkbox(XOR("Enemy Chams Invis		"), (bool*)&g_Config.ints["enemychamsinvis"].val);
-		ImGui::SameLine();
-		ImGui::ColorEdit4(XOR("Invis Col"), g_Config.arrfloats["enemyinviscol"].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
-		g_Chams.cEnemyInvisColor.SetFromPercent(g_Config.arrfloats["enemyinviscol"].val);
+			ImGui::Checkbox(XOR("Enemy Chams Invis		"), (bool*)&g_Config.ints[XOR("enemychamsinvis")].val);
+			ImGui::SameLine();
+			ImGui::ColorEdit4(XOR("Invis Col"), g_Config.arrfloats[XOR("enemyinviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 
-		ImGui::Checkbox(XOR("Lagcomp Chams"), (bool*)&g_Config.ints["lagcompchams"].val);
+			ImGui::Checkbox(XOR("Lagcomp Chams"), (bool*)&g_Config.ints[XOR("lagcompchams")].val);
+			if (g_Config.ints[XOR("lagcompchams")].val) {
+				static const char* pLagcompchamsMode[] = { "Fast", "Fancy" };
+				ImGui::Combo(XOR("Lagcompchams Type"), &g_Config.ints[XOR("lagcompchamstype")].val, pLagcompchamsMode, IM_ARRAYSIZE(pLagcompchamsMode));
+			}
+		}
+			break;
+		case 1: {
+			ImGui::Checkbox(XOR("Local Chams    		  "), (bool*)&g_Config.ints[XOR("localchams")].val);
+			ImGui::SameLine();
+			ImGui::ColorEdit4(XOR("Col"), g_Config.arrfloats[XOR("localcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+		}
+			break;
+		case 2: {
+			ImGui::Checkbox(XOR("Friendly Chams 		  "), (bool*)&g_Config.ints[XOR("friendlychamsvis")].val);
+			ImGui::SameLine();
+			ImGui::ColorEdit4(XOR("Vis Col"), g_Config.arrfloats[XOR("friendlyviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+			ImGui::Checkbox(XOR("Friendly Chams Invis	 "), (bool*)&g_Config.ints[XOR("friendlychamsinvis")].val);
+			ImGui::SameLine();
+			ImGui::ColorEdit4(XOR("Invis Col"), g_Config.arrfloats[XOR("friendlyinviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+		}
+			break;
+		}
+
 
 		ImGui::EndChild();
 	}
 		  break;
 		  //MISC
-	case 2: {
-		ImGui::BeginChild(XOR("Main-Misc"), ImVec2(vSize.x / 2 - style->WindowPadding.x - style->FramePadding.x, 0.f), true);
+	case 3: {
+		ImGui::BeginChild(XOR("Main-Misc"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Main Misc"));
-		ImGui::Checkbox(XOR("Bunnyhop"), (bool*)&g_Config.ints["bunnyhop"].val);
-		ImGui::Checkbox(XOR("Lagcompensation"), (bool*)&g_Config.ints["lagcomp"].val);
+		ImGui::Checkbox(XOR("Bunnyhop"), (bool*)&g_Config.ints[XOR("bunnyhop")].val);
+		ImGui::Checkbox(XOR("Lagcompensation"), (bool*)&g_Config.ints[XOR("lagcomp")].val);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
-		ImGui::BeginChild(XOR("Weapon-Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - style->FramePadding.x, 0.f), true);
+		ImGui::BeginChild(XOR("Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Config"));
 		static const char* pConfigSlot[] = { "Slot1", "Slot2", "Slot3", "Slot4" };
 		ImGui::Combo(XOR("Config Slot"), &g_Config.iSelConfig, pConfigSlot, IM_ARRAYSIZE(pConfigSlot));
-		if (ImGui::Button("Save", ImVec2(vSize.x / 4 - style->WindowPadding.x - style->FramePadding.x - style->CellPadding.x, 25.f)))
+		if (ImGui::Button(XOR("Save"), ImVec2(vSize.x / 4 - style->WindowPadding.x - style->FramePadding.x - 6, 25.f)))
 			g_Config.Save(pConfigSlot[g_Config.iSelConfig]);
 		ImGui::SameLine();
-		if (ImGui::Button("Load", ImVec2(vSize.x / 4 - style->WindowPadding.x - style->FramePadding.x - style->CellPadding.x, 25.f)))
+		if (ImGui::Button(XOR("Load"), ImVec2(vSize.x / 4 - style->WindowPadding.x - style->FramePadding.x - 6, 25.f)))
 			g_Config.Load(pConfigSlot[g_Config.iSelConfig]);
+		ImGui::PushStyleColor(ImGuiCol_Text, g_Config.Status().error ? IM_COL32(255, 0, 0, 255) : IM_COL32(0, 255, 0, 255));
+		ImGui::Text(g_Config.Status().msg.c_str());
+		ImGui::PopStyleColor();
+
 		ImGui::EndChild();
 	}
 

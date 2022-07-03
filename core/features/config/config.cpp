@@ -5,25 +5,37 @@ Config g_Config;
 
 void Config::Init() {
 	// call setupvalue for every variable
-	SetupVal(bunnyhop, 1, "misc", "bunnyhop");
-	SetupVal(lagcomp, 1, "misc", "lagcomp");
+	SetupVal(bunnyhop, 1, XOR("misc"), XOR("bunnyhop"));
+	SetupVal(lagcomp, 1, XOR("misc"), XOR("lagcomp"));
 
-	SetupVal(chamtype, 0, "chams", "chamtype");
-	SetupVal(enemychamsvis, 1, "chams", "enemychamsvis");
-	SetupVal(enemyviscol, { 1.f,0.3f,0.6f,1.f }, 4, "chams", "enemyviscol");
-	SetupVal(enemychamsinvis, 1, "chams", "enemychamsinvis");
-	SetupVal(enemyinviscol, { 0.6f,0.9f,0.3f,1.f }, 4, "chams", "enemyinviscol");
-	SetupVal(lagcompchams, 1, "chams", "lagcompchams");
+	SetupVal(chamtype, 0, XOR("chams"), XOR("chamtype"));
 
-	SetupVal(boxesp, 1, "esp", "boxesp");
-	SetupVal(nameesp, 1, "esp", "nameesp");
-	SetupVal(healthesp, 1, "esp", "healthesp");
+	SetupVal(enemychamsvis, 1, XOR("chams"), XOR("enemychamsvis"));
+	SetupVal(enemyviscol, { 1.f,0.3f,0.6f,1.f }, 4, XOR("chams"), XOR("enemyviscol"));
+	SetupVal(enemychamsinvis, 1, XOR("chams"), XOR("enemychamsinvis"));
+	SetupVal(enemyinviscol, { 0.6f,0.9f,0.3f,1.f }, 4, XOR("chams"), XOR("enemyinviscol"));
+	SetupVal(lagcompchamstype, 1, XOR("chams"), XOR("lagcompchamstype"));
+	SetupVal(lagcompchams, 1, XOR("chams"), XOR("lagcompchams"));
 
-	SetupVal(legitbot, 1, "legitbot", "legitbot");
-	SetupVal(legitgraph, { 0.f, 1.f, 0.25f, 0.1f, 0.75f, 0.1f, 1.f, 1.f }, "legitbot", "legitgraph");
-	SetupVal(legitfov, { 8.f, 8.f, 8.f }, 3, "legitbot", "legitfov");
-	SetupVal(legitsmoothing, { 10.f, 10.f, 10.f }, 3, "legitbot", "legitsmoothing");
-	SetupVal(legitrcs, { 25.f, 25.f, 25.f }, 3, "legitbot", "legitrcs");
+	SetupVal(localchams, 1, XOR("chams"), XOR("localchams"));
+	SetupVal(localcol, { 0.3f, 0.8f, 0.5f, 1.f }, 4, XOR("chams"), XOR("localcol"));
+
+	SetupVal(friendlychamsvis, 1, XOR("chams"), XOR("friendlychamsvis"));
+	SetupVal(friendlyviscol, { 0.3f, 0.8f, 0.9f, 1.f }, 4, XOR("chams"), XOR("friendlyviscol"));
+	SetupVal(friendlychamsinvis, 0, XOR("chams"), XOR("friendlychamsinvis"));
+	SetupVal(friendlyinviscol, { 0.3f, 0.5f, 0.9f, 1.f }, 4, XOR("chams"), XOR("friendlyinviscol"));
+
+	SetupVal(boxesp, 1, XOR("esp"), XOR("boxesp"));
+	SetupVal(nameesp, 1, XOR("esp"), XOR("nameesp"));
+	SetupVal(healthesp, 1, XOR("esp"), XOR("healthesp"));
+
+	SetupVal(legitbot, 1, XOR("legitbot"), XOR("legitbot"));
+	SetupVal(legitlagcompmode, 0, XOR("legitbot"), XOR("legitlagcompmode"));
+	SetupVal(legithitboxes, { 0,0,0,0 }, 4, XOR("legitbot"), XOR("legithitboxes"));
+	SetupVal(legitgraph, { 0.f, 1.f, 0.25f, 1.f, 0.75f, 1.f, 1.f, 1.f }, XOR("legitbot"), XOR("legitgraph"));
+	SetupVal(legitfov, { 8.f, 8.f, 8.f }, 3, XOR("legitbot"), XOR("legitfov"));
+	SetupVal(legitsmoothing, { 10.f, 10.f, 10.f }, 3, XOR("legitbot"), XOR("legitsmoothing"));
+	SetupVal(legitrcs, { 25.f, 25.f, 25.f }, 3, XOR("legitbot"), XOR("legitrcs"));
 }
 
 void Config::Save(std::string name) {
@@ -31,8 +43,8 @@ void Config::Save(std::string name) {
 	std::string folder, file;
 
 	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path))) {
-		folder = std::string(path) + "\\raybot\\";
-		file = folder + name + ".ini";
+		folder = std::string(path) + XOR("\\raybot\\");
+		file = folder + name + XOR(".ini");
 	}
 
 	CreateDirectory(folder.c_str(), NULL);
@@ -66,6 +78,7 @@ void Config::Save(std::string name) {
 			WritePrivateProfileString(value.second.category.c_str(), basename.c_str(), std::to_string(value.second.val[i]).c_str(), file.c_str());
 		}
 	}
+	status = CfgStatus{ false, XOR("Saved Config: ") + name };
 }
 
 void Config::Load(std::string name) {
@@ -73,8 +86,13 @@ void Config::Load(std::string name) {
 	std::string folder, file;
 
 	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path))) {
-		folder = std::string(path) + "\\raybot\\";
-		file = folder + name + ".ini";
+		folder = std::string(path) + XOR("\\raybot\\");
+		file = folder + name + XOR(".ini");
+	}
+
+	if (!std::filesystem::exists(file)) {
+		status = CfgStatus{ true, XOR("File not found: ") + name };
+		return;
 	}
 
 	char fileval[32] = { '\0' };
@@ -113,6 +131,7 @@ void Config::Load(std::string name) {
 			value.second.val[i] = atof(fileval);
 		}
 	}
+	status = CfgStatus{ false, XOR("Loaded Config: ") + name };
 }
 
 void Config::SetupVal(int& i, int def, std::string category, std::string name) {

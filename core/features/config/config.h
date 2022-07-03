@@ -16,7 +16,15 @@ struct ConfigVar {
 	int size;
 };
 
+struct CfgStatus {
+	bool error;
+	std::string msg;
+};
+
 class Config {
+private:
+	CfgStatus status;
+
 	// CHEAT VARS GO HERE
 private:
 	int bunnyhop;
@@ -27,13 +35,24 @@ private:
 	float enemyviscol[4];
 	int enemychamsinvis;
 	float enemyinviscol[4];
+	int lagcompchamstype;
 	int lagcompchams;
+
+	int localchams;
+	float localcol[4];
+
+	int friendlychamsvis;
+	float friendlyviscol[4];
+	int friendlychamsinvis;
+	float friendlyinviscol[4];
 
 	int nameesp;
 	int boxesp;
 	int healthesp;
 
 	int legitbot;
+	int legithitboxes[4];
+	int legitlagcompmode;
 	float legitsmoothing[3];
 	float legitfov[3];
 	float legitrcs[3];
@@ -56,6 +75,8 @@ public:
 	void Save(std::string name);
 	void Load(std::string name);
 	Config() { Init(); }
+
+	CfgStatus Status() { return status; }
 
 private:
 	void Init();

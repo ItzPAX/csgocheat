@@ -7,35 +7,20 @@ float LegitBot::ApplyBezierSmoothingValues(Vec3D& vViewAngles, Vec3D& vAngle, Ve
 	Vec3D vDelta = (vAngle - vViewAngles).Clamped();
 	float flDeltaLength = vDelta.Length2D();
 	// max angle distance can be 180 degrees
-	int iScaledNum = (int)g_Math.ScaleNumber(flDeltaLength, g_Config.arrfloats["legitfov"].val[iSelWeapon], 0.f, 99.f, 0.f);
+	int iScaledNum = (int)g_Math.ScaleNumber(flDeltaLength, g_Config.arrfloats[XOR("legitfov")].val[iActiveWeapon], 0.f, 99.f, 0.f);
 	int iIndex = 99 - iScaledNum;
 
 	// adjust smoothing value based on spline
-	return g_Config.arrfloats["legitsmoothing"].val[iSelWeapon] * (2 - pBezierVals[iIndex].y);
+	return g_Config.arrfloats[XOR("legitsmoothing")].val[iActiveWeapon] * (2 - pBezierVals[iIndex].y);
 }
 
 LagRecord* LegitBot::GetTargetRecord(CUserCmd* cmd) {
 	if (Game::g_pLocal->bIsDefusing())
 		return nullptr;
 
-	Entity* pActiveWeapon = Game::g_pLocal->pGetActiveWeapon();
-	if (!pActiveWeapon)
-		return nullptr;
-
-	// only run aimbot on actual weapons, not grenades etc.
-	int iWeaponType = pActiveWeapon->iGetWeaponType();
-
-	Vec3D vAimPunch{};
-	switch (iWeaponType) {
-	case Entity::WEAPONTYPE_RIFLE:
-	case Entity::WEAPONTYPE_SUBMACHINEGUN:
-	case Entity::WEAPONTYPE_MACHINEGUN:
-		vAimPunch = Game::g_pLocal->vGetAimPunchAngle();
-	}
-
 	int iBestPlayerInd = INVALID;
 	Player* pBestPlayer = nullptr;
-	float flBestDelta = g_Config.arrfloats["legitfov"].val[iSelWeapon];
+	float flBestDelta = g_Config.arrfloats[XOR("legitfov")].val[iActiveWeapon];
 
 	float flBestDeltaRecord = FLOAT_MAX;
 	int iBestRecord = INVALID;
@@ -55,7 +40,7 @@ LagRecord* LegitBot::GetTargetRecord(CUserCmd* cmd) {
 		Vec3D vAngle;
 		Vec3D vHitboxPos = pPlayer->vGetHitboxPos(HITBOX_HEAD);
 
-		g_Math.CalcAngle(vEyeOrigin, vHitboxPos + vAimPunch * 2, vAngle);
+		g_Math.CalcAngle(vEyeOrigin, vHitboxPos, vAngle);
 		vAngle.Clamp();
 
 		float flCurrDelta = (vAngle - vViewAngles).Clamped().Length();
@@ -69,11 +54,17 @@ LagRecord* LegitBot::GetTargetRecord(CUserCmd* cmd) {
 	if (iBestPlayerInd == INVALID || !pBestPlayer || g_Backtrack.deqLagRecords[iBestPlayerInd].size() <= 3)
 		return nullptr;
 
-	// aimbot will always aim at most recent record
 	pTargetRecord = &g_Backtrack.deqLagRecords[iBestPlayerInd].front();
 
-	if (!g_Config.ints["lagcomp"].val)
+	if (!g_Config.ints[XOR("lagcomp")].val)
 		return &g_Backtrack.deqLagRecords[iBestPlayerInd].front();
+
+	if (g_Config.ints["legitlagcompmode"].val == 1)
+		pTargetRecord = &g_Backtrack.deqLagRecords[iBestPlayerInd].front();
+	if (g_Config.ints["legitlagcompmode"].val == 2)
+		pTargetRecord = &g_Backtrack.deqLagRecords[iBestPlayerInd].back();
+
+	UpdateHitboxes();
 
 	// get best record
 	for (int i = 0; i < g_Backtrack.deqLagRecords[iBestPlayerInd].size(); i++) {
@@ -81,21 +72,24 @@ LagRecord* LegitBot::GetTargetRecord(CUserCmd* cmd) {
 		if (!g_Backtrack.ValidTick(record))
 			continue;
 
-		Vec3D vAngle;
+		for (int i = 0; i < HITBOX_MAX; i++) {
+			Vec3D vAngle;
+			Vec3D vHitboxPos = record.GetHitboxPos(i).vPos;
 
-		Vec3D vHitboxPos = record.GetHitboxPos(HITBOX_HEAD);
+			g_Math.CalcAngle(vEyeOrigin, vHitboxPos, vAngle);
+			vAngle.Clamp();
 
-		g_Math.CalcAngle(vEyeOrigin, vHitboxPos + vAimPunch * 2, vAngle);
-		vAngle.Clamp();
-
-		float flCurrDelta = (vAngle - vViewAngles).Clamped().Length();
-		if (flCurrDelta < flBestDeltaRecord) {
-			flBestDeltaRecord = flCurrDelta;
-			iBestRecord = i;
+			float flCurrDelta = (vAngle - vViewAngles).Clamped().Length();
+			if (flCurrDelta < flBestDeltaRecord) {
+				flBestDeltaRecord = flCurrDelta;
+				iBestRecord = i;
+			}
 		}
 	}
 
 	if (iBestRecord != INVALID) {
+		if (g_Config.ints["legitlagcompmode"].val == 0)
+			pTargetRecord = &g_Backtrack.deqLagRecords[iBestPlayerInd][iBestRecord];
 		return &g_Backtrack.deqLagRecords[iBestPlayerInd][iBestRecord];
 	}
 	return nullptr;
@@ -106,8 +100,37 @@ void LegitBot::CompensateRecoil(Vec3D& vAngle, Vec3D vAimPunch, float flRCS, flo
 	vAngle.y -= (vAimPunch.y * (1.f + (flRCS / 100.f))) / flSmoothing;
 }
 
+void LegitBot::UpdateHitboxes() {
+	vAllowedHitboxes.clear();
+	for (int i = 0; i < g_Config.arrints[XOR("legithitboxes")].size; i++) {
+		if (g_Config.arrints[XOR("legithitboxes")].val[i]) {
+			switch (i) {
+			case 0:
+				vAllowedHitboxes.push_back(HITBOX_HEAD);
+				vAllowedHitboxes.push_back(HITBOX_NECK);
+				break;
+			case 1:
+				vAllowedHitboxes.push_back(HITBOX_CHEST);
+				vAllowedHitboxes.push_back(HITBOX_LOWER_CHEST);
+				vAllowedHitboxes.push_back(HITBOX_UPPER_CHEST);
+				break;
+			case 2:
+				vAllowedHitboxes.push_back(HITBOX_STOMACH);
+				vAllowedHitboxes.push_back(HITBOX_PELVIS);
+				break;
+			case 3:
+				vAllowedHitboxes.push_back(HITBOX_LEFT_CALF);
+				vAllowedHitboxes.push_back(HITBOX_LEFT_THIGH);
+				vAllowedHitboxes.push_back(HITBOX_RIGHT_CALF);
+				vAllowedHitboxes.push_back(HITBOX_RIGHT_THIGH);
+				break;
+			}
+		}
+	}
+}
+
 void LegitBot::RunAimbot(CUserCmd* cmd) {
-	if (!g_Config.ints["legitbot"].val)
+	if (!g_Config.ints[XOR("legitbot")].val)
 		return;
 
 	// only run if we are trying to shoot
@@ -115,21 +138,6 @@ void LegitBot::RunAimbot(CUserCmd* cmd) {
 		return;
 
 	if (!pTargetRecord)
-		return;
-
-	Vec3D vEyeOrigin = Game::g_pLocal->vEyeOrigin();
-	Vec3D vViewAngles; g_Interface.pEngine->GetViewAngles(vViewAngles);
-
-	int iHitbox = HITBOX_NONE;
-
-	for (int i = 0; i < HITBOX_MAX; i++) {
-		if (pTargetRecord->pTargetPlayer->bIsPointVisible(vEyeOrigin, pTargetRecord->GetHitboxPos(i))) {
-			iHitbox = i;
-			break;
-		}
-	}
-
-	if (iHitbox == HITBOX_NONE)
 		return;
 
 	Entity* pActiveWeapon = Game::g_pLocal->pGetActiveWeapon();
@@ -141,17 +149,49 @@ void LegitBot::RunAimbot(CUserCmd* cmd) {
 	switch (iWeaponType) {
 	case Entity::WEAPONTYPE_MACHINEGUN:
 	case Entity::WEAPONTYPE_RIFLE:
-	case Entity::WEAPONTYPE_SNIPER:
 	case Entity::WEAPONTYPE_SHOTGUN:
 	case Entity::WEAPONTYPE_PISTOL:
-	{
-		if (!pActiveWeapon->iClip())
-			return;
-		break;
-	}
+	case Entity::WEAPONTYPE_SNIPER:
+		{
+			if (!pActiveWeapon->iClip())
+				return;
+			break;
+		}
 	default:
 		return;
 	}
+
+	if (iWeaponType == Entity::WEAPONTYPE_SNIPER)
+		iActiveWeapon = 0;
+	if (iWeaponType == Entity::WEAPONTYPE_MACHINEGUN || iWeaponType == Entity::WEAPONTYPE_RIFLE)
+		iActiveWeapon = 1;
+	if (iWeaponType == Entity::WEAPONTYPE_SHOTGUN || iWeaponType == Entity::WEAPONTYPE_PISTOL)
+		iActiveWeapon = 2;
+
+	Vec3D vEyeOrigin = Game::g_pLocal->vEyeOrigin();
+	Vec3D vViewAngles; g_Interface.pEngine->GetViewAngles(vViewAngles);
+
+	int iHitbox = HITBOX_NONE;
+	float flBestDelta = g_Config.arrfloats[XOR("legitfov")].val[iActiveWeapon];
+
+	UpdateHitboxes();
+
+	for (int i = 0; i < vAllowedHitboxes.size(); i++) {
+		if (pTargetRecord->GetHitboxPos(vAllowedHitboxes[i]).bVisible) {
+			Vec3D vAngle;
+			g_Math.CalcAngle(vEyeOrigin, pTargetRecord->GetHitboxPos(vAllowedHitboxes[i]).vPos, vAngle);
+			vAngle.Clamp();
+	
+			float flCurrDelta = (vAngle - vViewAngles).Clamped().Length();
+			if (flCurrDelta < flBestDelta) {
+				flBestDelta = flCurrDelta;
+				iHitbox = vAllowedHitboxes[i];
+			}
+		}
+	}
+
+	if (iHitbox == HITBOX_NONE)
+		return;
 
 	Vec3D vAimPunch{};
 	switch (iWeaponType) {
@@ -161,10 +201,8 @@ void LegitBot::RunAimbot(CUserCmd* cmd) {
 		vAimPunch = Game::g_pLocal->vGetAimPunchAngle();
 	}
 
-	cmd->buttons &= ~CUserCmd::IN_ATTACK;
-
 	Vec3D vEnemyAngle;
-	g_Math.CalcAngle(vEyeOrigin, pTargetRecord->GetHitboxPos(iHitbox), vEnemyAngle);
+	g_Math.CalcAngle(vEyeOrigin, pTargetRecord->GetHitboxPos(iHitbox).vPos, vEnemyAngle);
 	vEnemyAngle.Clamp();
 
 	float flSmoothing = ApplyBezierSmoothingValues(vViewAngles, vEnemyAngle, vAimbotCurve);
@@ -173,11 +211,10 @@ void LegitBot::RunAimbot(CUserCmd* cmd) {
 	g_Math.Clamp(&flSmoothing, FLT_MAX, 1.f);
 	vEnemyAngle = (vViewAngles + (vEnemyAngle - vViewAngles).Clamped() / flSmoothing).Clamped();
 
-	CompensateRecoil(vEnemyAngle, vAimPunch, g_Config.arrfloats["legitrcs"].val[iSelWeapon], flSmoothing);
+	CompensateRecoil(vEnemyAngle, vAimPunch, g_Config.arrfloats[XOR("legitrcs")].val[iActiveWeapon], flSmoothing);
 
 	// set cmd viewangles, cuz its faster then shoot and then set engine viewangles so it all looks legit
 	cmd->viewangles = vEnemyAngle;
-	cmd->buttons |= CUserCmd::IN_ATTACK;
 	g_Interface.pEngine->SetViewAngles(vEnemyAngle);
 
 	// invalidate record after we used it

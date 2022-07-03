@@ -127,9 +127,9 @@ void Visuals::DrawDormant(Player* pPlayer, RECT rPlayerRect) {
 
 	float flpAlpha = 0xFF * flEntOpacity[pPlayer->iIndex()];
 
-	if (g_Config.ints["boxesp"].val) DrawBox(rPlayerRect, Color(120, 120, 120, flpAlpha));
-	if (g_Config.ints["nameesp"].val) DrawName(rPlayerRect, pPlayer, Color(120, 120, 120, flpAlpha), playerInfo);
-	if (g_Config.ints["healthesp"].val) DrawHealth(rPlayerRect, pPlayer, Color(120, 120, 120, flpAlpha), playerInfo);
+	if (g_Config.ints[XOR("boxesp")].val) DrawBox(rPlayerRect, Color(120, 120, 120, flpAlpha));
+	if (g_Config.ints[XOR("nameesp")].val) DrawName(rPlayerRect, pPlayer, Color(120, 120, 120, flpAlpha), playerInfo);
+	if (g_Config.ints[XOR("healthesp")].val) DrawHealth(rPlayerRect, pPlayer, Color(120, 120, 120, flpAlpha), playerInfo);
 }
 
 void Visuals::DrawPlayer(Player* pPlayer, RECT rPlayerRect) {
@@ -152,9 +152,9 @@ void Visuals::DrawPlayer(Player* pPlayer, RECT rPlayerRect) {
 	PlayerInfo playerInfo;
 	g_Interface.pEngine->GetPlayerInfo(pPlayer->iIndex(), &playerInfo);
 
-	if (g_Config.ints["boxesp"].val) DrawBox(rPlayerRect, cHealthCol);
-	if (g_Config.ints["nameesp"].val) DrawName(rPlayerRect, pPlayer, Color::White(), playerInfo);
-	if (g_Config.ints["healthesp"].val) DrawHealth(rPlayerRect, pPlayer, cHealthCol, playerInfo);
+	if (g_Config.ints[XOR("boxesp")].val) DrawBox(rPlayerRect, cHealthCol);
+	if (g_Config.ints[XOR("nameesp")].val) DrawName(rPlayerRect, pPlayer, Color::White(), playerInfo);
+	if (g_Config.ints[XOR("healthesp")].val) DrawHealth(rPlayerRect, pPlayer, cHealthCol, playerInfo);
 }
 
 void Visuals::OnEndScene() {

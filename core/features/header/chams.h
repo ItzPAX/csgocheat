@@ -12,13 +12,12 @@ private:
 	tDrawModel c_oDrawModel = nullptr;
 
 public:
-	Color cEnemyVisColor;
-	Color cEnemyInvisColor;
-
 	enum Materials {
 		DEFAULT,
 		FLAT
 	};
+
+	int iChamsMode = 0;
 
 	inline static bool bMatsInit = false;
 
@@ -37,6 +36,7 @@ public:
 		return true;
 	}
 
+	void OverrideMaterial(int iMatIndex, bool bIgnoreZ, float* col);
 	void OverrideMaterial(int iMatIndex, bool bIgnoreZ, Color col);
 	void DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags = STUDIORENDER_DRAW_ENTIRE_MODEL);
 };

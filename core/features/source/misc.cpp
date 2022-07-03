@@ -3,7 +3,7 @@
 Misc g_Misc;
 
 void Misc::BunnyHop(CUserCmd* cmd) {
-	if (!g_Config.ints["bunnyhop"].val)
+	if (!g_Config.ints[XOR("bunnyhop")].val)
 		return;
 
 	if (!(Game::g_pLocal->iFlags() & Entity::FL_ONGROUND))

@@ -2,11 +2,16 @@
 #include "pch.h"
 #include "includes.h"
 
+struct RecordHitbox {
+	Vec3D vPos;
+	bool bVisible;
+};
+
 struct LagRecord {
 	Player* pTargetPlayer;
 	Matrix boneMat[MAXSTUDIOBONES], tempMat[MAXSTUDIOBONES];
 	Vec3D vAbsOrigin, vAbsAngles, vOrigin, vAngles;
-	Vec3D vHitBoxPos[HITBOX_MAX];
+	RecordHitbox rHitBoxPos[HITBOX_MAX];
 	float flSimTime;
 
 	// overload constructor
@@ -17,7 +22,8 @@ struct LagRecord {
 		pPlayer->SetupBones(boneMat, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, 0.f);
 
 		for (int i = 0; i < HITBOX_MAX; i++) {
-			vHitBoxPos[i] = pPlayer->vGetHitboxPos(i);
+			Vec3D vHitboxPos = pPlayer->vGetHitboxPos(i);
+			rHitBoxPos[i] = { vHitboxPos, pPlayer->bIsPointVisible(Game::g_pLocal->vEyeOrigin(), vHitboxPos) };
 		}
 
 		vAbsOrigin = pPlayer->vAbsOrigin();
@@ -29,10 +35,10 @@ struct LagRecord {
 		flSimTime = pPlayer->flSimTime();
 	}
 
-	Vec3D GetHitboxPos(int idx) {
-		return this->vHitBoxPos[idx];
+	RecordHitbox GetHitboxPos(int idx) {
+		return this->rHitBoxPos[idx];
 	}
-
+	 
 	void ApplyToPlayer(Player* pPlayer) {
 		pPlayer->SetAngles(vAbsAngles);
 		pPlayer->SetPosition(vAbsOrigin);

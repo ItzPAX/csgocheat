@@ -18,6 +18,34 @@ private:
 		ImGui::NewLine();
 	}
 
+	void MultiSelectCombo(const char* label, std::vector<std::string> items, bool* sel, int size) {
+		static std::string preview;
+		static std::vector<std::string> vec;
+		if (ImGui::BeginCombo(label, preview.c_str())) {
+			for (int i = 0; i < size; i++) {
+				ImGui::Selectable(items[i].c_str(), &sel[i], ImGuiSelectableFlags_DontClosePopups);
+			}
+			ImGui::EndCombo();
+		}
+		vec.clear();
+		for (int i = 0; i < size; i++) {
+			if (sel[i])
+				vec.push_back(items[i]);
+		}
+
+		preview = "";
+		if (vec.size() == 0)
+			preview = "None";
+		for (int i = 0; i < vec.size(); i++) {
+			if (vec.size() == 1)
+				preview += vec[i];
+			else if (!(i == vec.size() - 1))
+				preview += vec[i] + ',';
+			else
+				preview += vec[i];
+		}
+	}
+
 public:
 	inline static bool bInitialized = false;
 	inline static bool bToggled = false;

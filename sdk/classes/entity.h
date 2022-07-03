@@ -108,7 +108,7 @@ public:
 
 		g_Interface.pEngineTrace->TraceRay(ray, MASK_SHOT | CONTENTS_GRATE, &cTraceFilter, &tTrace);
 
-		return tTrace.m_pEnt == this;
+		return tTrace.m_pEnt == this && tTrace.fraction >= 0.97;
 	}
 
 	int iGetWeaponType() {

@@ -2,12 +2,6 @@
 #include "includes.h"
 #include "pch.h"
 
-void UpdateGraph(ImPlotPoint* p, float* cfgp, int size) {
-	for (int i = 0; i < size; i++) {
-
-	}
-}
-
 void DrawGraph(const char* graphname, const char* xname, const char* yname, bool& extended, Vec2D* pBezierVals, double* points) {
 	static ImPlotDragToolFlags flags = ImPlotDragToolFlags_None;
 	ImPlotAxisFlags ax_flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoTickMarks;
