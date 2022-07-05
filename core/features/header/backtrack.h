@@ -55,6 +55,7 @@ class Backtrack {
 private:
 	ConVar* pUpdateRate;
 	ConVar* pMaxUpdateRate;
+	ConVar* pMinUpdateRate;
 	ConVar* pInterp;
 	ConVar* pInterpRatio;
 	ConVar* pMinInterpRatio;
@@ -74,6 +75,7 @@ public:
 
 		pUpdateRate = g_Interface.pICVar->FindVar(XOR("cl_updaterate"));
 		pMaxUpdateRate = g_Interface.pICVar->FindVar(XOR("sv_maxupdaterate"));
+		pMinUpdateRate = g_Interface.pICVar->FindVar(XOR("sv_minupdaterate"));
 		pInterp = g_Interface.pICVar->FindVar(XOR("cl_interp"));
 		pInterpRatio = g_Interface.pICVar->FindVar(XOR("cl_interp_ratio"));
 		pMinInterpRatio = g_Interface.pICVar->FindVar(XOR("sv_client_min_interp_ratio"));

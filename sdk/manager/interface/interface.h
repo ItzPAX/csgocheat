@@ -19,6 +19,7 @@
 #include "classes/ICvar.h"
 #include "classes/IInput.h"
 #include "classes/IClientLeafSystem.h"
+#include "classes/CGlowObjectManager.h"
 
 class Interface {
 private:
@@ -37,6 +38,7 @@ public:
 	IMaterialSystem* pMaterialSystem;
 	IStudioRender* pStudioRender;
 	IRenderView* pRenderView;
+	CGlowObjectManager* pGlow;
 	ISurface* pSurface;
 	IPanel* pPanel;
 	IVModelInfo* pModelInfo;

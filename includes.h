@@ -36,6 +36,7 @@ using uchar = unsigned char;
 #include "utilities/math/math.h"
 
 // sdk
+#include "sdk/classes/IInterpolatedVar.h"
 #include "sdk/manager/interface/classes/ICollideable.h"
 #include "sdk/manager/interface/classes/IClientUnknown.h"
 #include "sdk/manager/interface/interface.h"

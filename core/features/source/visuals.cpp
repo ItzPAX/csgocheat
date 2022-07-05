@@ -5,7 +5,6 @@ Visuals g_Visuals;
 
 void Visuals::ThirdPerson() {
 	static bool bInThirdPerson = false;
-	static bool bStateSwapped = false;
 	static bool bJustPressed = false;
 
 	if (GetAsyncKeyState(VK_MBUTTON) & 0x8000 && !bJustPressed)
@@ -23,7 +22,7 @@ void Visuals::ThirdPerson() {
 	else
 		g_Interface.pInput->CAM_ToFirstPerson();
 
-	g_Interface.pInput->vCameraOffset.z = 100.f;
+	g_Interface.pInput->m_vCameraOffset.z = 100.f;
 }
 
 void Visuals::UpdatePlayerRects() {

@@ -28,6 +28,12 @@ void Config::Init() {
 	SetupVal(boxesp, 1, XOR("esp"), XOR("boxesp"));
 	SetupVal(nameesp, 1, XOR("esp"), XOR("nameesp"));
 	SetupVal(healthesp, 1, XOR("esp"), XOR("healthesp"));
+	SetupVal(enemyglow, 1, XOR("esp"), XOR("enemyglow"));
+	SetupVal(enemyglowcol, { 0.8f, 0.2f, 0.4f, 0.7f }, 4, XOR("esp"), XOR("enemyglowcol"));
+	SetupVal(friendlyglow, 1, XOR("esp"), XOR("friendlyglow"));
+	SetupVal(friendlyglowcol, { 0.2f, 0.4f, 0.8f, 0.7f }, 4, XOR("esp"), XOR("friendlyglowcol"));
+	SetupVal(weaponglow, 1, XOR("esp"), XOR("weaponglow"));
+	SetupVal(weaponglowcol, { 0.1f, 0.9f, 0.2f, 0.5f }, 4, XOR("esp"), XOR("weaponglowcol"));
 
 	SetupVal(legitbot, 1, XOR("legitbot"), XOR("legitbot"));
 	SetupVal(legitlagcompmode, 0, XOR("legitbot"), XOR("legitlagcompmode"));
@@ -41,6 +47,11 @@ void Config::Init() {
 void Config::Save(std::string name) {
 	static char path[MAX_PATH];
 	std::string folder, file;
+
+	if (name == "") {
+		status = CfgStatus{ true, XOR("Invalid Name: ") };
+		return;
+	}
 
 	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path))) {
 		folder = std::string(path) + XOR("\\raybot\\");
@@ -81,9 +92,17 @@ void Config::Save(std::string name) {
 	status = CfgStatus{ false, XOR("Saved Config: ") + name };
 }
 
-void Config::Load(std::string name) {
+void Config::Load(int index) {
 	static char path[MAX_PATH];
 	std::string folder, file;
+
+	if (index >= configs.size()) {
+		status = CfgStatus{ true, XOR("Invalid Config selected") };
+		return;
+	}
+
+	std::string name = configs[index];
+	activeconfig = '[' + name + "]";
 
 	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path))) {
 		folder = std::string(path) + XOR("\\raybot\\");
@@ -132,6 +151,34 @@ void Config::Load(std::string name) {
 		}
 	}
 	status = CfgStatus{ false, XOR("Loaded Config: ") + name };
+}
+
+void Config::Delete(int index) {
+	static char path[MAX_PATH];
+	std::string folder, file;
+
+	if (index >= configs.size()) {
+		status = CfgStatus{ true, XOR("Invalid Config selected") };
+		return;
+	}
+
+	std::string name = configs[index];
+
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path))) {
+		folder = std::string(path) + XOR("\\raybot\\");
+		file = folder + name + XOR(".ini");
+	}
+
+	if (!std::filesystem::exists(file)) {
+		status = CfgStatus{ true, XOR("File not found: ") + name };
+		return;
+	}
+
+	int iStatus = remove(file.c_str());
+	if (iStatus == 0)
+		status = CfgStatus{ false, XOR("Deleted Config: ") + name };
+	else
+		status = CfgStatus{ true, XOR("Error deleting Config: ") + name };
 }
 
 void Config::SetupVal(int& i, int def, std::string category, std::string name) {

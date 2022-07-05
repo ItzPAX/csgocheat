@@ -49,6 +49,12 @@ private:
 	int nameesp;
 	int boxesp;
 	int healthesp;
+	int enemyglow;
+	float enemyglowcol[4];
+	int friendlyglow;
+	float friendlyglowcol[4];
+	int weaponglow;
+	float weaponglowcol[4];
 
 	int legitbot;
 	int legithitboxes[4];
@@ -71,10 +77,23 @@ public:
 	std::unordered_map<std::string, ConfigVar<double*>> graphs;
 
 public:
+	std::vector<std::string> configs;
+	std::string activeconfig;
+
 	int iSelConfig = 0;
 	void Save(std::string name);
-	void Load(std::string name);
-	Config() { Init(); }
+	void Save(int index) {
+		if (index >= configs.size()) {
+			status = CfgStatus{ true, XOR("Invalid Config selected") };
+			return;
+		}
+
+		std::string name = configs[index];
+		Save(name);
+	}
+	void Load(int index);
+	void Delete(int index);
+	Config() { Init(); activeconfig = "[Default]"; }
 
 	CfgStatus Status() { return status; }
 

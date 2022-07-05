@@ -190,6 +190,9 @@
     <ClCompile Include="..\core\features\config\config.cpp">
       <Filter>core\features\config</Filter>
     </ClCompile>
+    <ClCompile Include="..\core\imgui\imgui_stdlib.cpp">
+      <Filter>core\imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes.h" />
@@ -426,6 +429,18 @@
     </ClInclude>
     <ClInclude Include="..\core\features\config\config.h">
       <Filter>core\features\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\imgui\imgui_stdlib.h">
+      <Filter>core\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\classes\IInterpolatedVar.h">
+      <Filter>sdk\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\CGlowObjectManager.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\classes\CUtlVector.h">
+      <Filter>sdk\classes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

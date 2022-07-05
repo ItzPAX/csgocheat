@@ -17,8 +17,8 @@ public:
 	int iMenuWeapon = 0;
 	int iActiveWeapon = 0;
 
-	LagRecord* GetTargetRecord(CUserCmd* cmd);
-	void RunAimbot(CUserCmd* cmd);
+	void GetTargetRecord(CUserCmd* cmd, LagRecord* pBestRecord);
+	void RunAimbot(CUserCmd* cmd, LagRecord* pBestRecord);
 };
 
 extern LegitBot g_LegitBot;

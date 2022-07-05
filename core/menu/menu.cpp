@@ -61,7 +61,9 @@ void Menu::Render() {
 	ImGui::NewFrame();
 
 	// call our menu
-	ImGui::Begin(XOR("RayBot"));
+	std::string menuname = XOR("RayBot | ") + g_Config.activeconfig + XOR("###MainWindow");
+
+	ImGui::Begin(menuname.c_str());
 	g_Menu.Draw();
 	ImGui::End();
 
@@ -110,8 +112,7 @@ void Menu::Draw() {
 		RenderClickableButtons({ XOR("Sniper"), XOR("Rifle"), XOR("Pistol") }, &g_LegitBot.iMenuWeapon, ImVec2{vSize.x / 2, vSize.y}, style->WindowPadding.x + 5);
 		ImGui::SliderFloat(XOR("Legitbot Smoothing"), &g_Config.arrfloats[XOR("legitsmoothing")].val[g_LegitBot.iMenuWeapon], 1.f, 100.f, "%.0f%", 1.f);
 		ImGui::SliderFloat(XOR("Legitbot FOV"), &g_Config.arrfloats[XOR("legitfov")].val[g_LegitBot.iMenuWeapon], 0.f, 180.f, "%.0f%", 1.f);
-		if (g_LegitBot.iMenuWeapon != 0)
-			ImGui::SliderFloat(XOR("Legitbot RCS"), &g_Config.arrfloats[XOR("legitrcs")].val[g_LegitBot.iMenuWeapon], 0.f, 100.f, "%.0f%", 1.f);
+		ImGui::SliderFloat(XOR("Legitbot RCS"), &g_Config.arrfloats[XOR("legitrcs")].val[g_LegitBot.iMenuWeapon], 0.f, 100.f, "%.0f%", 1.f);
 		ImGui::EndChild();
 	}
 		  break;
@@ -122,6 +123,18 @@ void Menu::Draw() {
 		ImGui::Checkbox(XOR("Box ESP"), (bool*)&g_Config.ints[XOR("boxesp")].val);
 		ImGui::Checkbox(XOR("Name ESP"), (bool*)&g_Config.ints[XOR("nameesp")].val);
 		ImGui::Checkbox(XOR("Health ESP"), (bool*)&g_Config.ints[XOR("healthesp")].val);
+
+		ImGui::Checkbox(XOR("Enemy Glow			 "), (bool*)&g_Config.ints[XOR("enemyglow")].val);
+		ImGui::SameLine();
+		ImGui::ColorEdit4(XOR("Enemy Col"), g_Config.arrfloats[XOR("enemyglowcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+		
+		ImGui::Checkbox(XOR("Friendly Glow		  "), (bool*)&g_Config.ints[XOR("friendlyglow")].val);
+		ImGui::SameLine();
+		ImGui::ColorEdit4(XOR("Friendly Col"), g_Config.arrfloats[XOR("friendlyglowcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+		ImGui::Checkbox(XOR("Weapon Glow		    "), (bool*)&g_Config.ints[XOR("weaponglow")].val);
+		ImGui::SameLine();
+		ImGui::ColorEdit4(XOR("Weapon Col"), g_Config.arrfloats[XOR("weaponglowcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
@@ -183,18 +196,59 @@ void Menu::Draw() {
 		ImGui::SameLine();
 		ImGui::BeginChild(XOR("Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Config"));
-		static const char* pConfigSlot[] = { "Slot1", "Slot2", "Slot3", "Slot4" };
-		ImGui::Combo(XOR("Config Slot"), &g_Config.iSelConfig, pConfigSlot, IM_ARRAYSIZE(pConfigSlot));
-		if (ImGui::Button(XOR("Save"), ImVec2(vSize.x / 4 - style->WindowPadding.x - style->FramePadding.x - 6, 25.f)))
-			g_Config.Save(pConfigSlot[g_Config.iSelConfig]);
+
+		g_Config.configs.clear();
+		static char path[MAX_PATH];
+		std::string folder;
+		std::string ext = ".ini";
+
+		if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path)))
+			folder = std::string(path) + XOR("\\raybot\\");
+		for (auto& p : std::filesystem::recursive_directory_iterator(folder)) {
+			if (p.path().extension() == ext)
+				g_Config.configs.push_back(p.path().stem().string());
+		}
+
+		char** CConfigArr = new char* [g_Config.configs.size()];
+		for (size_t i = 0; i < g_Config.configs.size(); i++) {
+			CConfigArr[i] = new char[g_Config.configs[i].size() + 1];
+			strcpy(CConfigArr[i], g_Config.configs[i].c_str());
+		}
+
+		ImGui::PushItemWidth(-1);
+		ImGui::ListBox(XOR(""), &g_Config.iSelConfig, &CConfigArr[0], g_Config.configs.size(), 5);
+		ImGui::NewLine();
+		static std::string name;
+		ImGui::PushStyleColor(ImGuiCol_TextDisabled, IM_COL32(150, 150, 150, 255));
+		ImGui::InputTextWithHint(XOR(""), XOR("Config Name"), &name);
+		ImGui::PopItemWidth();
+		ImGui::PopStyleColor();
+		if (ImGui::Button(XOR("Save"), ImVec2(vSize.x / 6 - style->WindowPadding.x - style->FramePadding.x, 25.f))) {
+			if (name == "") {
+				g_Config.Save(g_Config.iSelConfig);
+			}
+			else {
+				g_Config.Save(name);
+			}
+			name.clear();
+		}
 		ImGui::SameLine();
-		if (ImGui::Button(XOR("Load"), ImVec2(vSize.x / 4 - style->WindowPadding.x - style->FramePadding.x - 6, 25.f)))
-			g_Config.Load(pConfigSlot[g_Config.iSelConfig]);
+		if (ImGui::Button(XOR("Load"), ImVec2(vSize.x / 6 - style->WindowPadding.x - style->FramePadding.x, 25.f))) {
+			g_Config.Load(g_Config.iSelConfig);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button(XOR("Delete"), ImVec2(vSize.x / 6 - style->WindowPadding.x - style->FramePadding.x, 25.f)))
+			g_Config.Delete(g_Config.iSelConfig);
 		ImGui::PushStyleColor(ImGuiCol_Text, g_Config.Status().error ? IM_COL32(255, 0, 0, 255) : IM_COL32(0, 255, 0, 255));
 		ImGui::Text(g_Config.Status().msg.c_str());
 		ImGui::PopStyleColor();
 
 		ImGui::EndChild();
+
+		for (size_t i = 0; i < g_Config.configs.size(); i++) {
+			delete[] CConfigArr[i];
+		}
+		delete[] CConfigArr;
 	}
 
 		  break;

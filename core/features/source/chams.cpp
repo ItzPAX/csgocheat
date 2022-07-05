@@ -8,7 +8,7 @@ void Chams::OverrideMaterial(int iMatIndex, bool bIgnoreZ, float* col) {
 	pMats.at(iMatIndex)->ColorModulate(col[0], col[1], col[2]);
 
 	pMats.at(iMatIndex)->SetMaterialVarFlag(MaterialVarFlags_t::MATERIAL_VAR_IGNOREZ, bIgnoreZ);
-	g_Interface.pModelRender->OverrideMaterial(pMats.at(iMatIndex));
+	g_Interface.pStudioRender->ForcedMaterialOverride(pMats.at(iMatIndex));
 }
 
 void Chams::OverrideMaterial(int iMatIndex, bool bIgnoreZ, Color col) {
@@ -16,14 +16,12 @@ void Chams::OverrideMaterial(int iMatIndex, bool bIgnoreZ, Color col) {
 	pMats.at(iMatIndex)->ColorModulate(col.rgba[0], col.rgba[1], col.rgba[2]);
 
 	pMats.at(iMatIndex)->SetMaterialVarFlag(MaterialVarFlags_t::MATERIAL_VAR_IGNOREZ, bIgnoreZ);
-	g_Interface.pModelRender->OverrideMaterial(pMats.at(iMatIndex));
+	g_Interface.pStudioRender->ForcedMaterialOverride(pMats.at(iMatIndex));
 }
 
 void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags) {
 	if (!Game::g_pLocal || !info.m_pRenderable)
 		return;
-	
-	g_Interface.pModelRender->OverrideMaterial(nullptr); // change overwritten material to default
 
 	Entity* pEntity = info.m_pRenderable->GetIClientUnknown()->GetBaseEntity();
 	// we have a valid player
@@ -63,8 +61,6 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 		}
 
-		g_Interface.pModelRender->OverrideMaterial(nullptr); // change overwritten material to default
-
 		// vis chams
 		if (g_Config.ints[XOR("enemychamsvis")].val) {
 			OverrideMaterial(g_Config.ints[XOR("chamtype")].val, false, g_Config.arrfloats[XOR("enemyviscol")].val);
@@ -80,8 +76,6 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 		}
 
-		g_Interface.pModelRender->OverrideMaterial(nullptr); // change overwritten material to default
-
 		// vis chams
 		if (g_Config.ints[XOR("friendlychamsvis")].val) {
 			OverrideMaterial(g_Config.ints[XOR("chamtype")].val, false, g_Config.arrfloats[XOR("friendlyviscol")].val);
@@ -91,8 +85,6 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 
 	// local chams
 	if (pPlayer == Game::g_pLocal) {
-		g_Interface.pModelRender->OverrideMaterial(nullptr); // change overwritten material to default
-
 		// vis chams
 		if (g_Config.ints[XOR("localchams")].val) {
 			OverrideMaterial(g_Config.ints[XOR("chamtype")].val, false, g_Config.arrfloats[XOR("localcol")].val);

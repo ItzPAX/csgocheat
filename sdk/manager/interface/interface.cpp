@@ -64,6 +64,7 @@ bool Interface::Init() {
 	pGlobalVars = **reinterpret_cast<CGlobalVars***>((*reinterpret_cast<uintptr_t**>(pClient))[11] + 10);
 
 	// sig interfaces 
+	pGlow = *reinterpret_cast<CGlowObjectManager**>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x0F\x11\x05\x00\x00\x00\x00\x83\xC8\x01"), XOR("xxx????xxx")) + 0x03);
 	pClientMode = **reinterpret_cast<IClientMode***>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8B\x0D\x00\x00\x00\x00\x8B\x01\x5D\xFF\x60\x30"), XOR("xx????xxxxxx")) + 0x02);
 	pInput = *reinterpret_cast<IInput**>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\xB9\x00\x00\x00\x00\xF3\x0F\x11\x04\x24\xFF\x50\x10"), XOR("x????xxxxxxxx")) + 0x01);
 

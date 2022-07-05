@@ -12,20 +12,28 @@
 HookManager g_HookManager{ };
 
 #pragma region HookDefs
-namespace FSN {
-	using tFrameStageNotify = void(__thiscall*)(void*, IBaseClientDLL::ClientFrameStage_t);
-	tFrameStageNotify oFrameStageNotify = nullptr;
-
-	int iIndex = 37;
-	__forceinline void __stdcall hkFrameStageNotfy(IBaseClientDLL::ClientFrameStage_t curStage);
-}
-
 namespace SvCheats {
 	using tSvCheats = bool(__thiscall*)(void*);
 	tSvCheats oSvCheats = nullptr;
 
 	int iIndex = 13;
 	__forceinline bool __fastcall hkSvCheats(void* ConVar, int edx);
+}
+
+namespace DoPostScreenSpaceEffects {
+	using tDoPostScreenSpaceEffects = void(__fastcall*)(IClientMode*, int, const void*);
+	tDoPostScreenSpaceEffects oDoPostScreenSpaceEffects = nullptr;
+
+	int iIndex = 44;
+	__forceinline void __fastcall hkDoPostScreenSpaceEffects(IClientMode* icmptr, int edx, const void* pViewSetup);
+}
+
+namespace FSN {
+	using tFrameStageNotify = void(__thiscall*)(void*, IBaseClientDLL::ClientFrameStage_t);
+	tFrameStageNotify oFrameStageNotify = nullptr;
+
+	int iIndex = 37;
+	__forceinline void __stdcall hkFrameStageNotfy(IBaseClientDLL::ClientFrameStage_t curStage);
 }
 
 namespace HudUpdate {
@@ -93,13 +101,14 @@ bool HookManager::AddAllHooks() {
 	WndProc::oWndProc = (WndProc::tWndProc)SetWindowLong(g_DirectX.window, GWL_WNDPROC, (LONG)WndProc::hkWndProc);
 
 	// grab original function address and add hook to the queue
-	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pClientMode, CreateMove::hkCreateMove, CreateMove::iIndex, (PVOID*)&CreateMove::oCreateMove));
-	g_HookLib.AddHook(HookEntry("client.dll", g_Interface.pStudioRender, DrawModel::hkDrawModel, DrawModel::iIndex, (PVOID*)&DrawModel::oDrawModel));
-	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pClient, HudUpdate::hkHudUpdate, HudUpdate::iIndex, (PVOID*)&HudUpdate::oHudUpdate));
-	g_HookLib.AddHook(HookEntry("client.dll", g_Interface.pSurface, LockCursor::hkLockCursor, LockCursor::iIndex, (PVOID*)&LockCursor::oLockCursor));
+	g_HookLib.AddHook(HookEntry("materialsystem.dll", g_Interface.pClientMode, CreateMove::hkCreateMove, CreateMove::iIndex, (PVOID*)&CreateMove::oCreateMove));
+	g_HookLib.AddHook(HookEntry("materialsystem.dll", g_Interface.pClientMode, DoPostScreenSpaceEffects::hkDoPostScreenSpaceEffects, DoPostScreenSpaceEffects::iIndex, (PVOID*)&DoPostScreenSpaceEffects::oDoPostScreenSpaceEffects));
+	g_HookLib.AddHook(HookEntry("materialsystem.dll", g_Interface.pStudioRender, DrawModel::hkDrawModel, DrawModel::iIndex, (PVOID*)&DrawModel::oDrawModel));
+	g_HookLib.AddHook(HookEntry("panorama.dll", g_Interface.pClient, HudUpdate::hkHudUpdate, HudUpdate::iIndex, (PVOID*)&HudUpdate::oHudUpdate));
+	g_HookLib.AddHook(HookEntry("panorama.dll", g_Interface.pSurface, LockCursor::hkLockCursor, LockCursor::iIndex, (PVOID*)&LockCursor::oLockCursor));
 	ConVar* pSvCheats = g_Interface.pICVar->FindVar(XOR("sv_cheats"));
-	g_HookLib.AddHook(HookEntry("client.dll", pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex, (PVOID*)&SvCheats::oSvCheats));
-	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pClient, FSN::hkFrameStageNotfy, FSN::iIndex, (PVOID*)&FSN::oFrameStageNotify));
+	g_HookLib.AddHook(HookEntry("panorama.dll", pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex, (PVOID*)&SvCheats::oSvCheats));
+	g_HookLib.AddHook(HookEntry("panorama.dll", g_Interface.pClient, FSN::hkFrameStageNotfy, FSN::iIndex, (PVOID*)&FSN::oFrameStageNotify));
 
 	g_HookManager.bHooksAdded = true;
 	return true;
@@ -131,26 +140,33 @@ bool HookManager::ReleaseAll() {
 }
 
 #pragma region HkFunctions
+bool __fastcall SvCheats::hkSvCheats(void* ConVar, int edx) {
+	static auto pCamThink = reinterpret_cast<void*>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x85\xC0\x75\x30\x38\x86"), XOR("xxxxxx")));
+
+	if (!ConVar)
+		return false;
+
+	if ((_ReturnAddress()) == pCamThink)
+		return true;
+
+	return oSvCheats(ConVar);
+}
+
+void __fastcall DoPostScreenSpaceEffects::hkDoPostScreenSpaceEffects(IClientMode* icmptr, int edx, const void* pViewSetup) {
+	if (!Game::g_pLocal)
+		return oDoPostScreenSpaceEffects(icmptr, edx, pViewSetup);
+
+	cDoPostScreenSpaceEffects();
+
+	oDoPostScreenSpaceEffects(icmptr, edx, pViewSetup);
+}
+
 void __stdcall FSN::hkFrameStageNotfy(IBaseClientDLL::ClientFrameStage_t curStage) {
 	if (!Game::g_pLocal)
 		return oFrameStageNotify(g_Interface.pClient, curStage);
 
 	cFrameStageNotify(curStage);
 	oFrameStageNotify(g_Interface.pClient, curStage);
-}
-
-bool __fastcall SvCheats::hkSvCheats(void* ConVar, int edx) {
-	if (!Game::g_pLocal)
-		return oSvCheats(ConVar);
-
-	static auto pCamThink = reinterpret_cast<void*>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x85\xC0\x75\x30\x38\x86"), XOR("xxxxxx")));
-	
-	if (!ConVar)
-		return false;
-	
-	if ((_ReturnAddress()) == pCamThink)
-		return true;
-	return oSvCheats(ConVar);
 }
 
 void __stdcall HudUpdate::hkHudUpdate(bool bActive) {
@@ -165,8 +181,15 @@ void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults*
 	if (!Game::g_pLocal)
 		return oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 
+	// glow model
+	if (g_Interface.pStudioRender->IsForcedMaterialOverride()) {
+		oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+		return;
+	}
+
 	cDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 	oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+	g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
 }	
 bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	Game::g_pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());

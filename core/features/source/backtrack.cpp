@@ -21,7 +21,6 @@ bool Backtrack::ValidTick(LagRecord& pRecord) {
 }
 
 float Backtrack::GetLerpTime() {
-	// Get LerpTime
 	int iUpdateRate = pUpdateRate->GetInt();
 	float flInterpRatio = pInterpRatio->GetFloat();
 
@@ -61,7 +60,6 @@ void Backtrack::ApplyRecord(CUserCmd* cmd, LagRecord* record) {
 	if (!cmd || !record)
 		return;
 
-	if (cmd->buttons & CUserCmd::IN_ATTACK) {
-		cmd->tick_count = TIME_TO_TICKS(record->flSimTime);
-	}
+	if (cmd->buttons & CUserCmd::IN_ATTACK)
+		cmd->tick_count = TIME_TO_TICKS(record->flSimTime + GetLerpTime());
 }

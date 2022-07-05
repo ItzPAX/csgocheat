@@ -5,7 +5,7 @@ LegitBot g_LegitBot;
 float LegitBot::ApplyBezierSmoothingValues(Vec3D& vViewAngles, Vec3D& vAngle, Vec2D* pBezierVals) {
 	// get the delta angle and scale it into our spline range
 	Vec3D vDelta = (vAngle - vViewAngles).Clamped();
-	float flDeltaLength = vDelta.Length2D();
+	float flDeltaLength = vDelta.Length();
 	// max angle distance can be 180 degrees
 	int iScaledNum = (int)g_Math.ScaleNumber(flDeltaLength, g_Config.arrfloats[XOR("legitfov")].val[iActiveWeapon], 0.f, 99.f, 0.f);
 	int iIndex = 99 - iScaledNum;
@@ -14,9 +14,9 @@ float LegitBot::ApplyBezierSmoothingValues(Vec3D& vViewAngles, Vec3D& vAngle, Ve
 	return g_Config.arrfloats[XOR("legitsmoothing")].val[iActiveWeapon] * (2 - pBezierVals[iIndex].y);
 }
 
-LagRecord* LegitBot::GetTargetRecord(CUserCmd* cmd) {
+void LegitBot::GetTargetRecord(CUserCmd* cmd, LagRecord* pBestRecord) {
 	if (Game::g_pLocal->bIsDefusing())
-		return nullptr;
+		return;
 
 	int iBestPlayerInd = INVALID;
 	Player* pBestPlayer = nullptr;
@@ -25,10 +25,23 @@ LagRecord* LegitBot::GetTargetRecord(CUserCmd* cmd) {
 	float flBestDeltaRecord = FLOAT_MAX;
 	int iBestRecord = INVALID;
 
-	Vec3D vViewAngles;
-	g_Interface.pEngine->GetViewAngles(vViewAngles);
+	Vec3D vViewAngles = cmd->viewangles;
 
 	Vec3D vEyeOrigin = Game::g_pLocal->vEyeOrigin();
+
+	Entity* pActiveWeapon = Game::g_pLocal->pGetActiveWeapon();
+	if (!pActiveWeapon)
+		return;
+
+	int iWeaponType = pActiveWeapon->iGetWeaponType();
+
+	Vec3D vAimPunch{};
+	switch (iWeaponType) {
+	case Entity::WEAPONTYPE_RIFLE:
+	case Entity::WEAPONTYPE_SUBMACHINEGUN:
+	case Entity::WEAPONTYPE_MACHINEGUN:
+		vAimPunch = Game::g_pLocal->vGetAimPunchAngle();
+	}
 
 	// get best player
 	for (int i = 1; i <= g_Interface.pGlobalVars->iMaxClients; i++) {
@@ -52,19 +65,17 @@ LagRecord* LegitBot::GetTargetRecord(CUserCmd* cmd) {
 	}
 
 	if (iBestPlayerInd == INVALID || !pBestPlayer || g_Backtrack.deqLagRecords[iBestPlayerInd].size() <= 3)
-		return nullptr;
+		return;
 
-	pTargetRecord = &g_Backtrack.deqLagRecords[iBestPlayerInd].front();
+	*pBestRecord = g_Backtrack.deqLagRecords[iBestPlayerInd].front();
 
 	if (!g_Config.ints[XOR("lagcomp")].val)
-		return &g_Backtrack.deqLagRecords[iBestPlayerInd].front();
+		pTargetRecord = &g_Backtrack.deqLagRecords[iBestPlayerInd].front();
 
 	if (g_Config.ints["legitlagcompmode"].val == 1)
 		pTargetRecord = &g_Backtrack.deqLagRecords[iBestPlayerInd].front();
 	if (g_Config.ints["legitlagcompmode"].val == 2)
 		pTargetRecord = &g_Backtrack.deqLagRecords[iBestPlayerInd].back();
-
-	UpdateHitboxes();
 
 	// get best record
 	for (int i = 0; i < g_Backtrack.deqLagRecords[iBestPlayerInd].size(); i++) {
@@ -72,11 +83,11 @@ LagRecord* LegitBot::GetTargetRecord(CUserCmd* cmd) {
 		if (!g_Backtrack.ValidTick(record))
 			continue;
 
-		for (int i = 0; i < HITBOX_MAX; i++) {
+		for (int idx = 0; idx < HITBOX_MAX; idx++) {
 			Vec3D vAngle;
-			Vec3D vHitboxPos = record.GetHitboxPos(i).vPos;
+			Vec3D vHitboxPos = record.GetHitboxPos(idx).vPos;
 
-			g_Math.CalcAngle(vEyeOrigin, vHitboxPos, vAngle);
+			g_Math.CalcAngle(vEyeOrigin, vHitboxPos + vAimPunch * 2.f, vAngle);
 			vAngle.Clamp();
 
 			float flCurrDelta = (vAngle - vViewAngles).Clamped().Length();
@@ -90,9 +101,9 @@ LagRecord* LegitBot::GetTargetRecord(CUserCmd* cmd) {
 	if (iBestRecord != INVALID) {
 		if (g_Config.ints["legitlagcompmode"].val == 0)
 			pTargetRecord = &g_Backtrack.deqLagRecords[iBestPlayerInd][iBestRecord];
-		return &g_Backtrack.deqLagRecords[iBestPlayerInd][iBestRecord];
+		*pBestRecord = g_Backtrack.deqLagRecords[iBestPlayerInd][iBestRecord];
 	}
-	return nullptr;
+	return;
 }
 
 void LegitBot::CompensateRecoil(Vec3D& vAngle, Vec3D vAimPunch, float flRCS, float flSmoothing) {
@@ -129,7 +140,7 @@ void LegitBot::UpdateHitboxes() {
 	}
 }
 
-void LegitBot::RunAimbot(CUserCmd* cmd) {
+void LegitBot::RunAimbot(CUserCmd* cmd, LagRecord* pBestRecord) {
 	if (!g_Config.ints[XOR("legitbot")].val)
 		return;
 
@@ -198,6 +209,7 @@ void LegitBot::RunAimbot(CUserCmd* cmd) {
 	case Entity::WEAPONTYPE_RIFLE:
 	case Entity::WEAPONTYPE_SUBMACHINEGUN:
 	case Entity::WEAPONTYPE_MACHINEGUN:
+	case Entity::WEAPONTYPE_SNIPER:
 		vAimPunch = Game::g_pLocal->vGetAimPunchAngle();
 	}
 
@@ -215,6 +227,7 @@ void LegitBot::RunAimbot(CUserCmd* cmd) {
 
 	// set cmd viewangles, cuz its faster then shoot and then set engine viewangles so it all looks legit
 	cmd->viewangles = vEnemyAngle;
+	GetTargetRecord(cmd, pBestRecord);
 	g_Interface.pEngine->SetViewAngles(vEnemyAngle);
 
 	// invalidate record after we used it

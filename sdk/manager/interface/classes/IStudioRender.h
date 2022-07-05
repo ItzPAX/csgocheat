@@ -265,6 +265,16 @@ struct DrawModelInfo {
 
 class IStudioRender : IAppSystem {
 public:
+	enum EOverrideType : std::int32_t
+	{
+		OVERRIDE_NORMAL = 0,
+		OVERRIDE_BUILD_SHADOWS,
+		OVERRIDE_DEPTH_WRITE,
+		OVERRIDE_SELECTIVE,
+		OVERRIDE_SSAO_DEPTH_WRITE,
+	};
+
+public:
 	// outdated, maybe find new funcs
 
 	virtual void BeginFrame(void) = 0;
@@ -366,4 +376,15 @@ public:
 	virtual int GetMaterialList(StudioHDR* pStudioHdr, int count, IMaterial** ppMaterials) = 0;
 	virtual void PadFn8() = 0;
 	virtual void PadFn9() = 0;
+
+public:
+	void ForcedMaterialOverride(IMaterial* material, int type = OVERRIDE_NORMAL, int index = -1) {
+		using fn = void (__thiscall*)(void*, IMaterial*, int, int);
+		(*(fn**)this)[33](this, material, type, index);
+	}
+
+	bool IsForcedMaterialOverride() {
+		using fn = bool (__thiscall*)(void*);
+		return (*(fn**)this)[34](this);
+	}
 };

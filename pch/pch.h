@@ -14,6 +14,7 @@
 
 // File Managment
 #include <filesystem>
+#include <fstream>
 
 // Data structs
 #include <string>
@@ -33,6 +34,7 @@
 
 // imgui
 #include "core/imgui/imgui.h"
+#include "core/imgui/imgui_stdlib.h"
 #include "core/imgui/imgui_impl_dx9.h"
 #include "core/imgui/imgui_impl_win32.h"
 #include "core/imgui/implot.h"

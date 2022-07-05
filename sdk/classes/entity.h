@@ -2,10 +2,33 @@
 #include "utilities/structures/matrix/matrix.h"
 #include "utilities/tools/xorstr.h"
 #include "utilities/tools/tools.h"
+#include "CUtlVector.h"
 #include "includes.h"
 #include "pch.h"
 
 #define INVALID -1
+
+class VarMapEntry_t
+{
+public:
+	unsigned short		type;
+	unsigned short		m_bNeedsToInterpolate;	// Set to false when this var doesn't
+												// need Interpolate() called on it anymore.
+	void* data;
+	IInterpolatedVar* watcher;
+};
+
+struct VarMapping_t
+{
+	VarMapping_t()
+	{
+		m_nInterpolatedEntries = 0;
+	}
+
+	CUtlVector< VarMapEntry_t >	m_Entries;
+	int							m_nInterpolatedEntries;
+	float						m_lastInterpolationTime;
+};
 
 class Entity {
 public:
