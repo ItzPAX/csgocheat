@@ -5,7 +5,7 @@
 struct PlayerInfo {
 	int64_t _pad0;
 	union {
-		int64_t xuid;
+		int64_t steamid64;
 		struct {
 			int xuidlow;
 			int xuidhigh;
@@ -13,7 +13,9 @@ struct PlayerInfo {
 	};
 	char name[128];
 	int userid;
-	char guid[33];
+	char steamid[20];
+	char _pad1[0x10];
+	unsigned long isteamid;
 	unsigned int friendsid;
 	char friendsname[128];
 	bool fakeplayer;

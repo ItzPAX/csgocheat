@@ -39,6 +39,12 @@ public:
 	bool operator==(const Vec3D& v) {
 		return x == v.x && y == v.y && z == v.z;
 	}
+	bool operator>(const Vec3D& v) {
+		return x > v.x && y > v.y && z > v.z;
+	}
+	bool operator<(const Vec3D& v) {
+		return x < v.x && y < v.y && z < v.z;
+	}
 
 	Vec3D& operator+=(const Vec3D& v) {
 		x += v.x; y += v.y; z += v.z; return *this;

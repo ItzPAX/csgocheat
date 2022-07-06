@@ -25,6 +25,8 @@ void Config::Init() {
 	SetupVal(friendlychamsinvis, 0, XOR("chams"), XOR("friendlychamsinvis"));
 	SetupVal(friendlyinviscol, { 0.3f, 0.5f, 0.9f, 1.f }, 4, XOR("chams"), XOR("friendlyinviscol"));
 
+	SetupVal(watermark, 1, XOR("visuals"), XOR("watermark"));
+
 	SetupVal(boxesp, 1, XOR("esp"), XOR("boxesp"));
 	SetupVal(nameesp, 1, XOR("esp"), XOR("nameesp"));
 	SetupVal(healthesp, 1, XOR("esp"), XOR("healthesp"));
@@ -36,12 +38,17 @@ void Config::Init() {
 	SetupVal(weaponglowcol, { 0.1f, 0.9f, 0.2f, 0.5f }, 4, XOR("esp"), XOR("weaponglowcol"));
 
 	SetupVal(legitbot, 1, XOR("legitbot"), XOR("legitbot"));
+	SetupVal(legitbotkey, VK_LBUTTON, XOR("legitbot"), XOR("legitbotkey"));
 	SetupVal(legitlagcompmode, 0, XOR("legitbot"), XOR("legitlagcompmode"));
 	SetupVal(legithitboxes, { 0,0,0,0 }, 4, XOR("legitbot"), XOR("legithitboxes"));
+	SetupVal(legitrandomization, 0.f, XOR("legitbot"), XOR("legitrandomization"));
+	SetupVal(legitgraphmax, 2.f, XOR("legitbot"), XOR("legitgraphmax"));
 	SetupVal(legitgraph, { 0.f, 1.f, 0.25f, 1.f, 0.75f, 1.f, 1.f, 1.f }, XOR("legitbot"), XOR("legitgraph"));
 	SetupVal(legitfov, { 8.f, 8.f, 8.f }, 3, XOR("legitbot"), XOR("legitfov"));
 	SetupVal(legitsmoothing, { 10.f, 10.f, 10.f }, 3, XOR("legitbot"), XOR("legitsmoothing"));
 	SetupVal(legitrcs, { 25.f, 25.f, 25.f }, 3, XOR("legitbot"), XOR("legitrcs"));
+	SetupVal(triggerbot, 0, XOR("triggerbot"), XOR("triggerbot"));
+	SetupVal(triggerbotkey, VK_XBUTTON2, XOR("triggerbot"), XOR("triggerbotkey"));
 }
 
 void Config::Save(std::string name) {

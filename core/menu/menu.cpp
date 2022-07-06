@@ -1,10 +1,11 @@
 #include "pch.h"
 #include "includes.h"
+#include "customfunctions.h"
 #include "graph.h"
 
 Menu g_Menu;
 
-void Menu::Render() {
+void Menu::ApplyStyle() {
 	// apply style
 	style = &ImGui::GetStyle();
 
@@ -54,6 +55,10 @@ void Menu::Render() {
 	style->Colors[ImGuiCol_PlotHistogram] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
 	style->Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
 	style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
+}
+
+void Menu::Render() {
+	ApplyStyle();
 
 	// start frame and render to screen
 	ImGui_ImplDX9_NewFrame();
@@ -63,7 +68,7 @@ void Menu::Render() {
 	// call our menu
 	std::string menuname = XOR("RayBot | ") + g_Config.activeconfig + XOR("###MainWindow");
 
-	ImGui::Begin(menuname.c_str());
+	ImGui::Begin(menuname.c_str(), &g_Menu.bToggled);
 	g_Menu.Draw();
 	ImGui::End();
 
@@ -80,6 +85,9 @@ void Menu::Draw() {
 
 	RenderClickableButtons({ XOR("Ragebot"), XOR("Legitbot"), XOR("ESP"), XOR("Misc")}, &g_Menu.iCurrentTab, vSize, style->WindowPadding.x - 3);
 	ImGui::NewLine();
+
+	// Render the playerlist
+	g_PlayerList.DrawPlayerList();
 
 	switch (g_Menu.iCurrentTab) {
 		// RAGEBOT
@@ -99,15 +107,21 @@ void Menu::Draw() {
 		ImGui::BeginChild(XOR("Main-Legitbot"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Main Legitbot"));
 		ImGui::Checkbox(XOR("Legitbot"), (bool*)&g_Config.ints[XOR("legitbot")].val);
-		DrawExtendableGraph(XOR("[Extended] AimbotCurve"), XOR("Distance"), XOR("Speed"), XOR("AimbotCurve"), g_LegitBot.bGraphExtended, g_LegitBot.vAimbotCurve, g_Config.graphs["legitgraph"].val);
+		//ImGui::SameLine();
+		ImGui::Hotkey(XOR("Legitbot-Key"), & g_Config.ints["legitbotkey"].val);
+		DrawExtendableGraph(XOR("[Extended] AimbotCurve"), XOR("Distance"), XOR("Speed"), XOR("AimbotCurve"), g_LegitBot.bGraphExtended, g_LegitBot.vAimbotCurve, g_Config.graphs["legitgraph"].val, g_Config.floats["legitgraphmax"].val, LegitbotFunction);
 		MultiSelectCombo(XOR("Hitboxes"), { XOR("Head"), XOR("Chest"), XOR("Stomach"), XOR("Legs") }, (bool*)g_Config.arrints[XOR("legithitboxes")].val, 4);
 		
 		static const char* pLagRecordSelection[] = { "Closest", "First", "Last" };
 		ImGui::Combo(XOR("Lagcomp Mode"), &g_Config.ints[XOR("legitlagcompmode")].val, pLagRecordSelection, IM_ARRAYSIZE(pLagRecordSelection));
+		ImGui::Checkbox(XOR("Triggerbot"), (bool*)&g_Config.ints[XOR("triggerbot")].val);
+		//ImGui::SameLine();
+		ImGui::Hotkey(XOR("Triggerbot-Key"), &g_Config.ints[XOR("triggerbotkey")].val);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
 		ImGui::BeginChild(XOR("Weapon-Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
+		
 		ImGui::Text(XOR("Weapon-Config"));
 		RenderClickableButtons({ XOR("Sniper"), XOR("Rifle"), XOR("Pistol") }, &g_LegitBot.iMenuWeapon, ImVec2{vSize.x / 2, vSize.y}, style->WindowPadding.x + 5);
 		ImGui::SliderFloat(XOR("Legitbot Smoothing"), &g_Config.arrfloats[XOR("legitsmoothing")].val[g_LegitBot.iMenuWeapon], 1.f, 100.f, "%.0f%", 1.f);
@@ -191,6 +205,7 @@ void Menu::Draw() {
 		ImGui::Text(XOR("Main Misc"));
 		ImGui::Checkbox(XOR("Bunnyhop"), (bool*)&g_Config.ints[XOR("bunnyhop")].val);
 		ImGui::Checkbox(XOR("Lagcompensation"), (bool*)&g_Config.ints[XOR("lagcomp")].val);
+		ImGui::Checkbox(XOR("Watermark"), (bool*)&g_Config.ints[XOR("watermark")].val);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
@@ -226,6 +241,7 @@ void Menu::Draw() {
 		if (ImGui::Button(XOR("Save"), ImVec2(vSize.x / 6 - style->WindowPadding.x - style->FramePadding.x, 25.f))) {
 			if (name == "") {
 				g_Config.Save(g_Config.iSelConfig);
+				g_Config.Load(g_Config.iSelConfig);
 			}
 			else {
 				g_Config.Save(name);
@@ -243,6 +259,8 @@ void Menu::Draw() {
 		ImGui::Text(g_Config.Status().msg.c_str());
 		ImGui::PopStyleColor();
 
+		if (g_PlayerList.bListOpened ? ImGui::Button(XOR("Close Playerlist"), ImVec2(-1.f, 0.f)) : ImGui::Button(XOR("Open Playerlist"), ImVec2(-1.f, 0.f)))
+			g_PlayerList.bListOpened = !g_PlayerList.bListOpened;
 		ImGui::EndChild();
 
 		for (size_t i = 0; i < g_Config.configs.size(); i++) {

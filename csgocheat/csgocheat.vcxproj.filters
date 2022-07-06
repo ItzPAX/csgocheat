@@ -193,6 +193,9 @@
     <ClCompile Include="..\core\imgui\imgui_stdlib.cpp">
       <Filter>core\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="..\core\features\source\playerlist.cpp">
+      <Filter>core\features\source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes.h" />
@@ -441,6 +444,12 @@
     </ClInclude>
     <ClInclude Include="..\sdk\classes\CUtlVector.h">
       <Filter>sdk\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\menu\customfunctions.h">
+      <Filter>core\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\header\playerlist.h">
+      <Filter>core\features\header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

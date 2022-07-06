@@ -11,6 +11,9 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	// set cmd to be globally accessible
 	Game::g_pCmd = cmd;
 
+	// update the playerlist
+	g_PlayerList.UpdatePlayerList();
+
 	// lagcomp stuff
 	if (!bClientModeInit) {
 		g_Backtrack.Init();
@@ -21,6 +24,7 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 		LagRecord pRecord;
 		g_LegitBot.GetTargetRecord(cmd, &pRecord);
 		g_LegitBot.RunAimbot(cmd, &pRecord);
+		g_LegitBot.RunTriggerbot(cmd, &pRecord);
 		g_Backtrack.ApplyRecord(cmd, &pRecord);
 	}
 

@@ -2,7 +2,7 @@
 #include "includes.h"
 #include "pch.h"
 
-void DrawGraph(const char* graphname, const char* xname, const char* yname, bool& extended, Vec2D* pBezierVals, double* points) {
+void DrawGraph(const char* graphname, const char* xname, const char* yname, bool& extended, Vec2D* pBezierVals, double* points, float flGraphMax) {
 	static ImPlotDragToolFlags flags = ImPlotDragToolFlags_None;
 	ImPlotAxisFlags ax_flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoTickMarks;
 
@@ -15,13 +15,16 @@ void DrawGraph(const char* graphname, const char* xname, const char* yname, bool
 	if (ImPlot::BeginPlot(graphname, size, ImPlotFlags_NoTitle | ImPlotFlags_NoMenus | ImPlotFlags_NoBoxSelect | ImPlotFlags_NoMouseText | ImPlotSubplotFlags_NoResize)) {
 		ImPlot::SetupAxes(xname, yname, ax_flags, ax_flags);
 
-		ImPlot::SetupAxesLimits(0, 1, 0, 2, ImPlotCond_Always);
+		ImPlot::SetupAxesLimits(0, 1, 0, (double)flGraphMax, ImPlotCond_Always);
 		if (extended) {
-			ImPlot::DragPoint(1, &points[0], &points[1], ImVec4(0.1f, 0.9f, 0.1f, 1), 4, flags, 2, 0, true, 0);
-			ImPlot::DragPoint(2, &points[2], &points[3], ImVec4(1, 0.5f, 1, 1), 4, flags, 2, 0);
-			ImPlot::DragPoint(3, &points[4], &points[5], ImVec4(0, 0.5f, 1, 1), 4, flags, 2, 0);
-			ImPlot::DragPoint(4, &points[6], &points[7], ImVec4(0.1f, 0.9f, 0.1f, 1), 4, flags, 2, 0, true, 1);
+			ImPlot::DragPoint(1, &points[0], &points[1], ImVec4(0.1f, 0.9f, 0.1f, 1), 4, flags, flGraphMax, 0, true, 0);
+			ImPlot::DragPoint(2, &points[2], &points[3], ImVec4(1, 0.5f, 1, 1), 4, flags, flGraphMax, 0);
+			ImPlot::DragPoint(3, &points[4], &points[5], ImVec4(0, 0.5f, 1, 1), 4, flags, flGraphMax, 0);
+			ImPlot::DragPoint(4, &points[6], &points[7], ImVec4(0.1f, 0.9f, 0.1f, 1), 4, flags, flGraphMax, 0, true, 1);
 		}
+
+		points[3] = std::clamp(points[3], (double)0, (double)flGraphMax);
+		points[5] = std::clamp(points[5], (double)0, (double)flGraphMax);
 
 		ImVec2 size = ImPlot::GetPlotSize();
 		ImVec2 pos = ImPlot::GetPlotPos();
@@ -67,17 +70,21 @@ void DrawGraph(const char* graphname, const char* xname, const char* yname, bool
 }
 
 ImVec2 PopupSize = { 500,600 };
-void DrawExtendableGraph(const char* windowName, const char* xname, const char* yname, const char* graphname, bool& bextended, Vec2D* pBezierVals, double* points) {
+void DrawExtendableGraph(const char* windowName, const char* xname, const char* yname, const char* graphname, bool& bextended, Vec2D* pBezierVals, double* points, float graphmax, Menu::tGraphFunction extrafunc = nullptr) {	
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.06f, 0.05f, 0.07f, 1.00f));
-	
 	if (bextended) {
 		ImGui::SetNextWindowSize(PopupSize, ImGuiCond_Once);
 		ImGui::Begin(windowName, &bextended);
-		DrawGraph(graphname, xname, yname, bextended, pBezierVals, points);
+		if (extrafunc) {
+			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.34f, 0.0f, 0.69f, 1.00f));
+			extrafunc();
+			ImGui::PopStyleColor();
+		}
+		DrawGraph(graphname, xname, yname, bextended, pBezierVals, points, graphmax);
 		ImGui::End();
 	}
 	else {
-		DrawGraph(graphname, xname, yname, bextended, pBezierVals, points);
+		DrawGraph(graphname, xname, yname, bextended, pBezierVals, points, graphmax);
 	}
 	ImGui::PopStyleColor();
 }

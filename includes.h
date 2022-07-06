@@ -8,8 +8,6 @@ struct LagRecord;
 namespace Game {
 	inline CUserCmd* g_pCmd;
 	inline Player* g_pLocal;
-	inline int g_iScreenX;
-	inline int g_iScreenY;
 
 	inline HINSTANCE g_hInstance;
 }
@@ -60,6 +58,7 @@ using uchar = unsigned char;
 // features
 #include "core/features/config/config.h"
 #include "core/features/header/backtrack.h"
+#include "core/features/header/playerlist.h"
 #include "core/menu/menu.h"
 #include "core/features/header/visuals.h"
 #include "core/features/header/chams.h"

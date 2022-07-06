@@ -226,8 +226,7 @@ HRESULT __stdcall HkDirectX::hkEndScene(LPDIRECT3DDEVICE9 o_pDevice) {
 
 	// only draw if return address is our own device
 	if (dwAllowedReturn == 0 || dwAllowedReturn == dwReturnAddress) {
-		if (Game::g_pLocal)
-			cEndScene(); // relay function
+		cEndScene(); // relay function
 		cMenu(); // menu shit
 
 		dwAllowedReturn = dwReturnAddress;

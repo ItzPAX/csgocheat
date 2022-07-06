@@ -11,7 +11,10 @@ float LegitBot::ApplyBezierSmoothingValues(Vec3D& vViewAngles, Vec3D& vAngle, Ve
 	int iIndex = 99 - iScaledNum;
 
 	// adjust smoothing value based on spline
-	return g_Config.arrfloats[XOR("legitsmoothing")].val[iActiveWeapon] * (2 - pBezierVals[iIndex].y);
+	float randfactor = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (g_Config.ints["legitrandomization"].val + 1)));
+	randfactor /= 100.f;
+	randfactor += 1.f;
+	return (g_Config.arrfloats[XOR("legitsmoothing")].val[iActiveWeapon] / (pBezierVals[iIndex].y * randfactor));
 }
 
 void LegitBot::GetTargetRecord(CUserCmd* cmd, LagRecord* pBestRecord) {
@@ -106,6 +109,46 @@ void LegitBot::GetTargetRecord(CUserCmd* cmd, LagRecord* pBestRecord) {
 	return;
 }
 
+void LegitBot::RunTriggerbot(CUserCmd* cmd, LagRecord* pBestRecord) {
+	if (!g_Config.ints["triggerbot"].val)
+		return;
+
+	// not set / escape = always on
+	if (g_Config.ints["triggerbotkey"].val != 0 && !GetAsyncKeyState(g_Config.ints["triggerbotkey"].val))
+		return;
+
+	if (!pBestRecord)
+		return;
+
+	// 8192 is the max weaponrange src: http://strike-counter.com/cs-go-stats/weapons-data
+	Vec3D vEndPoint;
+	Vec3D vEyeOrigin = Game::g_pLocal->vEyeOrigin();
+	vEndPoint.Init(vEyeOrigin.x + (8192 * cosf(cmd->viewangles.y * (M_PI / 180.0)) * cosf(cmd->viewangles.x * (M_PI / 180.0))),
+		vEyeOrigin.y + (8192 * sinf(cmd->viewangles.y * (M_PI / 180.0)) * cosf(cmd->viewangles.x * (M_PI / 180.0))),
+		vEyeOrigin.z - (8192 * sinf(cmd->viewangles.x * (M_PI / 180.0))));
+
+	Ray_t triggerbotRay;
+	triggerbotRay.Init(vEyeOrigin, vEndPoint);
+	CTraceFilter filter;
+	filter.pSkip = Game::g_pLocal;
+
+	if (!pBestRecord->pTargetPlayer)
+		return;
+
+	CGameTrace trace;
+	g_Interface.pEngineTrace->TraceRay(triggerbotRay, MASK_SHOT, &filter, &trace);
+
+	// get entity from trace
+	if (!trace.m_pEnt || !trace.m_pEnt->bIsPlayer())
+		return;
+
+	Player* pPlayer = reinterpret_cast<Player*>(trace.m_pEnt);
+	if (!pPlayer->bIsEnemy(Game::g_pLocal))
+		return;
+
+	cmd->buttons |= CUserCmd::IN_ATTACK;
+}
+
 void LegitBot::CompensateRecoil(Vec3D& vAngle, Vec3D vAimPunch, float flRCS, float flSmoothing) {
 	vAngle.x -= (vAimPunch.x * (1.f + (flRCS / 100.f))) / flSmoothing;
 	vAngle.y -= (vAimPunch.y * (1.f + (flRCS / 100.f))) / flSmoothing;
@@ -144,8 +187,12 @@ void LegitBot::RunAimbot(CUserCmd* cmd, LagRecord* pBestRecord) {
 	if (!g_Config.ints[XOR("legitbot")].val)
 		return;
 
-	// only run if we are trying to shoot
-	if (!(cmd->buttons & CUserCmd::IN_ATTACK))
+	// only run if we are trying to shoot and user set it to mouse 1
+	if (!(cmd->buttons & CUserCmd::IN_ATTACK) && g_Config.ints["legitbotkey"].val == VK_LBUTTON)
+		return;
+
+	// not set / escape = always on
+	if (g_Config.ints["legitbotkey"].val != 0 && !GetAsyncKeyState(g_Config.ints["legitbotkey"].val))
 		return;
 
 	if (!pTargetRecord)

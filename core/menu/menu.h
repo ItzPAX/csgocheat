@@ -47,6 +47,8 @@ private:
 	}
 
 public:
+	using tGraphFunction = void(void);
+
 	inline static bool bInitialized = false;
 	inline static bool bToggled = false;
 
@@ -54,6 +56,7 @@ public:
 
 	inline static ImGuiStyle* style;
 
+	void ApplyStyle();
 	void Render();
 	void Draw();
 	void Init();

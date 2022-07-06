@@ -5,7 +5,9 @@
 
 void cEndScene() {
 	// call visuals
-	g_Visuals.OnEndScene();
+	if (Game::g_pLocal)
+		g_Visuals.OnEndScene();
+	g_Visuals.DrawWatermark();
 }
 
 void cMenu() {

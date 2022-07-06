@@ -76,8 +76,27 @@ void Visuals::SortPlayers() {
 	std::sort(pSortedPlayers.begin(), pSortedPlayers.end(), SortDistance);
 }
 
+void Visuals::DrawWatermark() {
+	if (!g_Config.ints[XOR("watermark")].val)
+		return;
+
+	int ping = 0;
+	auto nci = g_Interface.pEngine->GetNetChannelInfo();
+	if (nci)
+		ping = 1 / g_Interface.pEngine->GetNetChannelInfo()->GetLatency(FLOW_INCOMING);
+	int fps = 1 / g_Interface.pGlobalVars->flAbsFrametime;
+
+	std::string watermark = "RayBot by ItzPAX | Ping: ";
+	watermark += std::to_string(ping);
+	watermark += " | FPS: ";
+	watermark += std::to_string(fps);
+	Vec2D size = g_Render.TextSize(g_Render.pEspFont, watermark.c_str());
+	g_Render.DrawFilledRect(g_DirectX.iWindowWidth - size.x - 15, 6, size.x + 10, size.y + 5, Color(50.f, 50.f, 50.f, 200.f));
+	g_Render.Text(g_Render.pEspFont, watermark.c_str(), g_DirectX.iWindowWidth - (size.x / 2) - 10, 8, Color::White());
+}
+
 void Visuals::DrawBox(RECT rPlayerRect, Color col) {
-	g_Render.DrawOutlinedRect(rPlayerRect.left, rPlayerRect.top, (rPlayerRect.right - rPlayerRect.left), (rPlayerRect.bottom - rPlayerRect.top), Color(20,100,130,col.rgba[3]));
+	g_Render.DrawOutlinedRect(rPlayerRect.left, rPlayerRect.top, (rPlayerRect.right - rPlayerRect.left), (rPlayerRect.bottom - rPlayerRect.top), col);
 
 	// box outline
 	g_Render.DrawOutlinedRect(rPlayerRect.left + 1, rPlayerRect.top + 1, (rPlayerRect.right - rPlayerRect.left) - 2, (rPlayerRect.bottom - rPlayerRect.top) - 2, Color::Black(col.rgba[3]));
@@ -85,14 +104,15 @@ void Visuals::DrawBox(RECT rPlayerRect, Color col) {
 }
 
 void Visuals::DrawName(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info) {
-	Vec2D vSize = g_Render.TextSize(g_Render.pEspFont, info.name);
+	std::string name{ std::string(info.name).substr(0, 24) };
+	Vec2D vSize = g_Render.TextSize(g_Render.pEspFont, name.c_str());
 
 	// box
 	g_Render.DrawFilledRect((rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) - (vSize.x / 1.6), (rPlayerRect.top - vSize.y * 1.5) - 1, vSize.x * 1.3f, vSize.y * 1.25f, Color(30, 30, 30, col.rgba[3]));
 	g_Render.DrawLine((rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) - (vSize.x / 1.6), (rPlayerRect.top - 4), (rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2)) + (vSize.x / 1.5), (rPlayerRect.top - 4), 1, Color(130,20,60, col.rgba[3]));
 
 	// text
-	g_Render.Text(g_Render.pEspFont, info.name, rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2), (rPlayerRect.top - vSize.y * 1.5f) - 1, col);
+	g_Render.Text(g_Render.pEspFont, name.c_str(), rPlayerRect.left + ((rPlayerRect.right - rPlayerRect.left) / 2), (rPlayerRect.top - vSize.y * 1.5f) - 1, col);
 }
 
 void Visuals::DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info) {
@@ -143,16 +163,16 @@ void Visuals::DrawPlayer(Player* pPlayer, RECT rPlayerRect) {
 	if (flEntOpacity[pPlayer->iIndex()] == 0.f)
 		return;
 
-	int flpAlpha = 0xFF * flEntOpacity[pPlayer->iIndex()];
+	int flAlpha = 0xFF * flEntOpacity[pPlayer->iIndex()];
 
 	// construct our color
-	Color cHealthCol(((100 - pPlayer->iHealth()) * 2.55f), (pPlayer->iHealth() * 2.55f), 0.f, flpAlpha);
+	Color cHealthCol(((100 - pPlayer->iHealth()) * 2.55f), (pPlayer->iHealth() * 2.55f), 0.f, flAlpha);
 
 	PlayerInfo playerInfo;
 	g_Interface.pEngine->GetPlayerInfo(pPlayer->iIndex(), &playerInfo);
 
-	if (g_Config.ints[XOR("boxesp")].val) DrawBox(rPlayerRect, cHealthCol);
-	if (g_Config.ints[XOR("nameesp")].val) DrawName(rPlayerRect, pPlayer, Color::White(), playerInfo);
+	if (g_Config.ints[XOR("boxesp")].val) DrawBox(rPlayerRect, g_PlayerList.settings[pPlayer->iIndex()].bPriority ? Color::Red(flAlpha) : cHealthCol);
+	if (g_Config.ints[XOR("nameesp")].val) DrawName(rPlayerRect, pPlayer, g_PlayerList.settings[pPlayer->iIndex()].bPriority ? Color::Red(flAlpha) : Color::White(flAlpha), playerInfo);
 	if (g_Config.ints[XOR("healthesp")].val) DrawHealth(rPlayerRect, pPlayer, cHealthCol, playerInfo);
 }
 

@@ -300,6 +300,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugCheat|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\core\features\source\playerlist.cpp" />
     <ClCompile Include="..\core\features\source\visuals.cpp" />
     <ClCompile Include="..\core\hooks\directx\directx.cpp" />
     <ClCompile Include="..\core\hooks\hooks.cpp" />
@@ -386,6 +387,7 @@
     <ClInclude Include="..\core\features\header\backtrack.h" />
     <ClInclude Include="..\core\features\header\chams.h" />
     <ClInclude Include="..\core\features\header\misc.h" />
+    <ClInclude Include="..\core\features\header\playerlist.h" />
     <ClInclude Include="..\core\features\header\visuals.h" />
     <ClInclude Include="..\core\hooks\clientmode\clientmode.h" />
     <ClInclude Include="..\core\hooks\client\framestagenotify.h" />
@@ -407,6 +409,7 @@
     <ClInclude Include="..\core\imgui\imstb_truetype.h" />
     <ClInclude Include="..\core\init\convar.h" />
     <ClInclude Include="..\core\init\init.h" />
+    <ClInclude Include="..\core\menu\customfunctions.h" />
     <ClInclude Include="..\core\menu\graph.h" />
     <ClInclude Include="..\core\menu\menu.h" />
     <ClInclude Include="..\core\security\security.h" />

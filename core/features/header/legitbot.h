@@ -18,6 +18,7 @@ public:
 	int iActiveWeapon = 0;
 
 	void GetTargetRecord(CUserCmd* cmd, LagRecord* pBestRecord);
+	void RunTriggerbot(CUserCmd* cmd, LagRecord* pBestRecord);
 	void RunAimbot(CUserCmd* cmd, LagRecord* pBestRecord);
 };
 

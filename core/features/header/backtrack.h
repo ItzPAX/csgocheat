@@ -36,18 +36,20 @@ struct LagRecord {
 	}
 
 	RecordHitbox GetHitboxPos(int idx) {
-		return this->rHitBoxPos[idx];
+		if (idx < 19)
+			return this->rHitBoxPos[idx];
+		return this->rHitBoxPos[HITBOX_HEAD];
 	}
 	 
 	void ApplyToPlayer(Player* pPlayer) {
-		pPlayer->SetAngles(vAbsAngles);
-		pPlayer->SetPosition(vAbsOrigin);
+		//pPlayer->SetAngles(vAbsAngles);
+		//pPlayer->SetPosition(vAbsOrigin);
 
-		pPlayer->vOrigin() = vOrigin;
-		pPlayer->vEyeAngles() = vAngles;
+		//pPlayer->vOrigin() = vOrigin;
+		//pPlayer->vEyeAngles() = vAngles;
 		
-		pPlayer->SetupBones(tempMat, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, 0.f);
-		memcpy(tempMat, boneMat, sizeof(Matrix) * MAXSTUDIOBONES);
+		if (pPlayer->SetupBones(tempMat, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, g_Interface.pGlobalVars->flCurTime))
+			memcpy(tempMat, boneMat, sizeof(Matrix) * MAXSTUDIOBONES);
 	}
 };
 

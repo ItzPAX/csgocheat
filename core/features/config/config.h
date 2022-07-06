@@ -46,6 +46,8 @@ private:
 	int friendlychamsinvis;
 	float friendlyinviscol[4];
 
+	int watermark;
+
 	int nameesp;
 	int boxesp;
 	int healthesp;
@@ -57,13 +59,18 @@ private:
 	float weaponglowcol[4];
 
 	int legitbot;
+	int legitbotkey;
 	int legithitboxes[4];
 	int legitlagcompmode;
 	float legitsmoothing[3];
 	float legitfov[3];
 	float legitrcs[3];
+	int triggerbot;
+	int triggerbotkey;
 
 	// GRAPHS
+	int legitrandomization;
+	float legitgraphmax;
 	double legitgraph[8];
 
 	// access variables using these maps
