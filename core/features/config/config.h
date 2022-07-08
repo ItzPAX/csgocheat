@@ -27,6 +27,7 @@ private:
 
 	// CHEAT VARS GO HERE
 private:
+	int goofyahhcrosshair;
 	int bunnyhop;
 	int lagcomp;
 

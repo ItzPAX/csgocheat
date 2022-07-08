@@ -61,6 +61,8 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 		}
 
+		g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
+
 		// vis chams
 		if (g_Config.ints[XOR("enemychamsvis")].val) {
 			OverrideMaterial(g_Config.ints[XOR("chamtype")].val, false, g_Config.arrfloats[XOR("enemyviscol")].val);
@@ -75,6 +77,8 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 			OverrideMaterial(g_Config.ints[XOR("chamtype")].val, true, g_Config.arrfloats[XOR("friendlyinviscol")].val);
 			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 		}
+
+		g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
 
 		// vis chams
 		if (g_Config.ints[XOR("friendlychamsvis")].val) {

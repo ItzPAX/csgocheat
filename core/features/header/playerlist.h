@@ -8,7 +8,8 @@ struct PlayerListEntry {
 };
 
 struct PlayerListSettings {
-	bool bPriority = false;
+	bool bPrioritizePlayer = false;
+	bool bHighlightPlayer = false;
 };
 
 class PlayerList {
@@ -16,6 +17,7 @@ private:
 	ImVec2 WindowSize = { 700,500 };
 	ImGuiStyle* style;
 	std::vector<PlayerListEntry> listentries;
+	std::string localplayername;
 public:
 	PlayerListSettings settings[MAX_PLAYERS];
 

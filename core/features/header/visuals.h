@@ -18,6 +18,7 @@ public:
 	void UpdatePlayerRects();
 	void SortPlayers();
 	void DrawWatermark();
+	void GoofyAhhCrosshair();
 	void DrawBox(RECT rPlayerRect, Color col);
 	void DrawName(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);
 	void DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);

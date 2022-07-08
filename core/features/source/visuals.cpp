@@ -86,13 +86,45 @@ void Visuals::DrawWatermark() {
 		ping = 1 / g_Interface.pEngine->GetNetChannelInfo()->GetLatency(FLOW_INCOMING);
 	int fps = 1 / g_Interface.pGlobalVars->flAbsFrametime;
 
-	std::string watermark = "RayBot by ItzPAX | Ping: ";
+	std::string watermark = XOR("RayBot by ItzPAX | Ping: ");
 	watermark += std::to_string(ping);
-	watermark += " | FPS: ";
+	watermark += XOR(" | FPS: ");
 	watermark += std::to_string(fps);
 	Vec2D size = g_Render.TextSize(g_Render.pEspFont, watermark.c_str());
 	g_Render.DrawFilledRect(g_DirectX.iWindowWidth - size.x - 15, 6, size.x + 10, size.y + 5, Color(50.f, 50.f, 50.f, 200.f));
 	g_Render.Text(g_Render.pEspFont, watermark.c_str(), g_DirectX.iWindowWidth - (size.x / 2) - 10, 8, Color::White());
+}
+
+void Visuals::GoofyAhhCrosshair() {
+	static ConVar* pCrosshairSize = g_Interface.pICVar->FindVar(XOR("cl_crosshairsize"));
+	static ConVar* pCrosshairDot = g_Interface.pICVar->FindVar(XOR("cl_crosshairdot"));
+	static ConVar* pCrosshairThickness = g_Interface.pICVar->FindVar(XOR("cl_crosshairthickness"));
+	static ConVar* pCrosshairColor_r = g_Interface.pICVar->FindVar(XOR("cl_crosshaircolor_r"));
+	static ConVar* pCrosshairColor_g = g_Interface.pICVar->FindVar(XOR("cl_crosshaircolor_g"));
+	static ConVar* pCrosshairColor_b = g_Interface.pICVar->FindVar(XOR("cl_crosshaircolor_b"));
+	static ConVar* pCrosshairAlpha = g_Interface.pICVar->FindVar(XOR("cl_crosshairalpha"));
+
+
+	if (GetAsyncKeyState(g_Config.ints["goofyahhcrosshair"].val)) {
+	// goofy the crosshair
+		pCrosshairSize->SetValue(300);
+		pCrosshairDot->SetValue(1);
+		pCrosshairThickness->SetValue(900);
+		pCrosshairColor_r->SetValue(250);
+		pCrosshairColor_g->SetValue(250);
+		pCrosshairColor_b->SetValue(250);
+		pCrosshairAlpha->SetValue(255);
+	}
+	else {
+	// ungoofy the crosshair
+		pCrosshairSize->SetValue(1);
+		pCrosshairDot->SetValue(0);
+		pCrosshairThickness->SetValue(0.7f);
+		pCrosshairColor_r->SetValue(50);
+		pCrosshairColor_g->SetValue(250);
+		pCrosshairColor_b->SetValue(50);
+		pCrosshairAlpha->SetValue(200);
+	}
 }
 
 void Visuals::DrawBox(RECT rPlayerRect, Color col) {
@@ -171,8 +203,8 @@ void Visuals::DrawPlayer(Player* pPlayer, RECT rPlayerRect) {
 	PlayerInfo playerInfo;
 	g_Interface.pEngine->GetPlayerInfo(pPlayer->iIndex(), &playerInfo);
 
-	if (g_Config.ints[XOR("boxesp")].val) DrawBox(rPlayerRect, g_PlayerList.settings[pPlayer->iIndex()].bPriority ? Color::Red(flAlpha) : cHealthCol);
-	if (g_Config.ints[XOR("nameesp")].val) DrawName(rPlayerRect, pPlayer, g_PlayerList.settings[pPlayer->iIndex()].bPriority ? Color::Red(flAlpha) : Color::White(flAlpha), playerInfo);
+	if (g_Config.ints[XOR("boxesp")].val) DrawBox(rPlayerRect, g_PlayerList.settings[pPlayer->iIndex()].bHighlightPlayer ? Color::Red(flAlpha) : cHealthCol);
+	if (g_Config.ints[XOR("nameesp")].val) DrawName(rPlayerRect, pPlayer, g_PlayerList.settings[pPlayer->iIndex()].bHighlightPlayer ? Color::Red(flAlpha) : Color::White(flAlpha), playerInfo);
 	if (g_Config.ints[XOR("healthesp")].val) DrawHealth(rPlayerRect, pPlayer, cHealthCol, playerInfo);
 }
 

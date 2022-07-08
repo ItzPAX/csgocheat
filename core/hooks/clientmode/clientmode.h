@@ -4,6 +4,7 @@
 
 static bool bClientModeInit = false;
 void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
+
 	uintptr_t* pFramePointer;
 	__asm mov pFramePointer, ebp;
 	bool& bSendPacket = *reinterpret_cast<bool*>(*pFramePointer - 0x1C);
@@ -19,6 +20,10 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 		g_Backtrack.Init();
 		bClientModeInit = true;
 	}
+
+	// goofy ahh (by emlin)
+	g_Visuals.GoofyAhhCrosshair();
+
 
 	if (Game::g_pLocal->bIsAlive()) {
 		LagRecord pRecord;

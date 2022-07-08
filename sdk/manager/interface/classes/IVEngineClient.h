@@ -298,7 +298,7 @@ public:
 	// And then executes the command string immediately (vs ClientCmd() which executes in the next frame)
 	//
 	// Note: this is NOT checked against the FCVAR_CLIENTCMD_CAN_EXECUTE vars.
-	virtual void			ExecuteClientCmd(const char* szCmdString) = 0;
+	//virtual void			ExecuteClientCmd(const char* szCmdString) = 0;
 
 	// returns if the loaded map was processed with HDR info. This will be set regardless
 	// of what HDR mode the player is in.
@@ -388,6 +388,10 @@ public:
 		return (*(original_fn**)this)[19](this, angles);
 	}
 
+	void ExecuteClientCmd(const char* szCmdString) {
+		using original_fn = void(__thiscall*)(IVEngineClient*);
+		(*(original_fn**)this)[108](this);
+	}
 
 	// returns info interface for client netchannel
 	class INetChannelInfo* GetNetChannelInfo() {

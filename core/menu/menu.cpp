@@ -206,6 +206,7 @@ void Menu::Draw() {
 		ImGui::Checkbox(XOR("Bunnyhop"), (bool*)&g_Config.ints[XOR("bunnyhop")].val);
 		ImGui::Checkbox(XOR("Lagcompensation"), (bool*)&g_Config.ints[XOR("lagcomp")].val);
 		ImGui::Checkbox(XOR("Watermark"), (bool*)&g_Config.ints[XOR("watermark")].val);
+		ImGui::Hotkey(XOR("GoofyAhh Crosshair"), &g_Config.ints["goofyahhcrosshair"].val);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
@@ -239,13 +240,7 @@ void Menu::Draw() {
 		ImGui::PopItemWidth();
 		ImGui::PopStyleColor();
 		if (ImGui::Button(XOR("Save"), ImVec2(vSize.x / 6 - style->WindowPadding.x - style->FramePadding.x, 25.f))) {
-			if (name == "") {
-				g_Config.Save(g_Config.iSelConfig);
-				g_Config.Load(g_Config.iSelConfig);
-			}
-			else {
-				g_Config.Save(name);
-			}
+			g_Config.Save(name);
 			name.clear();
 		}
 		ImGui::SameLine();

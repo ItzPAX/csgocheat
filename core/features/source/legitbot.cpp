@@ -65,6 +65,14 @@ void LegitBot::GetTargetRecord(CUserCmd* cmd, LagRecord* pBestRecord) {
 			pBestPlayer = pPlayer;
 			iBestPlayerInd = i;
 		}
+		// this is a priorityplayer, if he is in fov range focus him
+		if (g_PlayerList.settings[pPlayer->iIndex()].bPrioritizePlayer) {
+			if (flCurrDelta < g_Config.arrfloats[XOR("legitfov")].val[iActiveWeapon]) {
+				pBestPlayer = pPlayer;
+				iBestPlayerInd = i;
+				break;
+			}
+		}
 	}
 
 	if (iBestPlayerInd == INVALID || !pBestPlayer || g_Backtrack.deqLagRecords[iBestPlayerInd].size() <= 3)
@@ -140,6 +148,10 @@ void LegitBot::RunTriggerbot(CUserCmd* cmd, LagRecord* pBestRecord) {
 
 	// get entity from trace
 	if (!trace.m_pEnt || !trace.m_pEnt->bIsPlayer())
+		return;
+
+	// check for hitgroup
+	if (trace.hitbox < HITBOX_HEAD || trace.hitbox > HITBOX_MAX)
 		return;
 
 	Player* pPlayer = reinterpret_cast<Player*>(trace.m_pEnt);

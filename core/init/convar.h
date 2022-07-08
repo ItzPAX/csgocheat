@@ -8,5 +8,8 @@ bool InitConvars() {
 	ConVar* rPortalsOpenAll = g_Interface.pICVar->FindVar(XOR("r_portalsopenall"));
 	rPortalTestEnts->SetValue(true);
 
+	ConVar* pClWeaponsShowAccuracy = g_Interface.pICVar->FindVar(XOR("cl_weapon_debug_show_accuracy"));
+	pClWeaponsShowAccuracy->SetValue(2);
+
 	return true;
 }
