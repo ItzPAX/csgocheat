@@ -451,6 +451,9 @@
     <ClInclude Include="..\core\features\header\playerlist.h">
       <Filter>core\features\header</Filter>
     </ClInclude>
+    <ClInclude Include="..\sdk\structs\shareddefs.h">
+      <Filter>sdk\structs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />

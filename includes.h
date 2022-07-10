@@ -34,6 +34,7 @@ using uchar = unsigned char;
 #include "utilities/math/math.h"
 
 // sdk
+#include "sdk/structs/shareddefs.h"
 #include "sdk/classes/IInterpolatedVar.h"
 #include "sdk/manager/interface/classes/ICollideable.h"
 #include "sdk/manager/interface/classes/IClientUnknown.h"

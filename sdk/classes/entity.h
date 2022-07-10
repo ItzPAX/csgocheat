@@ -231,6 +231,8 @@ public:
 		//return iHealth() > 0; 
 	}
 
+	ulong hObserverTarget() { return g_NetVars.GetNetvar<ulong>(XOR("DT_BasePlayer"), XOR("m_hObserverTarget"), this); }
+	int iObserverMode() { return g_NetVars.GetNetvar<ulong>(XOR("DT_BasePlayer"), XOR("m_iObserverMode"), this); }
 	Vec3D vGetVelocity() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecVelocity[0]"), this); }
 	Vec3D vGetViewOffset() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecViewOffset[0]"), this); }
 	Vec3D vGetAimPunchAngle() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_aimPunchAngle"), this); }

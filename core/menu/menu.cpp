@@ -59,18 +59,26 @@ void Menu::ApplyStyle() {
 
 void Menu::Render() {
 	ApplyStyle();
+	ImGuiIO& io = ImGui::GetIO();
+	io.MouseDrawCursor = false;
 
 	// start frame and render to screen
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	// call our menu
-	std::string menuname = XOR("RayBot | ") + g_Config.activeconfig + XOR("###MainWindow");
+	if (bToggled) {
+		io.MouseDrawCursor = true;
 
-	ImGui::Begin(menuname.c_str(), &g_Menu.bToggled);
-	g_Menu.Draw();
-	ImGui::End();
+		// call our menu
+		std::string menuname = XOR("RayBot | ") + g_Config.activeconfig + XOR("###MainWindow");
+
+		ImGui::Begin(menuname.c_str(), &g_Menu.bToggled, ImGuiWindowFlags_NoCollapse);
+		g_Menu.Draw();
+		ImGui::End();
+	}
+
+	g_Visuals.DrawSpectatorList();
 
 	// Render dear imgui into screen
 	ImGui::EndFrame();
@@ -206,7 +214,8 @@ void Menu::Draw() {
 		ImGui::Checkbox(XOR("Bunnyhop"), (bool*)&g_Config.ints[XOR("bunnyhop")].val);
 		ImGui::Checkbox(XOR("Lagcompensation"), (bool*)&g_Config.ints[XOR("lagcomp")].val);
 		ImGui::Checkbox(XOR("Watermark"), (bool*)&g_Config.ints[XOR("watermark")].val);
-		ImGui::Hotkey(XOR("GoofyAhh Crosshair"), &g_Config.ints["goofyahhcrosshair"].val);
+		ImGui::Checkbox(XOR("GoofyAhh Crosshair"), (bool*)&g_Config.ints["goofyahhcrosshair"].val);
+		ImGui::Checkbox(XOR("Spectatorlist"), (bool*)&g_Config.ints["spectatorlist"].val);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
@@ -240,16 +249,22 @@ void Menu::Draw() {
 		ImGui::PopItemWidth();
 		ImGui::PopStyleColor();
 		if (ImGui::Button(XOR("Save"), ImVec2(vSize.x / 6 - style->WindowPadding.x - style->FramePadding.x, 25.f))) {
-			g_Config.Save(name);
+			if (name.empty())
+				g_Config.Save(g_Config.iSelConfig);
+		
+			else
+				g_Config.Save(name);
 			name.clear();
 		}
+		
 		ImGui::SameLine();
-		if (ImGui::Button(XOR("Load"), ImVec2(vSize.x / 6 - style->WindowPadding.x - style->FramePadding.x, 25.f))) {
+		if (ImGui::Button(XOR("Load"), ImVec2(vSize.x / 6 - style->WindowPadding.x - style->FramePadding.x, 25.f)))
 			g_Config.Load(g_Config.iSelConfig);
-		}
+		
 		ImGui::SameLine();
 		if (ImGui::Button(XOR("Delete"), ImVec2(vSize.x / 6 - style->WindowPadding.x - style->FramePadding.x, 25.f)))
 			g_Config.Delete(g_Config.iSelConfig);
+
 		ImGui::PushStyleColor(ImGuiCol_Text, g_Config.Status().error ? IM_COL32(255, 0, 0, 255) : IM_COL32(0, 255, 0, 255));
 		ImGui::Text(g_Config.Status().msg.c_str());
 		ImGui::PopStyleColor();
@@ -272,10 +287,6 @@ void Menu::Init() {
 	// init imgui
 	ImGui::CreateContext();
 	ImPlot::CreateContext();
-	
-	ImGuiIO& io = ImGui::GetIO();
-
-	io.MouseDrawCursor = true;
 
 	ImGui_ImplWin32_Init(g_DirectX.window);
 	ImGui_ImplDX9_Init(g_DirectX.pDevice);

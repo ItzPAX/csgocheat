@@ -12,18 +12,11 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	// set cmd to be globally accessible
 	Game::g_pCmd = cmd;
 
-	// update the playerlist
-	g_PlayerList.UpdatePlayerList();
-
 	// lagcomp stuff
 	if (!bClientModeInit) {
 		g_Backtrack.Init();
 		bClientModeInit = true;
 	}
-
-	// goofy ahh (by emlin)
-	g_Visuals.GoofyAhhCrosshair();
-
 
 	if (Game::g_pLocal->bIsAlive()) {
 		LagRecord pRecord;

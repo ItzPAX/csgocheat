@@ -456,6 +456,7 @@
     <ClInclude Include="..\sdk\manager\interface\interface.h" />
     <ClInclude Include="..\sdk\manager\netvars\netvars.h" />
     <ClInclude Include="..\sdk\structs\models.h" />
+    <ClInclude Include="..\sdk\structs\shareddefs.h" />
     <ClInclude Include="..\utilities\hooklib\hooklib.h" />
     <ClInclude Include="..\utilities\math\math.h" />
     <ClInclude Include="..\utilities\render\render.h" />

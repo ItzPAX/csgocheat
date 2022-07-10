@@ -105,7 +105,7 @@ void Visuals::GoofyAhhCrosshair() {
 	static ConVar* pCrosshairAlpha = g_Interface.pICVar->FindVar(XOR("cl_crosshairalpha"));
 
 
-	if (GetAsyncKeyState(g_Config.ints["goofyahhcrosshair"].val)) {
+	if (!g_Interface.pEngine->IsInGame()) {
 	// goofy the crosshair
 		pCrosshairSize->SetValue(300);
 		pCrosshairDot->SetValue(1);
@@ -124,6 +124,54 @@ void Visuals::GoofyAhhCrosshair() {
 		pCrosshairColor_g->SetValue(250);
 		pCrosshairColor_b->SetValue(50);
 		pCrosshairAlpha->SetValue(200);
+	}
+}
+
+
+void Visuals::UpdateSpectators() {
+	pSpectators.clear();
+	Player* pSpecPlayer = Game::g_pLocal->bIsAlive() ? Game::g_pLocal : reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntityFromHandle(Game::g_pLocal->hObserverTarget()));
+
+	if (!pSpecPlayer)
+		return;
+
+	for (int i = 1; i <= g_Interface.pGlobalVars->iMaxClients; i++) {
+		Player* pPlayer = reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntity(i));
+		if (!pPlayer || pPlayer->bDormant() || pPlayer->bIsAlive() || reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntityFromHandle(pPlayer->hObserverTarget())) != pSpecPlayer || pPlayer == Game::g_pLocal)
+			continue;
+
+		Spectator spec;
+
+		PlayerInfo pinfo;
+		g_Interface.pEngine->GetPlayerInfo(i, &pinfo);
+
+		spec.name = std::string(pinfo.name);
+		
+		switch (pPlayer->iObserverMode()) {
+		case OBS_MODE_NONE:
+			spec.obsmode = "None";
+			break;
+		case OBS_MODE_DEATHCAM:
+			spec.obsmode = "Deathcam";
+			break;
+		case OBS_MODE_FREEZECAM:
+			spec.obsmode = "Freezecam";
+			break;
+		case OBS_MODE_FIXED:
+			spec.obsmode = "Fixed";
+			break;
+		case OBS_MODE_IN_EYE:
+			spec.obsmode = "Firstperson";
+			break;
+		case OBS_MODE_CHASE:
+			spec.obsmode = "Thirdperson";
+			break;
+		case OBS_MODE_ROAMING:
+			spec.obsmode = "Roaming";
+			break;
+		}
+
+		pSpectators.push_back(spec);
 	}
 }
 
@@ -208,11 +256,73 @@ void Visuals::DrawPlayer(Player* pPlayer, RECT rPlayerRect) {
 	if (g_Config.ints[XOR("healthesp")].val) DrawHealth(rPlayerRect, pPlayer, cHealthCol, playerInfo);
 }
 
+void Visuals::DrawSpectatorList() {
+	if (!g_Config.ints["spectatorlist"].val)
+		return;
+
+	if (pSpectators.empty() && !g_Menu.bToggled)
+		return;
+
+	// find longest name
+	int tmp = pSpectators.size();
+	std::vector<char*> names;
+	std::vector<char*> obsmodes;
+
+	for (auto& entry : pSpectators) {
+		names.push_back(const_cast<char*>(entry.name.c_str()));
+		obsmodes.push_back(const_cast<char*>(entry.obsmode.c_str()));
+	}
+
+	int size = pSpectators.size();
+	size = std::clamp(size, 0, 7);
+
+	ImGui::SetNextWindowSize(ImVec2(300, size * ImGui::GetTextLineHeightWithSpacing() + 72));
+	if (!g_Menu.bToggled) {
+		ImGui::Begin(XOR("Spectatorlist"), 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+	}
+	else {
+		ImGui::Begin(XOR("Spectatorlist"), (bool*)&g_Config.ints["spectatorlist"].val, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
+	}
+
+	ImVec2 vSize = ImGui::GetWindowSize();
+
+	ImGui::BeginChild(XOR("Spectators"), ImVec2(vSize.x / 2 - 17, 0.f));
+	ImGui::PushItemWidth(-1);
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.f, 0.f, 0.f, 0.f));
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.f, 0.f, 0.f, 0.f));
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, ImVec4(0.f, 0.f, 0.f, 0.f));
+	ImGui::ListBox(XOR(""), &tmp, &names[0], pSpectators.size());
+	ImGui::PopStyleColor(4);	
+	ImGui::EndChild();
+
+	ImGui::SameLine();
+
+	ImGui::BeginChild(XOR("Observermode"), ImVec2(vSize.x / 2 - 17, 0.f));
+	ImGui::PushItemWidth(-1);
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.f, 0.f, 0.f, 0.f));
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.f, 0.f, 0.f, 0.f));
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, ImVec4(0.f, 0.f, 0.f, 0.f));
+	ImGui::ListBox(XOR(""), &tmp, &obsmodes[0], pSpectators.size());
+	ImGui::PopStyleColor(4);
+	ImGui::EndChild();
+
+	ImGui::End();
+}
+
 void Visuals::OnEndScene() {
+	// update the playerlist
+	g_PlayerList.UpdatePlayerList();
+
+	pSpectators.clear();
+	UpdateSpectators();
+	std::cout << pSpectators.size() << std::endl;
+
 	for (int i = 0; i < pSortedPlayers.size(); i++) {
 		// get and validate player
 		Player* pPlayer = pSortedPlayers[i].pPlayer;
-		if (!pPlayer || !pPlayer->bIsAlive() || pPlayer == Game::g_pLocal || !pPlayer->bIsEnemy(Game::g_pLocal))
+		if (!pPlayer || pPlayer == Game::g_pLocal || !pPlayer->bIsAlive() || !pPlayer->bIsEnemy(Game::g_pLocal))
 			continue;
 
 		// get player rect

@@ -30,6 +30,7 @@ private:
 	int goofyahhcrosshair;
 	int bunnyhop;
 	int lagcomp;
+	int spectatorlist;
 
 	int chamtype;
 	int enemychamsvis;

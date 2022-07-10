@@ -5,9 +5,10 @@ Config g_Config;
 
 void Config::Init() {
 	// call setupvalue for every variable
-	SetupVal(goofyahhcrosshair, 0, "misc", "goofyahhcrosshair");
+	SetupVal(goofyahhcrosshair, 1, "misc", "goofyahhcrosshair");
 	SetupVal(bunnyhop, 1, XOR("misc"), XOR("bunnyhop"));
 	SetupVal(lagcomp, 1, XOR("misc"), XOR("lagcomp"));
+	SetupVal(spectatorlist, 1, XOR("misc"), XOR("spectatorlist"));
 
 	SetupVal(chamtype, 0, XOR("chams"), XOR("chamtype"));
 

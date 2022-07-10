@@ -4,6 +4,9 @@
 #include "includes.h"
 
 void cEndScene() {
+	// goofy ahh (by emlin)
+	g_Visuals.GoofyAhhCrosshair();
+
 	// call visuals
 	if (Game::g_pLocal)
 		g_Visuals.OnEndScene();
@@ -13,9 +16,6 @@ void cEndScene() {
 void cMenu() {
 	if (!g_Menu.bInitialized)
 		g_Menu.Init();
-
-	if (!g_Menu.bToggled)
-		return;
 
 	g_Menu.Render();
 }
