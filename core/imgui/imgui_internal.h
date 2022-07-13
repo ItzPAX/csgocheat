@@ -802,6 +802,21 @@ enum ImGuiButtonFlagsPrivate_
     ImGuiButtonFlags_PressedOnDefault_      = ImGuiButtonFlags_PressedOnClickRelease
 };
 
+// ImGuiHotkeyInd_
+enum ImGuiHotkeyMode_
+{
+   ImGuiHotkeyMode_KEYDOWN = 0,
+   ImGuiHotkeyMode_KEYUP,
+   ImGuiHotkeyMode_TOGGLE,
+};
+
+enum ImGuiHotkeyInd_
+{
+    ImGuiHotkeyInd_KEY = 0,
+    ImGuiHotkeyInd_MODE,
+    ImGuiHotkeyInd_INLIST,
+};
+
 // Extend ImGuiComboFlags_
 enum ImGuiComboFlagsPrivate_
 {

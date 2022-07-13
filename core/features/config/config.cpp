@@ -5,10 +5,13 @@ Config g_Config;
 
 void Config::Init() {
 	// call setupvalue for every variable
-	SetupVal(goofyahhcrosshair, 1, "misc", "goofyahhcrosshair");
+	SetupVal(goofyahhcrosshair, 1, XOR("misc"), XOR("goofyahhcrosshair"));
 	SetupVal(bunnyhop, 1, XOR("misc"), XOR("bunnyhop"));
 	SetupVal(lagcomp, 1, XOR("misc"), XOR("lagcomp"));
 	SetupVal(spectatorlist, 1, XOR("misc"), XOR("spectatorlist"));
+	SetupVal(hotkeylist, 0, XOR("misc"), XOR("hotkeylist"));
+	SetupVal(paranoia, 1, XOR("misc"), XOR("paranoia"));
+	SetupVal(trustfactor, 0, XOR("misc"), XOR("trustfactor"));
 
 	SetupVal(chamtype, 0, XOR("chams"), XOR("chamtype"));
 
@@ -32,6 +35,8 @@ void Config::Init() {
 	SetupVal(boxesp, 1, XOR("esp"), XOR("boxesp"));
 	SetupVal(nameesp, 1, XOR("esp"), XOR("nameesp"));
 	SetupVal(healthesp, 1, XOR("esp"), XOR("healthesp"));
+	SetupVal(thirdperson, 1, XOR("esp"), XOR("thirdperson"));
+	SetupVal(thirdpersonkey, { VK_MBUTTON, ImGuiHotkeyMode_TOGGLE, 1 }, 3, XOR("esp"), XOR("thirdpersonkey"));
 	SetupVal(enemyglow, 1, XOR("esp"), XOR("enemyglow"));
 	SetupVal(enemyglowcol, { 0.8f, 0.2f, 0.4f, 0.7f }, 4, XOR("esp"), XOR("enemyglowcol"));
 	SetupVal(friendlyglow, 1, XOR("esp"), XOR("friendlyglow"));
@@ -39,8 +44,11 @@ void Config::Init() {
 	SetupVal(weaponglow, 1, XOR("esp"), XOR("weaponglow"));
 	SetupVal(weaponglowcol, { 0.1f, 0.9f, 0.2f, 0.5f }, 4, XOR("esp"), XOR("weaponglowcol"));
 
+	SetupVal(ragebot, 0, XOR("ragebot"), XOR("ragebot"));
+	SetupVal(ragebotkey, { 0, ImGuiHotkeyMode_KEYDOWN, 0 }, 3, XOR("ragebot"), XOR("ragebotkey"));
+
 	SetupVal(legitbot, 1, XOR("legitbot"), XOR("legitbot"));
-	SetupVal(legitbotkey, VK_LBUTTON, XOR("legitbot"), XOR("legitbotkey"));
+	SetupVal(legitbotkey, { VK_LBUTTON, ImGuiHotkeyMode_KEYDOWN, 0 }, 3, XOR("legitbot"), XOR("legitbotkey"));
 	SetupVal(legitlagcompmode, 0, XOR("legitbot"), XOR("legitlagcompmode"));
 	SetupVal(legithitboxes, { 0,0,0,0 }, 4, XOR("legitbot"), XOR("legithitboxes"));
 	SetupVal(legitrandomization, 0.f, XOR("legitbot"), XOR("legitrandomization"));
@@ -49,8 +57,9 @@ void Config::Init() {
 	SetupVal(legitfov, { 8.f, 8.f, 8.f }, 3, XOR("legitbot"), XOR("legitfov"));
 	SetupVal(legitsmoothing, { 10.f, 10.f, 10.f }, 3, XOR("legitbot"), XOR("legitsmoothing"));
 	SetupVal(legitrcs, { 25.f, 25.f, 25.f }, 3, XOR("legitbot"), XOR("legitrcs"));
+	SetupVal(legitrandom, { 5.f,5.f,5.f }, 3, XOR("legitbot"), XOR("legitrandom"));
 	SetupVal(triggerbot, 0, XOR("triggerbot"), XOR("triggerbot"));
-	SetupVal(triggerbotkey, VK_XBUTTON2, XOR("triggerbot"), XOR("triggerbotkey"));
+	SetupVal(triggerbotkey, { VK_XBUTTON1, ImGuiHotkeyMode_KEYDOWN, 1 }, 3, XOR("triggerbot"), XOR("triggerbotkey"));
 }
 
 void Config::Save(std::string name) {

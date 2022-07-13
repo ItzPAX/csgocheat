@@ -25,16 +25,14 @@ void PlayerList::DrawPlayerList() {
 	ImGui::PushItemWidth(-1);
 	int height = (vSize.y - style->WindowPadding.y - style->FramePadding.y - 73) / ImGui::GetTextLineHeightWithSpacing();
 
-	if (cstring.empty())
-		return;
-
-	ImGui::ListBox(XOR(""), &iselplayer, &cstring[0], cstring.size(), height);
-
+	if (!cstring.empty()) {
+		ImGui::ListBox(XOR(""), &iselplayer, &cstring[0], cstring.size(), height);
+	}
 	ImGui::EndChild();
 
 	ImGui::SameLine();
-	ImGui::BeginChild(XOR("Options"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 
+	ImGui::BeginChild(XOR("Options"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 	// only draw options if sel entity is valid
 	if (iselplayer >= 0 && iselplayer < listentries.size()) {
 		if (!listentries[iselplayer].pPlayer)
@@ -44,8 +42,12 @@ void PlayerList::DrawPlayerList() {
 		if (playerind < 0 || playerind > MAX_PLAYERS) // invalid player
 			return;
 
-		ImGui::Checkbox(XOR("Prioritize Player"), &settings[playerind].bPrioritizePlayer);
-		ImGui::Checkbox(XOR("Hightlight Player"), &settings[playerind].bHighlightPlayer);
+		PlayerInfo pinfo;
+		g_Interface.pEngine->GetPlayerInfo(playerind, &pinfo);
+
+		ImGui::Checkbox(XOR("Prioritize Player"), &settings[pinfo.isteamid].bPrioritizePlayer);
+		ImGui::Checkbox(XOR("Hightlight Player"), &settings[pinfo.isteamid].bHighlightPlayer);
+		ImGui::Checkbox(XOR("Exclude from Paranoia Mode"), &settings[pinfo.isteamid].bIgnoreFromParanoia);
 
 		// get playerinfo struct and dump it to a string
 		static std::string info = "";

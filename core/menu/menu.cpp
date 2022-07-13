@@ -79,6 +79,7 @@ void Menu::Render() {
 	}
 
 	g_Visuals.DrawSpectatorList();
+	g_Visuals.DrawHotkeyList();
 
 	// Render dear imgui into screen
 	ImGui::EndFrame();
@@ -102,11 +103,17 @@ void Menu::Draw() {
 	case 0: {
 		ImGui::BeginChild(XOR("Main-Ragebot"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Main Ragebot"));
+		if (!g_Config.ints[XOR("trustfactor")].val) {
+			ImGui::Checkbox(XOR("Ragebot"), (bool*)&g_Config.ints[XOR("ragebot")].val);
+			ImGui::Hotkey(XOR("Ragebot-Key"), g_Config.arrints[XOR("ragebotkey")].val);
+		}
 		ImGui::EndChild();
 
 		ImGui::SameLine();
 		ImGui::BeginChild(XOR("Weapon-Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Weapon-Config"));
+		if (!g_Config.ints[XOR("trustfactor")].val) {
+		}
 		ImGui::EndChild();
 	}
 		break;
@@ -116,15 +123,15 @@ void Menu::Draw() {
 		ImGui::Text(XOR("Main Legitbot"));
 		ImGui::Checkbox(XOR("Legitbot"), (bool*)&g_Config.ints[XOR("legitbot")].val);
 		//ImGui::SameLine();
-		ImGui::Hotkey(XOR("Legitbot-Key"), & g_Config.ints["legitbotkey"].val);
-		DrawExtendableGraph(XOR("[Extended] AimbotCurve"), XOR("Distance"), XOR("Speed"), XOR("AimbotCurve"), g_LegitBot.bGraphExtended, g_LegitBot.vAimbotCurve, g_Config.graphs["legitgraph"].val, g_Config.floats["legitgraphmax"].val, LegitbotFunction);
+		ImGui::Hotkey(XOR("Legitbot-Key"), g_Config.arrints["legitbotkey"].val);
+		DrawExtendableGraph(XOR("[Extended] AimbotCurve"), XOR("Distance"), XOR("Speed"), XOR("AimbotCurve"), g_LegitBot.bGraphExtended, g_LegitBot.vAimbotCurve, g_Config.graphs[XOR("legitgraph")].val, g_Config.floats[XOR("legitgraphmax")].val, LegitbotFunction, XOR("Control how the aimbot behaves, depending on the distance to the target"));
 		MultiSelectCombo(XOR("Hitboxes"), { XOR("Head"), XOR("Chest"), XOR("Stomach"), XOR("Legs") }, (bool*)g_Config.arrints[XOR("legithitboxes")].val, 4);
-		
+
 		static const char* pLagRecordSelection[] = { "Closest", "First", "Last" };
 		ImGui::Combo(XOR("Lagcomp Mode"), &g_Config.ints[XOR("legitlagcompmode")].val, pLagRecordSelection, IM_ARRAYSIZE(pLagRecordSelection));
 		ImGui::Checkbox(XOR("Triggerbot"), (bool*)&g_Config.ints[XOR("triggerbot")].val);
 		//ImGui::SameLine();
-		ImGui::Hotkey(XOR("Triggerbot-Key"), &g_Config.ints[XOR("triggerbotkey")].val);
+		ImGui::Hotkey(XOR("Triggerbot-Key"), g_Config.arrints[XOR("triggerbotkey")].val);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
@@ -133,8 +140,15 @@ void Menu::Draw() {
 		ImGui::Text(XOR("Weapon-Config"));
 		RenderClickableButtons({ XOR("Sniper"), XOR("Rifle"), XOR("Pistol") }, &g_LegitBot.iMenuWeapon, ImVec2{vSize.x / 2, vSize.y}, style->WindowPadding.x + 5);
 		ImGui::SliderFloat(XOR("Legitbot Smoothing"), &g_Config.arrfloats[XOR("legitsmoothing")].val[g_LegitBot.iMenuWeapon], 1.f, 100.f, "%.0f%", 1.f);
+		if (g_Config.ints[XOR("trustfactor")].val)
+			ImGui::HelpMarker(XOR("For Preserve TrustFactor on a smoothing of more than 10 is highly recommended"));
 		ImGui::SliderFloat(XOR("Legitbot FOV"), &g_Config.arrfloats[XOR("legitfov")].val[g_LegitBot.iMenuWeapon], 0.f, 180.f, "%.0f%", 1.f);
-		ImGui::SliderFloat(XOR("Legitbot RCS"), &g_Config.arrfloats[XOR("legitrcs")].val[g_LegitBot.iMenuWeapon], 0.f, 100.f, "%.0f%", 1.f);
+		if (!g_Config.ints[XOR("trustfactor")].val)
+			ImGui::SliderFloat(XOR("Legitbot RCS"), &g_Config.arrfloats[XOR("legitrcs")].val[g_LegitBot.iMenuWeapon], 0.f, 100.f, "%.0f%", 1.f);
+		else {
+			ImGui::SliderFloat(XOR("Legitbot Randomization"), &g_Config.arrfloats[XOR("legitrandom")].val[g_LegitBot.iMenuWeapon], 2.f, 20.f, "%.0f%%", 0.2f);
+			ImGui::HelpMarker(XOR("To not get flagged by VacNET a minimum of 5% randomization is recommended on every weapon"));
+		}
 		ImGui::EndChild();
 	}
 		  break;
@@ -145,18 +159,23 @@ void Menu::Draw() {
 		ImGui::Checkbox(XOR("Box ESP"), (bool*)&g_Config.ints[XOR("boxesp")].val);
 		ImGui::Checkbox(XOR("Name ESP"), (bool*)&g_Config.ints[XOR("nameesp")].val);
 		ImGui::Checkbox(XOR("Health ESP"), (bool*)&g_Config.ints[XOR("healthesp")].val);
-
-		ImGui::Checkbox(XOR("Enemy Glow			 "), (bool*)&g_Config.ints[XOR("enemyglow")].val);
-		ImGui::SameLine();
-		ImGui::ColorEdit4(XOR("Enemy Col"), g_Config.arrfloats[XOR("enemyglowcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 		
-		ImGui::Checkbox(XOR("Friendly Glow		  "), (bool*)&g_Config.ints[XOR("friendlyglow")].val);
-		ImGui::SameLine();
-		ImGui::ColorEdit4(XOR("Friendly Col"), g_Config.arrfloats[XOR("friendlyglowcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+		ImGui::Checkbox(XOR("Thirdperson"), (bool*)&g_Config.ints[XOR("thirdperson")].val);
+		ImGui::Hotkey(XOR("Thirdperson-Key"), g_Config.arrints[XOR("thirdpersonkey")].val);
 
-		ImGui::Checkbox(XOR("Weapon Glow		    "), (bool*)&g_Config.ints[XOR("weaponglow")].val);
-		ImGui::SameLine();
-		ImGui::ColorEdit4(XOR("Weapon Col"), g_Config.arrfloats[XOR("weaponglowcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+		if (!g_Config.ints[XOR("trustfactor")].val) {
+			ImGui::Checkbox(XOR("Enemy Glow"), (bool*)&g_Config.ints[XOR("enemyglow")].val);
+			ImGui::SameLine(vSize.x / 4);
+			ImGui::ColorEdit4(XOR("Enemy Col"), g_Config.arrfloats[XOR("enemyglowcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+			ImGui::Checkbox(XOR("Friendly Glow"), (bool*)&g_Config.ints[XOR("friendlyglow")].val);
+			ImGui::SameLine(vSize.x / 4);
+			ImGui::ColorEdit4(XOR("Friendly Col"), g_Config.arrfloats[XOR("friendlyglowcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+			ImGui::Checkbox(XOR("Weapon Glow"), (bool*)&g_Config.ints[XOR("weaponglow")].val);
+			ImGui::SameLine(vSize.x / 4);
+			ImGui::ColorEdit4(XOR("Weapon Col"), g_Config.arrfloats[XOR("weaponglowcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+		}
 		ImGui::EndChild();
 
 		ImGui::SameLine();
@@ -170,12 +189,12 @@ void Menu::Draw() {
 
 		switch(g_Chams.iChamsMode) {
 		case 0: {
-			ImGui::Checkbox(XOR("Enemy Chams Vis		  "), (bool*)&g_Config.ints[XOR("enemychamsvis")].val);
-			ImGui::SameLine();
+			ImGui::Checkbox(XOR("Enemy Chams Vis"), (bool*)&g_Config.ints[XOR("enemychamsvis")].val);
+			ImGui::SameLine(vSize.x / 4);
 			ImGui::ColorEdit4(XOR("Vis Col"), g_Config.arrfloats[XOR("enemyviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 
-			ImGui::Checkbox(XOR("Enemy Chams Invis		"), (bool*)&g_Config.ints[XOR("enemychamsinvis")].val);
-			ImGui::SameLine();
+			ImGui::Checkbox(XOR("Enemy Chams Invis"), (bool*)&g_Config.ints[XOR("enemychamsinvis")].val);
+			ImGui::SameLine(vSize.x / 4);
 			ImGui::ColorEdit4(XOR("Invis Col"), g_Config.arrfloats[XOR("enemyinviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 
 			ImGui::Checkbox(XOR("Lagcomp Chams"), (bool*)&g_Config.ints[XOR("lagcompchams")].val);
@@ -186,18 +205,18 @@ void Menu::Draw() {
 		}
 			break;
 		case 1: {
-			ImGui::Checkbox(XOR("Local Chams    		  "), (bool*)&g_Config.ints[XOR("localchams")].val);
-			ImGui::SameLine();
+			ImGui::Checkbox(XOR("Local Chams"), (bool*)&g_Config.ints[XOR("localchams")].val);
+			ImGui::SameLine(vSize.x / 4);
 			ImGui::ColorEdit4(XOR("Col"), g_Config.arrfloats[XOR("localcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 		}
 			break;
 		case 2: {
-			ImGui::Checkbox(XOR("Friendly Chams 		  "), (bool*)&g_Config.ints[XOR("friendlychamsvis")].val);
-			ImGui::SameLine();
+			ImGui::Checkbox(XOR("Friendly Chams"), (bool*)&g_Config.ints[XOR("friendlychamsvis")].val);
+			ImGui::SameLine(vSize.x / 4);
 			ImGui::ColorEdit4(XOR("Vis Col"), g_Config.arrfloats[XOR("friendlyviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 
-			ImGui::Checkbox(XOR("Friendly Chams Invis	 "), (bool*)&g_Config.ints[XOR("friendlychamsinvis")].val);
-			ImGui::SameLine();
+			ImGui::Checkbox(XOR("Friendly Chams Invis"), (bool*)&g_Config.ints[XOR("friendlychamsinvis")].val);
+			ImGui::SameLine(vSize.x / 4);
 			ImGui::ColorEdit4(XOR("Invis Col"), g_Config.arrfloats[XOR("friendlyinviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 		}
 			break;
@@ -211,11 +230,16 @@ void Menu::Draw() {
 	case 3: {
 		ImGui::BeginChild(XOR("Main-Misc"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Main Misc"));
-		ImGui::Checkbox(XOR("Bunnyhop"), (bool*)&g_Config.ints[XOR("bunnyhop")].val);
-		ImGui::Checkbox(XOR("Lagcompensation"), (bool*)&g_Config.ints[XOR("lagcomp")].val);
+		ImGui::Checkbox(XOR("Preserve TrustFactor"), (bool*)&g_Config.ints[XOR("trustfactor")].val); ImGui::HelpMarker(XOR("Disables / changes features of the cheat to not get flagged by VacNET (SEVERELY limits the cheats capabilities!!)"));
+		ImGui::Checkbox(XOR("Paranaoia Mode"), (bool*)&g_Config.ints[XOR("paranoia")].val); ImGui::HelpMarker(XOR("Disables ESP & Aimbot, while you are being spectated"));
+		ImGui::Checkbox(XOR("GoofyAhh Crosshair"), (bool*)&g_Config.ints[XOR("goofyahhcrosshair")].val); ImGui::HelpMarker(XOR("Makes the crosshair goofy for everyone spectating you"));
+		if (!g_Config.ints[XOR("trustfactor")].val) {
+			ImGui::Checkbox(XOR("Bunnyhop"), (bool*)&g_Config.ints[XOR("bunnyhop")].val);
+			ImGui::Checkbox(XOR("Lagcompensation"), (bool*)&g_Config.ints[XOR("lagcomp")].val);
+		}
 		ImGui::Checkbox(XOR("Watermark"), (bool*)&g_Config.ints[XOR("watermark")].val);
-		ImGui::Checkbox(XOR("GoofyAhh Crosshair"), (bool*)&g_Config.ints["goofyahhcrosshair"].val);
-		ImGui::Checkbox(XOR("Spectatorlist"), (bool*)&g_Config.ints["spectatorlist"].val);
+		ImGui::Checkbox(XOR("Spectatorlist"), (bool*)&g_Config.ints[XOR("spectatorlist")].val);
+		ImGui::Checkbox(XOR("Hotkeylist"), (bool*)&g_Config.ints[XOR("hotkeylist")].val);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
@@ -225,7 +249,7 @@ void Menu::Draw() {
 		g_Config.configs.clear();
 		static char path[MAX_PATH];
 		std::string folder;
-		std::string ext = ".ini";
+		std::string ext = XOR(".ini");
 
 		if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path)))
 			folder = std::string(path) + XOR("\\raybot\\");

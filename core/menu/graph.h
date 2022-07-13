@@ -70,7 +70,7 @@ void DrawGraph(const char* graphname, const char* xname, const char* yname, bool
 }
 
 ImVec2 PopupSize = { 500,600 };
-void DrawExtendableGraph(const char* windowName, const char* xname, const char* yname, const char* graphname, bool& bextended, Vec2D* pBezierVals, double* points, float graphmax, Menu::tGraphFunction extrafunc = nullptr) {	
+void DrawExtendableGraph(const char* windowName, const char* xname, const char* yname, const char* graphname, bool& bextended, Vec2D* pBezierVals, double* points, float graphmax, Menu::tGraphFunction extrafunc = nullptr, const char* tooltip = "") {
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.06f, 0.05f, 0.07f, 1.00f));
 	if (bextended) {
 		ImGui::SetNextWindowSize(PopupSize, ImGuiCond_Once);
@@ -85,6 +85,8 @@ void DrawExtendableGraph(const char* windowName, const char* xname, const char* 
 	}
 	else {
 		DrawGraph(graphname, xname, yname, bextended, pBezierVals, points, graphmax);
+		if (tooltip != "")
+			ImGui::HelpMarker(tooltip);
 	}
 	ImGui::PopStyleColor();
 }

@@ -10,12 +10,13 @@ struct Spectator {
 	std::string obsmode;
 };
 
+struct HotkeylistEntry;
+
 class Visuals {
 private:
 	inline static float flEntOpacity[MAX_PLAYERS] = { 0.f };
 	inline static std::vector<RECT> rPlayerRects;
 	inline static std::vector<PlayerDist> pSortedPlayers;
-	inline static std::vector<Spectator> pSpectators;
 
 public:
 	// local stuff
@@ -25,7 +26,6 @@ public:
 	void SortPlayers();
 	void DrawWatermark();
 	void GoofyAhhCrosshair();
-	void UpdateSpectators();
 	void DrawBox(RECT rPlayerRect, Color col);
 	void DrawName(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);
 	void DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);
@@ -36,6 +36,9 @@ public:
 
 	// Draw SpectatorList
 	void DrawSpectatorList();
+
+	// Draw hotkeylist
+	void DrawHotkeyList();
 
 	// these functions are called in the hooks
 public:

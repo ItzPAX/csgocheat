@@ -157,7 +157,6 @@ void __fastcall DoPostScreenSpaceEffects::hkDoPostScreenSpaceEffects(IClientMode
 		return oDoPostScreenSpaceEffects(icmptr, edx, pViewSetup);
 
 	cDoPostScreenSpaceEffects();
-
 	oDoPostScreenSpaceEffects(icmptr, edx, pViewSetup);
 }
 
@@ -182,10 +181,8 @@ void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults*
 		return oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 
 	// glow model
-	if (g_Interface.pStudioRender->IsForcedMaterialOverride()) {
-		oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
-		return;
-	}
+	if (g_Interface.pStudioRender->IsForcedMaterialOverride())
+		return oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 
 	cDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 	oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);

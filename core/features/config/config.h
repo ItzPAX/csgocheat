@@ -31,6 +31,9 @@ private:
 	int bunnyhop;
 	int lagcomp;
 	int spectatorlist;
+	int hotkeylist;
+	int paranoia;
+	int trustfactor;
 
 	int chamtype;
 	int enemychamsvis;
@@ -53,6 +56,8 @@ private:
 	int nameesp;
 	int boxesp;
 	int healthesp;
+	int thirdperson;
+	int thirdpersonkey[3];
 	int enemyglow;
 	float enemyglowcol[4];
 	int friendlyglow;
@@ -60,15 +65,19 @@ private:
 	int weaponglow;
 	float weaponglowcol[4];
 
+	int ragebot;
+	int ragebotkey[3];
+
 	int legitbot;
-	int legitbotkey;
+	int legitbotkey[3];
 	int legithitboxes[4];
 	int legitlagcompmode;
 	float legitsmoothing[3];
 	float legitfov[3];
 	float legitrcs[3];
+	float legitrandom[3];
 	int triggerbot;
-	int triggerbotkey;
+	int triggerbotkey[3];
 
 	// GRAPHS
 	int legitrandomization;

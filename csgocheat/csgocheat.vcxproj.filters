@@ -196,6 +196,9 @@
     <ClCompile Include="..\core\features\source\playerlist.cpp">
       <Filter>core\features\source</Filter>
     </ClCompile>
+    <ClCompile Include="..\core\features\source\inputmgr.cpp">
+      <Filter>core\features\source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes.h" />
@@ -453,6 +456,9 @@
     </ClInclude>
     <ClInclude Include="..\sdk\structs\shareddefs.h">
       <Filter>sdk\structs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\header\inputmgr.h">
+      <Filter>core\features\header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

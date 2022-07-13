@@ -43,6 +43,7 @@ Index of this file:
 // System includes
 #include <ctype.h>      // toupper
 #include <Windows.h>    // GetAsyncKeyState
+#include <unordered_map> // HOTKEY
 
 #include <string>
 #if defined(_MSC_VER) && _MSC_VER <= 1500 // MSVC 2008 or earlier
@@ -134,11 +135,12 @@ static ImVec2           InputTextCalcTextSizeW(const ImWchar* text_begin, const 
 //-------------------------------------------------------------------------
 // [SECTION] Hotkey
 //-------------------------------------------------------------------------
-bool ImGui::Hotkey(const char* label, int* k, const ImVec2& size_arg)
+std::unordered_map<std::string, bool> drawwindowforhotkey;
+bool ImGui::Hotkey(const char* label, int* hotkeyent, const ImVec2& size_arg)
 {
     ImGuiWindow* window = ImGui::GetCurrentWindow();
     if (window->SkipItems)
-        return false;
+       return false;
 
     ImGuiContext& g = *GImGui;
     ImGuiIO& io = g.IO;
@@ -151,8 +153,8 @@ bool ImGui::Hotkey(const char* label, int* k, const ImVec2& size_arg)
     const ImRect total_bb(window->DC.CursorPos, frame_bb.Max);
 
     ImGui::ItemSize(total_bb, style.FramePadding.y);
-    if (!ImGui::ItemAdd(total_bb, id))
-        return false;
+    //if (!ImGui::ItemAdd(total_bb, id))
+     //   return false;
 
     const bool focus_requested = ImGui::FocusableItemRegister(window, g.ActiveId);
 
@@ -169,7 +171,7 @@ bool ImGui::Hotkey(const char* label, int* k, const ImVec2& size_arg)
             // Start edition
             memset(io.MouseDown, 0, sizeof(io.MouseDown));
             memset(io.KeysDown, 0, sizeof(io.KeysDown));
-            *k = 0;
+            hotkeyent[ImGuiHotkeyInd_KEY] = 0;
         }
         ImGui::SetActiveID(id, window);
         ImGui::FocusWindow(window);
@@ -181,7 +183,7 @@ bool ImGui::Hotkey(const char* label, int* k, const ImVec2& size_arg)
     }
 
     bool value_changed = false;
-    int key = *k;
+    int key = hotkeyent[ImGuiHotkeyInd_KEY];
 
     if (g.ActiveId == id) {
         for (auto i = 0; i < 5; i++) {
@@ -218,11 +220,11 @@ bool ImGui::Hotkey(const char* label, int* k, const ImVec2& size_arg)
         }
 
         if (IsKeyPressedMap(ImGuiKey_Escape)) {
-            *k = 0;
+            hotkeyent[ImGuiHotkeyInd_KEY] = 0;
             ImGui::ClearActiveID();
         }
         else {
-            *k = key;
+            hotkeyent[ImGuiHotkeyInd_KEY] = key;
         }
     }
 
@@ -236,8 +238,8 @@ bool ImGui::Hotkey(const char* label, int* k, const ImVec2& size_arg)
 
     ImGui::RenderFrame(frame_bb.Min + (width / 2), frame_bb.Max, ImGui::GetColorU32(style.Colors[ImGuiCol_FrameBg]), true, style.FrameRounding);
 
-    if (*k != 0 && g.ActiveId != id) {
-        strcpy_s(buf_display, KeyNames[*k]);
+    if (hotkeyent[ImGuiHotkeyInd_KEY] != 0 && g.ActiveId != id) {
+        strcpy_s(buf_display, KeyNames[hotkeyent[ImGuiHotkeyInd_KEY]]);
     }
     else if (g.ActiveId == id) {
         strcpy_s(buf_display, "...");
@@ -251,6 +253,25 @@ bool ImGui::Hotkey(const char* label, int* k, const ImVec2& size_arg)
 
     if (label_size.x > 0)
         ImGui::RenderText(ImVec2(total_bb.Min.x, frame_bb.Min.y + style.FramePadding.y), label);
+
+    ImGui::SameLine();
+    std::string buttonname = ".##" + std::to_string(id) + "button";
+    ImGuiID buttonid = window->GetID(buttonname.c_str());
+    if (ImGui::Button(buttonname.c_str())) {
+        drawwindowforhotkey[buttonname] = !drawwindowforhotkey[buttonname];
+    }
+
+    if (drawwindowforhotkey[buttonname]) {
+        std::string t = label;
+        t += "##";
+        t += std::to_string(id) + "window";
+        ImGui::SetNextWindowSize(ImVec2(175, 110), ImGuiCond_Once);
+        ImGui::Begin(t.c_str(), &drawwindowforhotkey[buttonname], ImGuiWindowFlags_NoCollapse);
+        const char* modes[] = { "Key down", "Key up", "Toggle" };
+        ImGui::Combo("Mode", &hotkeyent[ImGuiHotkeyInd_MODE], modes, IM_ARRAYSIZE(modes));
+        ImGui::Checkbox("Hotkeylist", (bool*)&hotkeyent[ImGuiHotkeyInd_INLIST]);
+        ImGui::End();
+    }
 
     return value_changed;
 }
@@ -1420,6 +1441,19 @@ void ImGui::Bullet()
     ImU32 text_col = GetColorU32(ImGuiCol_Text);
     RenderBullet(window->DrawList, bb.Min + ImVec2(style.FramePadding.x + g.FontSize * 0.5f, line_height * 0.5f), text_col);
     SameLine(0, style.FramePadding.x * 2.0f);
+}
+
+IMGUI_API void ImGui::HelpMarker(const char* desc) {
+    ImGui::SameLine();
+    ImGui::TextDisabled("(?)");
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
 }
 
 //-------------------------------------------------------------------------

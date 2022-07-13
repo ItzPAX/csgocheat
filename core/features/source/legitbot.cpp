@@ -65,8 +65,12 @@ void LegitBot::GetTargetRecord(CUserCmd* cmd, LagRecord* pBestRecord) {
 			pBestPlayer = pPlayer;
 			iBestPlayerInd = i;
 		}
+
+		PlayerInfo pinfo;
+		g_Interface.pEngine->GetPlayerInfo(i, &pinfo);
+
 		// this is a priorityplayer, if he is in fov range focus him
-		if (g_PlayerList.settings[pPlayer->iIndex()].bPrioritizePlayer) {
+		if (g_PlayerList.settings[pinfo.isteamid].bPrioritizePlayer) {
 			if (flCurrDelta < g_Config.arrfloats[XOR("legitfov")].val[iActiveWeapon]) {
 				pBestPlayer = pPlayer;
 				iBestPlayerInd = i;
@@ -80,8 +84,10 @@ void LegitBot::GetTargetRecord(CUserCmd* cmd, LagRecord* pBestRecord) {
 
 	*pBestRecord = g_Backtrack.deqLagRecords[iBestPlayerInd].front();
 
-	if (!g_Config.ints[XOR("lagcomp")].val)
+	if (!g_Config.ints[XOR("lagcomp")].val || g_Config.ints[XOR("trustfactor")].val) {
 		pTargetRecord = &g_Backtrack.deqLagRecords[iBestPlayerInd].front();
+		return;
+	}
 
 	if (g_Config.ints["legitlagcompmode"].val == 1)
 		pTargetRecord = &g_Backtrack.deqLagRecords[iBestPlayerInd].front();
@@ -121,8 +127,7 @@ void LegitBot::RunTriggerbot(CUserCmd* cmd, LagRecord* pBestRecord) {
 	if (!g_Config.ints["triggerbot"].val)
 		return;
 
-	// not set / escape = always on
-	if (g_Config.ints["triggerbotkey"].val != 0 && !GetAsyncKeyState(g_Config.ints["triggerbotkey"].val))
+	if (!g_InputMgr.GetHotkeyState(g_Config.arrints[XOR("triggerbotkey")].val, XOR("Triggerbot")))
 		return;
 
 	if (!pBestRecord)
@@ -139,9 +144,6 @@ void LegitBot::RunTriggerbot(CUserCmd* cmd, LagRecord* pBestRecord) {
 	triggerbotRay.Init(vEyeOrigin, vEndPoint);
 	CTraceFilter filter;
 	filter.pSkip = Game::g_pLocal;
-
-	if (!pBestRecord->pTargetPlayer)
-		return;
 
 	CGameTrace trace;
 	g_Interface.pEngineTrace->TraceRay(triggerbotRay, MASK_SHOT, &filter, &trace);
@@ -195,19 +197,96 @@ void LegitBot::UpdateHitboxes() {
 	}
 }
 
+void LegitBot::AimAtPosition(float x, float y, float smoothing) {
+	int width = g_DirectX.iWindowWidth;
+	int height = g_DirectX.iWindowHeight;
+	int ScreenCenterY = height * 0.5f;
+	int ScreenCenterX = width * 0.5f;
+
+	float AimSpeed = smoothing;
+	float TargetX = 0;
+	float TargetY = 0;
+
+	// only aim if we are focused into csgo and our menu isn't opened
+	if (g_Menu.bToggled || GetForegroundWindow() != g_DirectX.window || g_Interface.pEngine->IsPaused())
+		return;
+
+	//X Axis
+	if (x != 0)
+	{
+		if (x > ScreenCenterX)
+		{
+			TargetX = -(ScreenCenterX - x);
+			TargetX /= AimSpeed;
+			if (TargetX + ScreenCenterX > ScreenCenterX * 2) TargetX = 0;
+		}
+
+		if (x < ScreenCenterX)
+		{
+			TargetX = x - ScreenCenterX;
+			TargetX /= AimSpeed;
+			if (TargetX + ScreenCenterX < 0) TargetX = 0;
+		}
+	}
+
+	//Y Axis
+	if (y != 0)
+	{
+		if (y > ScreenCenterY)
+		{
+			TargetY = -(ScreenCenterY - y);
+			TargetY /= AimSpeed;
+			if (TargetY + ScreenCenterY > ScreenCenterY * 2) TargetY = 0;
+		}
+
+		if (y < ScreenCenterY)
+		{
+			TargetY = y - ScreenCenterY;
+			TargetY /= AimSpeed;
+			if (TargetY + ScreenCenterY < 0) TargetY = 0;
+		}
+	}
+
+
+	//improve acc and prevent "overshooting" as good as possible
+	if (fabs(TargetX) < 1)
+	{
+		if (TargetX > 0)
+		{
+			TargetX = 1;
+		}
+		if (TargetX < 0)
+		{
+			TargetX = -1;
+		}
+	}
+	if (fabs(TargetY) < 1)
+	{
+		if (TargetY > 0)
+		{
+			TargetY = 1;
+		}
+		if (TargetY < 0)
+		{
+			TargetY = -1;
+		}
+	}
+
+	mouse_event(MOUSEEVENTF_MOVE, (DWORD)(TargetX), (DWORD)(TargetY), NULL, NULL);
+}
+
 void LegitBot::RunAimbot(CUserCmd* cmd, LagRecord* pBestRecord) {
 	if (!g_Config.ints[XOR("legitbot")].val)
 		return;
 
-	// only run if we are trying to shoot and user set it to mouse 1
-	if (!(cmd->buttons & CUserCmd::IN_ATTACK) && g_Config.ints["legitbotkey"].val == VK_LBUTTON)
-		return;
-
-	// not set / escape = always on
-	if (g_Config.ints["legitbotkey"].val != 0 && !GetAsyncKeyState(g_Config.ints["legitbotkey"].val))
+	if (!g_InputMgr.GetHotkeyState(g_Config.arrints[XOR("legitbotkey")].val, XOR("Legitbot")))
 		return;
 
 	if (!pTargetRecord)
+		return;
+
+	// paranoia mode
+	if (g_Misc.iParanoiaSpecs > 0 && g_Config.ints[XOR("paranoia")].val)
 		return;
 
 	Entity* pActiveWeapon = Game::g_pLocal->pGetActiveWeapon();
@@ -222,11 +301,11 @@ void LegitBot::RunAimbot(CUserCmd* cmd, LagRecord* pBestRecord) {
 	case Entity::WEAPONTYPE_SHOTGUN:
 	case Entity::WEAPONTYPE_PISTOL:
 	case Entity::WEAPONTYPE_SNIPER:
-		{
-			if (!pActiveWeapon->iClip())
-				return;
-			break;
-		}
+	{
+		if (!pActiveWeapon->iClip())
+			return;
+		break;
+	}
 	default:
 		return;
 	}
@@ -251,7 +330,7 @@ void LegitBot::RunAimbot(CUserCmd* cmd, LagRecord* pBestRecord) {
 			Vec3D vAngle;
 			g_Math.CalcAngle(vEyeOrigin, pTargetRecord->GetHitboxPos(vAllowedHitboxes[i]).vPos, vAngle);
 			vAngle.Clamp();
-	
+
 			float flCurrDelta = (vAngle - vViewAngles).Clamped().Length();
 			if (flCurrDelta < flBestDelta) {
 				flBestDelta = flCurrDelta;
@@ -284,10 +363,17 @@ void LegitBot::RunAimbot(CUserCmd* cmd, LagRecord* pBestRecord) {
 
 	CompensateRecoil(vEnemyAngle, vAimPunch, g_Config.arrfloats[XOR("legitrcs")].val[iActiveWeapon], flSmoothing);
 
-	// set cmd viewangles, cuz its faster then shoot and then set engine viewangles so it all looks legit
-	cmd->viewangles = vEnemyAngle;
-	GetTargetRecord(cmd, pBestRecord);
-	g_Interface.pEngine->SetViewAngles(vEnemyAngle);
+	if (g_Config.ints[XOR("trustfactor")].val) {
+		Vec3D vTarget;
+		g_Interface.pDebugOverlay->WorldToScreen(pTargetRecord->GetHitboxPos(iHitbox).vPos, vTarget);
+		vTarget += vTarget * ((g_Config.arrfloats[XOR("legitrandom")].val[iActiveWeapon] / 100.f) * (rand() % 2 ? 1 : -1)); // randomization
+		AimAtPosition(vTarget.x, vTarget.y, flSmoothing);
+	}
+	else {
+		// set cmd viewangles, cuz its faster then shoot and then set engine viewangles so it all looks legit
+		cmd->viewangles = vEnemyAngle;
+		g_Interface.pEngine->SetViewAngles(vEnemyAngle);
+	}
 
 	// invalidate record after we used it
 	pTargetRecord = nullptr;

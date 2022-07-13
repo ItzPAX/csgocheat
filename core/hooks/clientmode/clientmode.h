@@ -30,6 +30,9 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 }
 
 void cDoPostScreenSpaceEffects() {
+	if (g_Config.ints[XOR("trustfactor")].val)
+		return;
+	
 	// loop through all glow objects
 	for (int i = 0; i < g_Interface.pGlow->glowObjects.size; i++) {
 		// get the glow obj

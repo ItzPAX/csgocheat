@@ -57,6 +57,7 @@ using uchar = unsigned char;
 #include "sdk/manager/netvars/netvars.h"
 
 // features
+#include "core/features/header/inputmgr.h"
 #include "core/features/config/config.h"
 #include "core/features/header/backtrack.h"
 #include "core/features/header/playerlist.h"

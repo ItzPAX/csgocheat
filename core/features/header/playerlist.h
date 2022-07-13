@@ -10,6 +10,7 @@ struct PlayerListEntry {
 struct PlayerListSettings {
 	bool bPrioritizePlayer = false;
 	bool bHighlightPlayer = false;
+	bool bIgnoreFromParanoia = false;
 };
 
 class PlayerList {
@@ -19,7 +20,7 @@ private:
 	std::vector<PlayerListEntry> listentries;
 	std::string localplayername;
 public:
-	PlayerListSettings settings[MAX_PLAYERS];
+	std::unordered_map<ulong, PlayerListSettings> settings;
 
 	bool bListOpened = false;
 	int iselplayer = 0;
