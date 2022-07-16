@@ -149,14 +149,14 @@ void LegitBot::RunTriggerbot(CUserCmd* cmd, LagRecord* pBestRecord) {
 	g_Interface.pEngineTrace->TraceRay(triggerbotRay, MASK_SHOT, &filter, &trace);
 
 	// get entity from trace
-	if (!trace.m_pEnt || !trace.m_pEnt->bIsPlayer())
+	if (!trace.pHitEntity || !trace.pHitEntity->bIsPlayer())
 		return;
 
 	// check for hitgroup
-	if (trace.hitbox < HITBOX_HEAD || trace.hitbox > HITBOX_MAX)
+	if (trace.iHitbox < HITBOX_HEAD || trace.iHitbox > HITBOX_MAX)
 		return;
 
-	Player* pPlayer = reinterpret_cast<Player*>(trace.m_pEnt);
+	Player* pPlayer = reinterpret_cast<Player*>(trace.pHitEntity);
 	if (!pPlayer->bIsEnemy(Game::g_pLocal))
 		return;
 
@@ -175,7 +175,6 @@ void LegitBot::UpdateHitboxes() {
 			switch (i) {
 			case 0:
 				vAllowedHitboxes.push_back(HITBOX_HEAD);
-				vAllowedHitboxes.push_back(HITBOX_NECK);
 				break;
 			case 1:
 				vAllowedHitboxes.push_back(HITBOX_CHEST);
@@ -197,7 +196,7 @@ void LegitBot::UpdateHitboxes() {
 	}
 }
 
-void LegitBot::AimAtPosition(float x, float y, float smoothing) {
+void LegitBot::GetMouseDeltas(float x, float y, float smoothing, float* dx, float* dy) {
 	int width = g_DirectX.iWindowWidth;
 	int height = g_DirectX.iWindowHeight;
 	int ScreenCenterY = height * 0.5f;
@@ -272,7 +271,8 @@ void LegitBot::AimAtPosition(float x, float y, float smoothing) {
 		}
 	}
 
-	mouse_event(MOUSEEVENTF_MOVE, (DWORD)(TargetX), (DWORD)(TargetY), NULL, NULL);
+	*dx = TargetX;
+	*dy = TargetY;
 }
 
 void LegitBot::RunAimbot(CUserCmd* cmd, LagRecord* pBestRecord) {
@@ -363,15 +363,22 @@ void LegitBot::RunAimbot(CUserCmd* cmd, LagRecord* pBestRecord) {
 
 	CompensateRecoil(vEnemyAngle, vAimPunch, g_Config.arrfloats[XOR("legitrcs")].val[iActiveWeapon], flSmoothing);
 
+	Vec3D vTarget;
+	g_Interface.pDebugOverlay->WorldToScreen(pTargetRecord->GetHitboxPos(iHitbox).vPos, vTarget);
+
+	Vec3D vDelta;
+	GetMouseDeltas(vTarget.x, vTarget.y, flSmoothing, &vDelta.x, &vDelta.y);
+
 	if (g_Config.ints[XOR("trustfactor")].val) {
-		Vec3D vTarget;
-		g_Interface.pDebugOverlay->WorldToScreen(pTargetRecord->GetHitboxPos(iHitbox).vPos, vTarget);
-		vTarget += vTarget * ((g_Config.arrfloats[XOR("legitrandom")].val[iActiveWeapon] / 100.f) * (rand() % 2 ? 1 : -1)); // randomization
-		AimAtPosition(vTarget.x, vTarget.y, flSmoothing);
+		vDelta += vDelta * ((g_Config.arrfloats[XOR("legitrandom")].val[iActiveWeapon] / 100.f) * (rand() % 2 ? 1 : -1)); // randomization
+		mouse_event(MOUSEEVENTF_MOVE, (DWORD)(vDelta.x), (DWORD)(vDelta.y), NULL, NULL);
 	}
 	else {
 		// set cmd viewangles, cuz its faster then shoot and then set engine viewangles so it all looks legit
 		cmd->viewangles = vEnemyAngle;
+		// fill in mouse deltas, not perfect but works
+		cmd->mousedx += vDelta.x;
+		cmd->mousedy += vDelta.y;
 		g_Interface.pEngine->SetViewAngles(vEnemyAngle);
 	}
 

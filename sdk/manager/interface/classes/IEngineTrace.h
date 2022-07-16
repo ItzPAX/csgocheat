@@ -121,7 +121,7 @@ struct Ray_t
 	VectorAligned  m_Delta;	// direction + length of the ray
 	VectorAligned  m_StartOffset;	// Add this to m_Start to get the actual ray start
 	VectorAligned  m_Extents;	// Describes an axis aligned box extruded along a ray
-	const void* m_pWorldAxisTransformation;
+	const Matrix*  m_pWorldAxisTransformation;
 	bool	m_IsRay;	// are the extents zero?
 	bool	m_IsSwept;	// is delta != 0?
 
@@ -154,26 +154,6 @@ struct Ray_t
 
 		m_Start = start + ((maxs + mins) * 0.5f);
 	}
-
-	// compute inverse delta
-	Vec3D InvDelta() const
-	{
-		Vec3D vecInvDelta;
-		for (int iAxis = 0; iAxis < 3; ++iAxis)
-		{
-			if (m_Delta[iAxis] != 0.0f)
-			{
-				vecInvDelta[iAxis] = 1.0f / m_Delta[iAxis];
-			}
-			else
-			{
-				vecInvDelta[iAxis] = FLT_MAX;
-			}
-		}
-		return vecInvDelta;
-	}
-
-private:
 };
 
 //-----------------------------------------------------------------------------
@@ -305,33 +285,16 @@ struct csurface_t
 class CBaseTrace
 {
 public:
-	// Displacement flags tests.
-	bool IsDispSurface(void) { return ((dispFlags & DISPSURF_FLAG_SURFACE) != 0); }
-	bool IsDispSurfaceWalkable(void) { return ((dispFlags & DISPSURF_FLAG_WALKABLE) != 0); }
-	bool IsDispSurfaceBuildable(void) { return ((dispFlags & DISPSURF_FLAG_BUILDABLE) != 0); }
-	bool IsDispSurfaceProp1(void) { return ((dispFlags & DISPSURF_FLAG_SURFPROP1) != 0); }
-	bool IsDispSurfaceProp2(void) { return ((dispFlags & DISPSURF_FLAG_SURFPROP2) != 0); }
+	CBaseTrace() { }
 
-public:
-
-	// these members are aligned!!
-	Vec3D			startpos;				// start position
-	Vec3D			endpos;					// final position
-	cplane_t		plane;					// surface normal at impact
-
-	float			fraction;				// time completed, 1.0 = didn't hit anything
-
-	int				contents;				// contents on other side of surface hit
-	unsigned short	dispFlags;				// displacement flags for marking surfaces with data
-
-	bool			allsolid;				// if true, plane is not valid
-	bool			startsolid;				// if true, the initial point was in a solid area
-
-	CBaseTrace() {}
-
-private:
-	// No copy constructors allowed
-	CBaseTrace(const CBaseTrace& vOther);
+	Vec3D			vecStart;		// start position
+	Vec3D			vecEnd;			// final position
+	cplane_t		plane;			// surface normal at impact
+	float			flFraction;		// time completed, 1.0 = didn't hit anything
+	int				iContents;		// contents on other side of surface hit
+	std::uint16_t	fDispFlags;		// displacement flags for marking surfaces with data
+	bool			bAllSolid;		// if true, plane is not valid
+	bool			bStartSolid;	// if true, the initial point was in a solid area
 };
 
 //-----------------------------------------------------------------------------
@@ -343,44 +306,45 @@ class Entity;
 class CGameTrace : public CBaseTrace
 {
 public:
+	CGameTrace() : pHitEntity(nullptr) { }
 
-	// Returns true if hEnt points at the world entity.
-	// If this returns true, then you can't use GetHitBoxIndex().
-	bool DidHitWorld() const {
-		return false;
+	float				flFractionLeftSolid;	// time we left a solid, only valid if we started in solid
+	csurface_t			surface;				// surface hit (impact surface)
+	int					iHitGroup;				// 0 == generic, non-zero is specific body part
+	short				sPhysicsBone;			// physics bone hit by trace in studio
+	std::uint16_t		uWorldSurfaceIndex;		// index of the msurface2_t, if applicable
+	Entity*				pHitEntity;				// entity hit by trace
+	int					iHitbox;				// box hit by trace in studio
+
+	inline bool DidHit() const
+	{
+		return (flFraction < 1.0f || bAllSolid || bStartSolid);
 	}
 
-	// Returns true if we hit something and it wasn't the world.
-	bool DidHitNonWorldEntity() const {
-		return m_pEnt != NULL && !DidHitWorld();
+	inline bool IsVisible() const
+	{
+		return (flFraction > 0.97f);
 	}
-
-	// Returns true if there was any kind of impact at all
-	bool DidHit() const {
-		return fraction < 1.f || allsolid || startsolid;
-	}
-
-
-public:
-
-	float		fractionleftsolid;		// time we left a solid, only valid if we started in solid
-	csurface_t	surface;				// surface hit (impact surface)
-
-	int			hitgroup;				// 0 == generic, non-zero is specific body part
-	short		physicsbone;			// physics bone hit by trace in studio
-
-	Entity*		m_pEnt;
-
-	// NOTE: this member is overloaded.
-	// If hEnt points at the world entity, then this is the static prop index.
-	// Otherwise, this is the hitbox index.
-	int			hitbox;					// box hit by trace in studio
-
-	CGameTrace() {}
 
 private:
-	// No copy constructors allowed
-	CGameTrace(const CGameTrace& vOther);
+	CGameTrace(const CGameTrace& other)
+	{
+		this->vecStart = other.vecStart;
+		this->vecEnd = other.vecEnd;
+		this->plane = other.plane;
+		this->flFraction = other.flFraction;
+		this->iContents = other.iContents;
+		this->fDispFlags = other.fDispFlags;
+		this->bAllSolid = other.bAllSolid;
+		this->bStartSolid = other.bStartSolid;
+		this->flFractionLeftSolid = other.flFractionLeftSolid;
+		this->surface = other.surface;
+		this->iHitGroup = other.iHitGroup;
+		this->sPhysicsBone = other.sPhysicsBone;
+		this->uWorldSurfaceIndex = other.uWorldSurfaceIndex;
+		this->pHitEntity = other.pHitEntity;
+		this->iHitbox = other.iHitbox;
+	}
 };
 
 class ICollideable;
@@ -389,7 +353,7 @@ typedef CGameTrace trace_t;
 class IEngineTrace {
 public:
 	// Returns the contents mask + entity at a particular world-space position
-	virtual int		GetPointContents(const Vec3D& vecAbsPosition, IHandleEntity** ppEntity = NULL) = 0;
+	virtual int		GetPointContents(const Vec3D& vecAbsPosition, int mask = MASK_ALL, IHandleEntity** ppEntity = nullptr) = 0;
 
 	// Get the point contents, but only test the specific entity. This works
 	// on static props and brush models.

@@ -199,6 +199,12 @@
     <ClCompile Include="..\core\features\source\inputmgr.cpp">
       <Filter>core\features\source</Filter>
     </ClCompile>
+    <ClCompile Include="..\core\features\source\penetration.cpp">
+      <Filter>core\features\source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\core\features\source\ragebot.cpp">
+      <Filter>core\features\source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes.h" />
@@ -334,9 +340,6 @@
     <ClInclude Include="..\core\features\header\chams.h">
       <Filter>core\features\header</Filter>
     </ClInclude>
-    <ClInclude Include="..\sdk\classes\entityclass.h">
-      <Filter>sdk\classes</Filter>
-    </ClInclude>
     <ClInclude Include="..\core\hooks\client\hudupdate.h">
       <Filter>core\hooks\client</Filter>
     </ClInclude>
@@ -354,9 +357,6 @@
     </ClInclude>
     <ClInclude Include="..\utilities\structures\vecaligned\vecaligned.h">
       <Filter>utilities\structs\vecaligned</Filter>
-    </ClInclude>
-    <ClInclude Include="..\sdk\classes\collideable.h">
-      <Filter>sdk\classes</Filter>
     </ClInclude>
     <ClInclude Include="..\sdk\manager\interface\classes\IEngineTrace.h">
       <Filter>sdk\manager\interface\classes</Filter>
@@ -458,6 +458,24 @@
       <Filter>sdk\structs</Filter>
     </ClInclude>
     <ClInclude Include="..\core\features\header\inputmgr.h">
+      <Filter>core\features\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\header\penetration.h">
+      <Filter>core\features\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\structs\weapondata.h">
+      <Filter>sdk\structs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\structs\surfacedata.h">
+      <Filter>sdk\structs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IPhysicsSurfaceProps.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IWeaponSystem.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\header\ragebot.h">
       <Filter>core\features\header</Filter>
     </ClInclude>
   </ItemGroup>

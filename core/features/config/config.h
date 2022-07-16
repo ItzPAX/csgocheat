@@ -67,6 +67,16 @@ private:
 
 	int ragebot;
 	int ragebotkey[3];
+	int targetmode;
+	int autowall;
+	int ragedmg[3];
+	int ragehitchance[3];
+	// SIZE = WEAPONTYPES[3] * HITBOXES[4]
+	int ragehitboxes[3 * 4];
+	int teamcheck;
+	int silent;
+	int autoshoot;
+	int compensaterecoil;
 
 	int legitbot;
 	int legitbotkey[3];

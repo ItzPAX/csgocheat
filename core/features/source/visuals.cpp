@@ -310,10 +310,6 @@ void Visuals::DrawHotkeyList() {
 }
 
 void Visuals::OnEndScene() {
-	// update the playerlist
-	g_PlayerList.UpdatePlayerList();
-	g_Misc.UpdateSpectators();
-
 	for (int i = 0; i < pSortedPlayers.size(); i++) {
 		// get and validate player
 		Player* pPlayer = pSortedPlayers[i].pPlayer;

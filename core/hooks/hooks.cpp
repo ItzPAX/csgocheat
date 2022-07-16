@@ -91,6 +91,11 @@ bool HookManager::AddAllHooks() {
 	if (!g_HookLib.OverrideACHooks()) 
 		return false;
 
+	HWND hCSGOWindow = NULL;
+	while (!(hCSGOWindow != FindWindowA(XOR("Valve001"), nullptr))) {
+		Sleep(500);
+	}
+
 	// hook directx
 	if (g_DirectX.GetD3D9Device(HkDirectX::pD3D9Device, sizeof(HkDirectX::pD3D9Device))) {
 		memcpy(HkDirectX::pEndSceneBytes, (char*)HkDirectX::pD3D9Device[HkDirectX::iEndScene], 7);
@@ -188,13 +193,17 @@ void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults*
 	oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 	g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
 }	
-bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {
+bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {	
+	if (!g_Interface.pEngine->IsInGame())
+		Game::g_pLocal = nullptr;
+
 	Game::g_pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
-	if (!Game::g_pLocal)
-		return false;
-	
+
 	if (!cmd || !cmd->command_number)
 		return false;
+
+	if (!Game::g_pLocal)
+		return oCreateMove(flInputSampleTime, cmd);
 
 	// relay function
 	cCreateMove(flInputSampleTime, cmd);

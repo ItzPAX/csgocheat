@@ -18,18 +18,18 @@ private:
 		ImGui::NewLine();
 	}
 
-	void MultiSelectCombo(const char* label, std::vector<std::string> items, bool* sel, int size) {
+	void MultiSelectCombo(const char* label, std::vector<std::string> items, bool* sel, int size, int iMul = 0) {
 		static std::string preview;
 		static std::vector<std::string> vec;
 		if (ImGui::BeginCombo(label, preview.c_str())) {
 			for (int i = 0; i < size; i++) {
-				ImGui::Selectable(items[i].c_str(), &sel[i], ImGuiSelectableFlags_DontClosePopups);
+				ImGui::Selectable(items[i].c_str(), &sel[(i * 4) + (size * iMul * 4)], ImGuiSelectableFlags_DontClosePopups);
 			}
 			ImGui::EndCombo();
 		}
 		vec.clear();
 		for (int i = 0; i < size; i++) {
-			if (sel[i])
+			if (sel[(i * 4) + (size * iMul * 4)])
 				vec.push_back(items[i]);
 		}
 

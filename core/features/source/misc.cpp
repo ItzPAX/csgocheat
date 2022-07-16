@@ -5,8 +5,8 @@ Misc g_Misc;
 
 void Misc::UpdateSpectators() {
 	pSpectators.clear();
-	Player* pSpecPlayer = Game::g_pLocal->bIsAlive() ? Game::g_pLocal : reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntityFromHandle(Game::g_pLocal->hObserverTarget()));
 
+	Player* pSpecPlayer = Game::g_pLocal->bIsAlive() ? Game::g_pLocal : reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntityFromHandle(Game::g_pLocal->hObserverTarget()));
 	if (!pSpecPlayer)
 		return;
 
@@ -14,12 +14,14 @@ void Misc::UpdateSpectators() {
 	g_Interface.pEngine->GetPlayerInfo(pSpecPlayer->iIndex(), &specinfo);
 
 	speclistname = std::string(specinfo.name);
-
 	iParanoiaSpecs = 0;
 
 	for (int i = 1; i <= g_Interface.pGlobalVars->iMaxClients; i++) {
 		Player* pPlayer = reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntity(i));
-		if (!pPlayer || pPlayer->bDormant() || pPlayer->bIsAlive() || reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntityFromHandle(pPlayer->hObserverTarget())) != pSpecPlayer || pPlayer == Game::g_pLocal)
+		if (!pPlayer || !pPlayer->bIsPlayer() || pPlayer->bDormant() || pPlayer->bIsAlive() || pPlayer == Game::g_pLocal)
+			continue;
+
+		if (reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntityFromHandle(pPlayer->hObserverTarget())) != pSpecPlayer)
 			continue;
 
 		Spectator spec;

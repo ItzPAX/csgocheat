@@ -35,6 +35,7 @@ using uchar = unsigned char;
 
 // sdk
 #include "sdk/structs/shareddefs.h"
+#include "sdk/structs/weapondata.h"
 #include "sdk/classes/IInterpolatedVar.h"
 #include "sdk/manager/interface/classes/ICollideable.h"
 #include "sdk/manager/interface/classes/IClientUnknown.h"
@@ -43,7 +44,7 @@ using uchar = unsigned char;
 #include "sdk/structs/models.h"
 #include "sdk/classes/entity.h"
 #include "sdk/classes/cusercmd.h"
-#include "sdk/classes/entityclass.h"
+#include "sdk/structs/surfacedata.h"
 #include "sdk/classes/INetChannelInfo.h"
 #include "sdk/classes/convar.h"
 
@@ -57,6 +58,8 @@ using uchar = unsigned char;
 #include "sdk/manager/netvars/netvars.h"
 
 // features
+#include "core/features/header/ragebot.h"
+#include "core/features/header/penetration.h"
 #include "core/features/header/inputmgr.h"
 #include "core/features/config/config.h"
 #include "core/features/header/backtrack.h"

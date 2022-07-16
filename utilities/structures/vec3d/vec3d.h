@@ -107,6 +107,18 @@ public:
 		cross_p.z = (v1.x * v2.y) - (v1.y * v2.x); //k
 	}
 
+	float NormalizeInPlace()
+	{
+		const float flLength = this->Length();
+		const float flRadius = 1.0f / (flLength + std::numeric_limits<float>::epsilon());
+
+		this->x *= flRadius;
+		this->y *= flRadius;
+		this->z *= flRadius;
+
+		return flLength;
+	}
+
 	Vec3D Cross(const Vec3D& other) const {
 		Vec3D res;
 		Crossproduct(*this, other, res);

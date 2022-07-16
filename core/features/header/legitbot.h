@@ -10,7 +10,7 @@ private:
 	float ApplyBezierSmoothingValues(Vec3D& vViewAngles, Vec3D& vAngle, Vec2D* pBezierVals);
 	void CompensateRecoil(Vec3D& vAngle, Vec3D vAimPunch, float flRCS, float flSmoothing);
 	void UpdateHitboxes();
-	void AimAtPosition(float x, float y, float smoothing);
+	void GetMouseDeltas(float x, float y, float smoothing, float* dx, float* dy);
 
 public:
 	Vec2D vAimbotCurve[100];

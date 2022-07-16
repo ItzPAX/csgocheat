@@ -1,42 +1,21 @@
 #include "includes.h"
 
-#define DECL_ALIGN(x) __declspec(align(x))
-#define ALIGN16 DECL_ALIGN(16)
-#define ALIGN16_POST DECL_ALIGN(16)
-
-//-----------------------------------------------------------------------------
-// Here's where we add all those lovely SSE optimized routines
-//-----------------------------------------------------------------------------
-
-class ALIGN16 VectorAligned : public Vec3D
+class __declspec(align(16)) VectorAligned : public Vec3D
 {
 public:
-	inline VectorAligned(void) {};
-	inline VectorAligned(float X, float Y, float Z)
+	VectorAligned() = default;
+
+	explicit VectorAligned(const Vec3D& vecBase)
 	{
-		Init(X, Y, Z);
+		this->x = vecBase.x; this->y = vecBase.y; this->z = vecBase.z; this->w = 0.f;
 	}
 
-#ifdef VECTOR_NO_SLOW_OPERATIONS
-
-private:
-	// No copy constructors allowed if we're in optimal mode
-	VectorAligned(const VectorAligned& vOther);
-	VectorAligned(const Vector& vOther);
-
-#else
-public:
-	explicit VectorAligned(const Vec3D& vOther)
+	constexpr VectorAligned& operator=(const Vec3D& vecBase)
 	{
-		Init(vOther.x, vOther.y, vOther.z);
-	}
-
-	VectorAligned& operator=(const Vec3D& vOther)
-	{
-		Init(vOther.x, vOther.y, vOther.z);
+		this->x = vecBase.x; this->y = vecBase.y; this->z = vecBase.z; this->w = 0.f;
 		return *this;
 	}
 
-#endif
-	float w;	// this space is used anyway
-} ALIGN16_POST;
+public:
+	float w;
+};

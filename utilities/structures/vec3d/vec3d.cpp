@@ -49,27 +49,17 @@ void Vec3D::Normalize() {
 }
 
 Vec3D Vec3D::Normalized(void) {
-	Vec3D vec(*this);
-	vec.Normalize();
-
-	return vec;
+	Vec3D vOut = *this;
+	vOut.NormalizeInPlace();
+	return vOut;
 }
 
 float Vec3D::Length(void) {
-	float root = 0.0f, sqsr = this->LengthSqr();
-
-	__asm        sqrtss xmm0, sqsr
-	__asm        movss root, xmm0
-
-	return root;
+	return std::sqrtf(this->LengthSqr());
 }
 
 float Vec3D::LengthSqr(void) {
-	auto sqr = [](float n) {
-		return static_cast<float>(n * n);
-	};
-
-	return (sqr(x) + sqr(y) + sqr(z));
+	return Dot(*this);
 }
 
 float Vec3D::Length2DSqr(void) const {

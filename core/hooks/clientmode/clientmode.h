@@ -9,6 +9,10 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	__asm mov pFramePointer, ebp;
 	bool& bSendPacket = *reinterpret_cast<bool*>(*pFramePointer - 0x1C);
 
+	// update the playerlist
+	g_PlayerList.UpdatePlayerList();
+	g_Misc.UpdateSpectators();
+
 	// set cmd to be globally accessible
 	Game::g_pCmd = cmd;
 
@@ -24,6 +28,8 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 		g_LegitBot.RunAimbot(cmd, &pRecord);
 		g_LegitBot.RunTriggerbot(cmd, &pRecord);
 		g_Backtrack.ApplyRecord(cmd, &pRecord);
+
+		g_Ragebot.RunAimbot(cmd);
 	}
 
 	g_Misc.BunnyHop(cmd);
@@ -51,7 +57,7 @@ void cDoPostScreenSpaceEffects() {
 
 		switch (iClassID) {
 		// player
-		case CClientClass::CCSPlayer: 
+		case CCSPlayer: 
 		{
 			Player* player = reinterpret_cast<Player*>(pEnt);
 		
@@ -71,7 +77,7 @@ void cDoPostScreenSpaceEffects() {
 			break;
 		}
 
-		if (iClassID == CClientClass::CAK47 || (iClassID >= CClientClass::CWeaponAug && iClassID <= CClientClass::CWeaponZoneRepulsor)) {
+		if (iClassID == CAK47 || (iClassID >= CWeaponAug && iClassID <= CWeaponZoneRepulsor)) {
 			if (g_Config.ints["weaponglow"].val)
 				glowObject.SetColor(g_Config.arrfloats["weaponglowcol"].val);
 		}

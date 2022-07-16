@@ -15,8 +15,6 @@ public:
 	// These methods return the bounds of an OBB measured in "collision" space
 	// which can be retreived through the CollisionToWorldTransform or
 	// GetCollisionOrigin/GetCollisionAngles methods
-	virtual const Vec3D& OBBMinsPreScaled() const = 0;
-	virtual const Vec3D& OBBMaxsPreScaled() const = 0;
 	virtual const Vec3D& OBBMins() const = 0;
 	virtual const Vec3D& OBBMaxs() const = 0;
 

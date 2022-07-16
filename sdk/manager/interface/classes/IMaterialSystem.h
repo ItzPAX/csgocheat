@@ -1,6 +1,8 @@
 #pragma once
 #include "IMaterial.h"
 
+using MaterialHandle_t = std::uint16_t;
+
 #define DECLARE_POINTER_HANDLE(name) struct name##__ { int unused; }; typedef struct name##__ *name
 #define MAXSTUDIOSKINS		32
 

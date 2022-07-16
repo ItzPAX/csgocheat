@@ -106,6 +106,16 @@ void Menu::Draw() {
 		if (!g_Config.ints[XOR("trustfactor")].val) {
 			ImGui::Checkbox(XOR("Ragebot"), (bool*)&g_Config.ints[XOR("ragebot")].val);
 			ImGui::Hotkey(XOR("Ragebot-Key"), g_Config.arrints[XOR("ragebotkey")].val);
+			const char* targetmodes[] = { "Damage", "Crosshair", "Distance" };
+			ImGui::Combo(XOR("Target selection"), &g_Config.ints[XOR("targetmode")].val, targetmodes, IM_ARRAYSIZE(targetmodes));
+			ImGui::Checkbox(XOR("Autowall"), (bool*)&g_Config.ints[XOR("autowall")].val);
+			ImGui::Checkbox(XOR("Teamcheck"), (bool*)&g_Config.ints[XOR("teamcheck")].val);
+			ImGui::Checkbox(XOR("Silent"), (bool*)&g_Config.ints[XOR("ragesilent")].val);
+			ImGui::Checkbox(XOR("Autoshoot"), (bool*)&g_Config.ints[XOR("autoshoot")].val);
+			ImGui::Checkbox(XOR("Compensate recoil"), (bool*)&g_Config.ints[XOR("compensaterecoil")].val);
+		}
+		else {
+			ImGui::TextColored(ImVec4(0.9f, 0.2f, 0.2f, 1.f), XOR("Disabled due to Preserve TrustFactor"));
 		}
 		ImGui::EndChild();
 
@@ -113,6 +123,13 @@ void Menu::Draw() {
 		ImGui::BeginChild(XOR("Weapon-Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Weapon-Config"));
 		if (!g_Config.ints[XOR("trustfactor")].val) {
+			RenderClickableButtons({ XOR("Sniper"), XOR("Rifle"), XOR("Pistol") }, &g_Ragebot.iMenuWeapon, ImVec2{ vSize.x / 2, vSize.y }, style->WindowPadding.x + 5);
+			ImGui::SliderInt(XOR("Minimum damage"), &g_Config.arrints[XOR("ragedmg")].val[g_Ragebot.iMenuWeapon], 1.f, 100.f);
+			ImGui::SliderInt(XOR("Minimum hitchance"), &g_Config.arrints[XOR("ragehitchance")].val[g_Ragebot.iMenuWeapon], 1.f, 100.f);
+			MultiSelectCombo(XOR("Hitboxes"), { XOR("Head"), XOR("Chest"), XOR("Stomach"), XOR("Legs") }, (bool*)g_Config.arrints[XOR("ragehitboxes")].val, 4, g_Ragebot.iMenuWeapon);
+		}
+		else {
+			ImGui::TextColored(ImVec4(0.9f, 0.2f, 0.2f, 1.f), XOR("Disabled due to Preserve TrustFactor"));
 		}
 		ImGui::EndChild();
 	}

@@ -89,14 +89,42 @@ public:
 	void* pRenderable() { return reinterpret_cast<void*>(uintptr_t(this) + 0x4); }
 	void* pNetworkable() { return reinterpret_cast<void*>(uintptr_t(this) + 0x8); }
 
+	ICollideable* GetCollideable() {
+		using original_fn = ICollideable * (__thiscall*)(void*);
+		return (*(original_fn**)this)[3](this);
+	}
+
+	CCSWeaponData* GetWeaponData() {
+		return g_Interface.pWeaponSystem->GetWeaponData(this->iItemDefinitionIndex());
+	}
+
 	int iIndex() {
 		using original_fn = int(__thiscall*)(void*);
 		return (*(original_fn**)pNetworkable())[10](pNetworkable());
 	}
 
+	int IsMaxHealth()
+	{
+		// @ida: FF 90 ? ? ? ? 85 C0 0F 8F ? ? ? ? 80 + 0x2
+		using original_fn = int(__thiscall*)(void*);
+		return (*(original_fn**)this)[122](this);
+	}
+
 	bool bIsPlayer() {
 		using original_fn = bool(__thiscall*)(void*);
 		return (*(original_fn**)this)[158](this);
+	}
+
+	const char* GetClassname()
+	{
+		// @ida: client.dll @ [8B 01 FF 90 ? ? ? ? 90 + 0x4] / sizeof(std::uintptr_t)
+		using original_fn = const char*(__thiscall*)(void*);
+		return (*(original_fn**)this)[143](this);
+	}
+
+	unsigned int PhysicsSolidMaskForEntity() {
+		using original_fn = unsigned int(__thiscall*)(void*);
+		return (*(original_fn**)this)[152](this);
 	}
 
 	bool bIsBaseCombatWeapon() {
@@ -106,7 +134,6 @@ public:
 
 	ClientClass* cGetClientClass() {
 		using original_fn = ClientClass*(__thiscall*)(void*);
-
 		if (this && this->pNetworkable())
 			return (*(original_fn**)pNetworkable())[2](pNetworkable());
 		return nullptr;
@@ -131,7 +158,22 @@ public:
 
 		g_Interface.pEngineTrace->TraceRay(ray, MASK_SHOT | CONTENTS_GRATE, &cTraceFilter, &tTrace);
 
-		return tTrace.m_pEnt == this && tTrace.fraction >= 0.97;
+		return tTrace.pHitEntity == this && tTrace.flFraction >= 0.97;
+	}
+
+	float Inaccuracy() {
+		using original_fn = float(__thiscall*)(void*);
+		return (*(original_fn**)this)[482](this);
+	}
+
+	float GetSpread() {
+		using original_fn = float(__thiscall*)(void*);
+		return (*(original_fn**)this)[452](this);
+	}
+
+	void UpdateAccuracyPenalty() {
+		using original_fn = void(__thiscall*)(void*);
+		(*(original_fn**)this)[483](this);
 	}
 
 	int iGetWeaponType() {
@@ -139,10 +181,23 @@ public:
 		return (*(original_fn**)this)[455](this);
 	}
 
-	bool bDormant() { using tOriginalFn = bool(__thiscall*)(void*); return (*static_cast<tOriginalFn**>(pNetworkable()))[9](pNetworkable()); }
-	Vec3D vOrigin() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecOrigin"), this); }
-	int iTeamNum() { return g_NetVars.GetNetvar<int>(XOR("DT_CSPlayer"), XOR("m_iTeamNum"), this); }
+	int iHealth() {
+		return *reinterpret_cast<int*>(uintptr_t(this) + 0x100);
+	}
+
+	bool bIsBroken() { return g_NetVars.Netvar<bool>(XOR("CBreakableSurface"), XOR("m_bIsBroken"), this); }
+	bool bDormant() { 
+		using tOriginalFn = bool(__thiscall*)(void*); 
+		if (pNetworkable())
+			return (*reinterpret_cast<tOriginalFn**>(pNetworkable()))[9](pNetworkable()); 
+		return true;
+	}
+	Vec3D vOrigin() { return g_NetVars.Netvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecOrigin"), this); }
+	int iTeamNum() { return g_NetVars.Netvar<int>(XOR("DT_CSPlayer"), XOR("m_iTeamNum"), this); }
+	int iTickBase() { return g_NetVars.GetNetvar<int>(XOR("DT_CSPlayer"), XOR("m_nTickBase"), this); }
+	float flNextPrimary() { return g_NetVars.GetNetvar<float>(XOR("DT_BaseCombatWeapon"), XOR("m_flNextPrimaryAttack"), this); }
 	int iClip() { return g_NetVars.GetNetvar<int>(XOR("DT_CBaseCombatWeapon"), XOR("m_iClip1"), this); }
+	short iItemDefinitionIndex() { return g_NetVars.Netvar<short>(XOR("DT_BaseAttributableItem"), XOR("m_iItemDefinitionIndex"), this); }
 };
 
 class Player : public Entity {
@@ -224,34 +279,28 @@ public:
 	bool bIsEnemy(Player* to) { return this->iTeamNum() != to->iTeamNum(); }
 
 	bool bIsAlive() { 
-		if (NetvarOffsets::iHealth == 0)
-			return iHealth() > 0;
-
-		return *reinterpret_cast<int*>(uintptr_t(this) + NetvarOffsets::iHealth) > 0;
-		//return iHealth() > 0; 
+		return iHealth() > 0;
 	}
 
-	ulong hObserverTarget() { return g_NetVars.GetNetvar<ulong>(XOR("DT_BasePlayer"), XOR("m_hObserverTarget"), this); }
-	int iObserverMode() { return g_NetVars.GetNetvar<ulong>(XOR("DT_BasePlayer"), XOR("m_iObserverMode"), this); }
-	Vec3D vGetVelocity() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecVelocity[0]"), this); }
-	Vec3D vGetViewOffset() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecViewOffset[0]"), this); }
-	Vec3D vGetAimPunchAngle() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_aimPunchAngle"), this); }
-	float flSimTime() { return g_NetVars.GetNetvar<float>(XOR("DT_CSPlayer"), XOR("m_flSimulationTime"), this); }
-	int iGetHitboxSet() { return g_NetVars.GetNetvar<int>(XOR("DT_BasePlayer"), XOR("m_nHitboxSet"), this); }
-	bool bIsDefusing() { return g_NetVars.GetNetvar<bool>(XOR("DT_CSPlayer"), XOR("m_bIsDefusing"), this); }
-	bool bIsScoped() { return g_NetVars.GetNetvar<bool>(XOR("DT_CSPlayer"), XOR("m_bIsScoped"), this); }
-	bool bHasGunGameImmunity() { return g_NetVars.GetNetvar<bool>(XOR("DT_CSPlayer"), XOR("m_bGunGameImmunity"), this); }
-	int iHealth() { 
-		if (NetvarOffsets::iHealth == 0)
-			return  g_NetVars.GetNetvar<int>(XOR("DT_BasePlayer"), XOR("m_iHealth"), this);
+	ulong hObserverTarget() { return g_NetVars.Netvar<ulong>(XOR("DT_BasePlayer"), XOR("m_hObserverTarget"), this); }
+	int iObserverMode() { return g_NetVars.Netvar<int>(XOR("DT_BasePlayer"), XOR("m_iObserverMode"), this); }
+	Vec3D vGetVelocity() { return g_NetVars.Netvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecVelocity[0]"), this); }
+	Vec3D vGetViewOffset() { return g_NetVars.Netvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecViewOffset[0]"), this); }
+	Vec3D vGetAimPunchAngle() { return g_NetVars.Netvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_aimPunchAngle"), this); }
+	float flSimTime() { return g_NetVars.Netvar<float>(XOR("DT_CSPlayer"), XOR("m_flSimulationTime"), this); }
+	int iGetHitboxSet() { return g_NetVars.Netvar<int>(XOR("DT_BasePlayer"), XOR("m_nHitboxSet"), this); }
+	bool bIsDefusing() { return g_NetVars.Netvar<bool>(XOR("DT_CSPlayer"), XOR("m_bIsDefusing"), this); }
+	bool bIsScoped() { return g_NetVars.Netvar<bool>(XOR("DT_CSPlayer"), XOR("m_bIsScoped"), this); }
+	bool bHasGunGameImmunity() { return g_NetVars.Netvar<bool>(XOR("DT_CSPlayer"), XOR("m_bGunGameImmunity"), this); }
+	bool bHasHelmet() { return g_NetVars.Netvar<bool>(XOR("DT_CSPlayer"), XOR("m_bHasHelmet"), this); }
+	bool bHasHeavyArmor() { return g_NetVars.Netvar<bool>(XOR("DT_CSPlayer"), XOR("m_bHasHeavyArmor"), this); }
+	int iArmor() { return g_NetVars.Netvar<int>(XOR("DT_CSPlayer"), XOR("m_ArmorValue"), this); }
 
-		return *reinterpret_cast<int*>(uintptr_t(this) + NetvarOffsets::iHealth);
-	}
-	Vec3D vEyeAngles() { return g_NetVars.GetNetvar<Vec3D>(XOR("DT_CSPlayer"), XOR("m_angEyeAngles"), this); }
-	int iShotsFired() { return g_NetVars.GetNetvar<int>(XOR("DT_CSPlayer"), XOR("m_iShotsFired"), this); }
-	int iFlags() { return g_NetVars.GetNetvar<int>(XOR("DT_CSPlayer"), XOR("m_fFlags"), this); }
+	Vec3D vEyeAngles() { return g_NetVars.Netvar<Vec3D>(XOR("DT_CSPlayer"), XOR("m_angEyeAngles"), this); }
+	int iShotsFired() { return g_NetVars.Netvar<int>(XOR("DT_CSPlayer"), XOR("m_iShotsFired"), this); }
+	int iFlags() { return g_NetVars.Netvar<int>(XOR("DT_CSPlayer"), XOR("m_fFlags"), this); }
 
 	float flOldSimTime() {
-		return this->flSimTime() + 0x4;
+		return g_NetVars.Netvar<float>(XOR("DT_CSPlayer"), XOR("m_flSimulationTime"), this + 0x4);;
 	}
 };

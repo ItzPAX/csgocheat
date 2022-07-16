@@ -20,6 +20,8 @@
 #include "classes/IInput.h"
 #include "classes/IClientLeafSystem.h"
 #include "classes/CGlowObjectManager.h"
+#include "classes/IPhysicsSurfaceProps.h"
+#include "classes/IWeaponSystem.h"
 
 class Interface {
 private:
@@ -41,8 +43,10 @@ public:
 	CGlowObjectManager* pGlow;
 	ISurface* pSurface;
 	IPanel* pPanel;
+	IPhysicsSurfaceProps* pSurfaceProps;
 	IVModelInfo* pModelInfo;
 	ICvar* pICVar;
+	IWeaponSystem* pWeaponSystem;
 	ICvarQuery* pICVarQuery;
 	IEngineTrace* pEngineTrace;
 	IClientLeafSystem* pClientLeafSystem;

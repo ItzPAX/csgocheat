@@ -46,6 +46,15 @@ void Config::Init() {
 
 	SetupVal(ragebot, 0, XOR("ragebot"), XOR("ragebot"));
 	SetupVal(ragebotkey, { 0, ImGuiHotkeyMode_KEYDOWN, 0 }, 3, XOR("ragebot"), XOR("ragebotkey"));
+	SetupVal(targetmode, 0, XOR("ragebot"), XOR("targetmode"));
+	SetupVal(autowall, 1, XOR("ragebot"), XOR("autowall"));
+	SetupVal(ragedmg, { 20, 10, 25 }, 3, XOR("ragebot"), XOR("ragedmg"));
+	SetupVal(ragehitchance, { 20, 10, 25 }, 3, XOR("ragebot"), XOR("ragehitchance"));
+	SetupVal(ragehitboxes, { 0,0,0,0,0,0,0,0,0,0,0,0 }, 3 * 4, XOR("ragebot"), XOR("ragehitboxes"));
+	SetupVal(teamcheck, 1, XOR("ragebot"), XOR("teamcheck"));
+	SetupVal(silent, 1, XOR("ragebot"), XOR("ragesilent"));
+	SetupVal(autoshoot, 1, XOR("ragebot"), XOR("autoshoot"));
+	SetupVal(compensaterecoil, 1, XOR("ragebot"), XOR("compensaterecoil"));
 
 	SetupVal(legitbot, 1, XOR("legitbot"), XOR("legitbot"));
 	SetupVal(legitbotkey, { VK_LBUTTON, ImGuiHotkeyMode_KEYDOWN, 0 }, 3, XOR("legitbot"), XOR("legitbotkey"));

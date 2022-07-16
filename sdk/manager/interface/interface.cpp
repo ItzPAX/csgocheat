@@ -57,6 +57,7 @@ bool Interface::Init() {
 	pModelInfo = (IVModelInfo*)GetInterface(XOR("engine.dll"), XOR("VModelInfoClient"));
 	pEngineTrace = (IEngineTrace*)GetInterface(XOR("engine.dll"), XOR("EngineTraceClient"));
 	pICVar = (ICvar*)GetInterface(XOR("vstdlib.dll"), XOR("VEngineCvar"));
+	pSurfaceProps = (IPhysicsSurfaceProps*)GetInterface(XOR("Vphysics.dll"), XOR("VPhysicsSurfaceProps"));
 	pICVarQuery = (ICvarQuery*)GetInterface(XOR("vstdlib.dll"), XOR("VCvarQuery"));
 	pClientLeafSystem = (IClientLeafSystem*)GetInterface(XOR("client.dll"), XOR("ClientLeafSystem"));
 
@@ -67,6 +68,7 @@ bool Interface::Init() {
 	pGlow = *reinterpret_cast<CGlowObjectManager**>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x0F\x11\x05\x00\x00\x00\x00\x83\xC8\x01"), XOR("xxx????xxx")) + 0x03);
 	pClientMode = **reinterpret_cast<IClientMode***>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8B\x0D\x00\x00\x00\x00\x8B\x01\x5D\xFF\x60\x30"), XOR("xx????xxxxxx")) + 0x02);
 	pInput = *reinterpret_cast<IInput**>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\xB9\x00\x00\x00\x00\xF3\x0F\x11\x04\x24\xFF\x50\x10"), XOR("x????xxxxxxxx")) + 0x01);
+	pWeaponSystem = *reinterpret_cast<IWeaponSystem**>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8B\x35\x00\x00\x00\x00\xFF\x10\x0F\xB7\xC0"), XOR("xx????xxxxx")) + 0x02);
 
 	return true;
 }
