@@ -29,6 +29,8 @@ public:
 	void DrawBox(RECT rPlayerRect, Color col);
 	void DrawName(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);
 	void DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);
+	void DrawWeapon(RECT rPlayerRect, Player* pPlayer, Color col);
+	void BombESP();
 
 	// Main Funcs
 	void DrawDormant(Player* pPlayer, RECT rPlayerRect);
@@ -42,6 +44,8 @@ public:
 
 	// these functions are called in the hooks
 public:
+	bool bInThirdperson = false;
+
 	void OnEndScene();
 };
 

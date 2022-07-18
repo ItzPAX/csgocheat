@@ -1,5 +1,10 @@
 #pragma once
 
+struct MultiPoints {
+	std::vector<Vec3D> cSafePoints;
+	std::vector<Vec3D> cUnsafePoints;
+};
+
 class RageBot {
 private:
 	enum ETargetMode : int {
@@ -12,12 +17,12 @@ private:
 
 	Player* GetTargetPlayer();
 	void UpdateHitboxes();
-	bool GunReady();
-	bool HitChance(Player* player, CUserCmd* cmd, Vec3D vTargetPoint);
+	bool HitChance();
 	std::vector<int> vAllowedHitboxes;
 
 public:
 	int iMenuWeapon = 0;
+	bool GunReady();
 	void RunAimbot(CUserCmd* cmd);
 };
 

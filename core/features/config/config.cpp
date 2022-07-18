@@ -35,6 +35,7 @@ void Config::Init() {
 	SetupVal(boxesp, 1, XOR("esp"), XOR("boxesp"));
 	SetupVal(nameesp, 1, XOR("esp"), XOR("nameesp"));
 	SetupVal(healthesp, 1, XOR("esp"), XOR("healthesp"));
+	SetupVal(weaponesp, 1, XOR("esp"), XOR("weaponesp"));
 	SetupVal(thirdperson, 1, XOR("esp"), XOR("thirdperson"));
 	SetupVal(thirdpersonkey, { VK_MBUTTON, ImGuiHotkeyMode_TOGGLE, 1 }, 3, XOR("esp"), XOR("thirdpersonkey"));
 	SetupVal(enemyglow, 1, XOR("esp"), XOR("enemyglow"));
@@ -44,6 +45,14 @@ void Config::Init() {
 	SetupVal(weaponglow, 1, XOR("esp"), XOR("weaponglow"));
 	SetupVal(weaponglowcol, { 0.1f, 0.9f, 0.2f, 0.5f }, 4, XOR("esp"), XOR("weaponglowcol"));
 
+	SetupVal(antiaim, 1, XOR("antiaim"), XOR("antiaim"));
+	SetupVal(attargets, 1, XOR("antiaim"), XOR("attargets"));
+	SetupVal(pitch, { 89,89,89 }, 3, XOR("antiaim"), XOR("pitch"));
+	SetupVal(yaw, { 180,180,180 }, 3, XOR("antiaim"), XOR("yaw"));
+	SetupVal(changepitch, { 1,1,1 }, 3, XOR("antiaim"), XOR("changepitch"));
+	SetupVal(changeyaw, { 1,1,1 }, 3, XOR("antiaim"), XOR("changeyaw"));
+	SetupVal(desyncdelta, { 30,30,30 }, 3, XOR("antiaim"), XOR("desyncdelta"));
+
 	SetupVal(ragebot, 0, XOR("ragebot"), XOR("ragebot"));
 	SetupVal(ragebotkey, { 0, ImGuiHotkeyMode_KEYDOWN, 0 }, 3, XOR("ragebot"), XOR("ragebotkey"));
 	SetupVal(targetmode, 0, XOR("ragebot"), XOR("targetmode"));
@@ -51,6 +60,7 @@ void Config::Init() {
 	SetupVal(ragedmg, { 20, 10, 25 }, 3, XOR("ragebot"), XOR("ragedmg"));
 	SetupVal(ragehitchance, { 20, 10, 25 }, 3, XOR("ragebot"), XOR("ragehitchance"));
 	SetupVal(ragehitboxes, { 0,0,0,0,0,0,0,0,0,0,0,0 }, 3 * 4, XOR("ragebot"), XOR("ragehitboxes"));
+	SetupVal(autoscope, 1, XOR("ragebot"), XOR("autoscope"));
 	SetupVal(teamcheck, 1, XOR("ragebot"), XOR("teamcheck"));
 	SetupVal(silent, 1, XOR("ragebot"), XOR("ragesilent"));
 	SetupVal(autoshoot, 1, XOR("ragebot"), XOR("autoshoot"));

@@ -17,8 +17,6 @@ void Penetration::UTIL_TraceLine(Vec3D vecAbsStart, Vec3D vecAbsEnd, unsigned in
 }
 
 void Penetration::UTIL_ClipTraceToPlayers(const Vec3D& vecAbsStart, const Vec3D& vecAbsEnd, unsigned int mask, ITraceFilter* filter, trace_t* tr, const float flMinRange) {
-	// @ida util_cliptracetoplayers: client.dll @ E8 ? ? ? ? 0F 28 84 24 68 02 00 00
-
 	if (!filter || !tr)
 		return;
 
@@ -84,7 +82,7 @@ void Penetration::UTIL_ClipTraceToPlayers(const Vec3D& vecAbsStart, const Vec3D&
 	}
 }
 
-bool Penetration::TraceToExit(trace_t& enterTrace, trace_t& exitTrace, Vec3D& vecPosition, Vec3D& vecDirection, Player* pClipPlayer) {
+__forceinline bool Penetration::TraceToExit(trace_t& enterTrace, trace_t& exitTrace, Vec3D& vecPosition, Vec3D& vecDirection, Player* pClipPlayer) {
 	float flMaxDistance = 90.f, flRayExtension = 4.f, flCurrDistance = 0;
 	int iStartContents = 0;
 
@@ -99,19 +97,19 @@ bool Penetration::TraceToExit(trace_t& enterTrace, trace_t& exitTrace, Vec3D& ve
 		if (!iStartContents)
 			iStartContents = g_Interface.pEngineTrace->GetPointContents(vecStart, MASK_SHOT_HULL | CONTENTS_HITBOX, nullptr);
 		int iCurrentContents = g_Interface.pEngineTrace->GetPointContents(vecStart, MASK_SHOT_HULL | CONTENTS_HITBOX, nullptr);
-
+		
 		if (!(iCurrentContents & MASK_SHOT_HULL) || (iCurrentContents & CONTENTS_HITBOX && iCurrentContents != iStartContents))
 		{
 			// setup our end position by deducting the direction by the extra added distance
-			const Vec3D vecEnd = vecStart - (vecDirection * 4.0f);
+			const Vec3D vecEnd = vecStart - (vecDirection * flRayExtension);
 
 			// trace ray to world
 			Ray_t rayWorld;
 			rayWorld.Init(vecStart, vecEnd);
 
 			CTraceFilter nofilter;
-			g_Interface.pEngineTrace->TraceRay(rayWorld, MASK_SHOT_HULL | CONTENTS_HITBOX, nullptr, &exitTrace);
-
+			g_Interface.pEngineTrace->TraceRay(rayWorld, MASK_SHOT | CONTENTS_HITBOX, nullptr, &exitTrace);
+			
 			CTraceFilter filter;
 			filter.pSkip = pClipPlayer;
 			UTIL_ClipTraceToPlayers(vecEnd, vecStart, MASK_SHOT_HULL | CONTENTS_HITBOX, &filter, &exitTrace, -60.f);
@@ -122,36 +120,36 @@ bool Penetration::TraceToExit(trace_t& enterTrace, trace_t& exitTrace, Vec3D& ve
 				// trace ray to entity
 				Ray_t ray;
 				ray.Init(vecStart, vecPosition);
-
+			
 				CTraceFilter filter;
 				filter.pSkip = exitTrace.pHitEntity;
-
+			
 				g_Interface.pEngineTrace->TraceRay(ray, MASK_SHOT_HULL, &filter, &exitTrace);
-
+			
 				if (exitTrace.DidHit() && !exitTrace.bStartSolid)
 				{
 					vecStart = exitTrace.vecEnd;
 					return true;
 				}
-
+			
 				continue;
 			}
-
+			
 			if (exitTrace.DidHit() && !exitTrace.bStartSolid)
 			{
 				if (g_Penetration.IsBreakableEnt(enterTrace.pHitEntity) && g_Penetration.IsBreakableEnt(exitTrace.pHitEntity))
 					return true;
-
-				if (enterTrace.surface.flags & SURF_NODRAW || (!(exitTrace.surface.flags & SURF_NODRAW) && exitTrace.plane.normal.Dot(vecDirection) <= 1.0f))
+			
+				if (enterTrace.surface.flags & SURF_NODRAW || !(exitTrace.surface.flags & SURF_NODRAW) && (exitTrace.plane.normal.Dot(vecDirection) <= 1.0f))
 				{
 					const float flMultiplier = exitTrace.flFraction * 4.0f;
 					vecStart -= vecDirection * flMultiplier;
 					return true;
 				}
-
+			
 				continue;
 			}
-
+			
 			if (!exitTrace.DidHit() || exitTrace.bStartSolid)
 			{
 				if (enterTrace.pHitEntity != nullptr && enterTrace.pHitEntity->iIndex() != 0 && g_Penetration.IsBreakableEnt(enterTrace.pHitEntity))
@@ -161,7 +159,7 @@ bool Penetration::TraceToExit(trace_t& enterTrace, trace_t& exitTrace, Vec3D& ve
 					exitTrace.vecEnd = vecStart + vecDirection;
 					return true;
 				}
-
+			
 				continue;
 			}
 		}
@@ -416,82 +414,26 @@ float Penetration::ScaleDamage(Player* plPlayer, float flDamage, float flArmorRa
 }
 
 bool Penetration::IsBreakableEnt(Entity* pEnt) {
-	// @ida isbreakableentity: 55 8B EC 51 56 8B F1 85 F6 74 68
+	using Fn = bool(__fastcall*)(Entity*);
+	static auto fn = reinterpret_cast<Fn>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x55\x8B\xEC\x51\x56\x8B\xF1\x85\xF6\x74\x68\x83\xBE"), XOR("xxxxxxxxxxxxx")));
 
-		// skip invalid entities
-	if (pEnt == nullptr)
+	if (!pEnt || !pEnt->iIndex())
 		return false;
 
-	const int iHealth = pEnt->iHealth();
+	auto take_damage{ (char*)((uintptr_t)pEnt + *(size_t*)((uintptr_t)fn + 0x26)) };
+	auto take_damage_backup{ *take_damage };
 
-	// first check to see if it's already broken
-	if (iHealth < 0 && pEnt->IsMaxHealth() > 0)
-		return true;
+	ClientClass* pClass = pEnt->cGetClientClass();
 
+	if (pClass->m_pNetworkName == XOR("CBreakableSurface"))
+		*take_damage = DAMAGE_YES;
+	else if (pClass->m_pNetworkName == XOR("CBaseDoor") || pClass->m_pNetworkName == XOR("CDynamicProp"))
+		*take_damage = DAMAGE_NO;
 
-	typedef bool(__thiscall* isBreakbaleEntityFn)(Entity*);
-	static isBreakbaleEntityFn IsBreakableEntity;
+	bool breakable = fn(pEnt);
+	*take_damage = take_damage_backup;
 
-	if (!IsBreakableEntity)
-		IsBreakableEntity = (isBreakbaleEntityFn)g_Tools.SignatureScan(XOR("client.dll"), XOR("\x55\x8B\xEC\x51\x56\x8B\xF1\x85\xF6\x74\x68\x83\xBE"), XOR("xxxxxxxxxxxxxx"));
-
-
-	static size_t sizeTakeDamageOff{ *(size_t*)((uintptr_t)IsBreakableEntity + 38) };
-
-	// get takedamage and save old takedamage.
-
-	char cTakeDmg, cOldTakeDmg;
-	cTakeDmg = (char)((uintptr_t)pEnt + sizeTakeDamageOff);
-
-	if (cTakeDmg != DAMAGE_YES)
-	{
-		const int nClassIndex = pEnt->cGetClientClass()->m_ClassID;
-
-		// force pass cfuncbrush
-		if (nClassIndex != CFuncBrush)
-			return false;
-	}
-
-	if (iHealth > 200)
-		return false;
-
-	IMultiplayerPhysics* pPhysicsInterface = reinterpret_cast<IMultiplayerPhysics*>(pEnt);
-	if (pPhysicsInterface != nullptr)
-	{
-		if (pPhysicsInterface->GetMultiplayerPhysicsMode() != PHYSICS_MULTIPLAYER_SOLID)
-			return false;
-	}
-	else
-	{
-		const char* szClassName = pEnt->GetClassname();
-
-		if (!strcmp(szClassName, XOR("func_breakable")) || !strcmp(szClassName, XOR("func_breakable_surf")))
-		{
-			if (!strcmp(szClassName, XOR("func_breakable_surf")))
-			{
-				Entity* pSurface = static_cast<Entity*>(pEnt);
-
-				// don't try to break it if it has already been broken
-				if (pSurface->bIsBroken())
-					return false;
-			}
-		}
-		else if (pEnt->PhysicsSolidMaskForEntity() & CONTENTS_PLAYERCLIP)
-		{
-			// hostages and players use CONTENTS_PLAYERCLIP, so we can use it to ignore them
-			return false;
-		}
-	}
-
-	IBreakableWithPropData* pBreakableInterface = reinterpret_cast<IBreakableWithPropData*>(pEnt);
-	if (pBreakableInterface != nullptr)
-	{
-		// bullets don't damage it - ignore
-		if (pBreakableInterface->GetDmgModBullet() <= 0.0f)
-			return false;
-	}
-
-	return true;
+	return breakable;
 }
 
 float Penetration::GetDamage(Player* local, const Vec3D& point, FireBulletData_t& dataOut) {

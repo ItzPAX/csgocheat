@@ -95,6 +95,9 @@ void Render::Text(LPD3DXFONT font, const char* text, float x, float y, Color _co
 }
 
 Vec2D Render::TextSize(LPD3DXFONT font, const char* text) {
+	if (!font)
+		return Vec2D(0.f, 0.f);
+
 	RECT rect = { 0,0,0,0 };
 	font->DrawTextA(NULL, text, -1, &rect, DT_CALCRECT, D3DCOLOR_ARGB(0,0,0,0));
 

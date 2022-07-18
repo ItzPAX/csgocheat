@@ -9,10 +9,14 @@ void Visuals::ThirdPerson() {
 		return;
 	}
 
-	if (g_InputMgr.GetHotkeyState(g_Config.arrints[XOR("thirdpersonkey")].val, XOR("Thirdperson")))
+	if (g_InputMgr.GetHotkeyState(g_Config.arrints[XOR("thirdpersonkey")].val, XOR("Thirdperson"))) {
 		g_Interface.pInput->CAM_ToThirdPerson();
-	else
+		bInThirdperson = true;
+	}
+	else {
 		g_Interface.pInput->CAM_ToFirstPerson();
+		bInThirdperson = false;
+	}
 
 	g_Interface.pInput->m_vCameraOffset.z = 100.f;
 }
@@ -156,6 +160,30 @@ void Visuals::DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInf
 	g_Render.Text(g_Render.pEspFont, str.c_str(), rPlayerRect.left - (vSizeHP.x / 2.f) - 5, flScaledNum - (vSizeHP.y / 2), Color::White(col.rgba[3]));
 }
 
+void Visuals::DrawWeapon(RECT rPlayerRect, Player* pPlayer, Color col) {
+	Entity* weapon = pPlayer->pGetActiveWeapon();
+	if (!weapon)
+		return;
+
+	CCSWeaponData* data = weapon->GetWeaponData();
+	if (!data)
+		return;
+
+	std::stringstream name(data->szWeaponName);
+	std::string segment;
+	std::vector<std::string> seglist;
+
+	while (std::getline(name, segment, '_'))
+	{
+		seglist.push_back(segment);
+	}
+	if (seglist.size() < 2)
+		return;
+
+	Vec2D size = g_Render.TextSize(g_Render.pEspFont, seglist[1].c_str());
+	g_Render.Text(g_Render.pEspFont, seglist[1].c_str(), rPlayerRect.right + 4.f + size.x / 2, rPlayerRect.top, Color::White(col.rgba[3]));
+}
+
 void Visuals::DrawDormant(Player* pPlayer, RECT rPlayerRect) {
 	// opacity should reach 1 in 3000 milliseconds.
 	constexpr float flFrequency = 1.f / 3.f;
@@ -178,6 +206,7 @@ void Visuals::DrawDormant(Player* pPlayer, RECT rPlayerRect) {
 	if (g_Config.ints[XOR("boxesp")].val) DrawBox(rPlayerRect, Color(120, 120, 120, flpAlpha));
 	if (g_Config.ints[XOR("nameesp")].val) DrawName(rPlayerRect, pPlayer, Color(120, 120, 120, flpAlpha), playerInfo);
 	if (g_Config.ints[XOR("healthesp")].val) DrawHealth(rPlayerRect, pPlayer, Color(120, 120, 120, flpAlpha), playerInfo);
+	if (g_Config.ints[XOR("weaponesp")].val) DrawWeapon(rPlayerRect, pPlayer, Color(120, 120, 120, flpAlpha));
 }
 
 void Visuals::DrawPlayer(Player* pPlayer, RECT rPlayerRect) {
@@ -203,6 +232,7 @@ void Visuals::DrawPlayer(Player* pPlayer, RECT rPlayerRect) {
 	if (g_Config.ints[XOR("boxesp")].val) DrawBox(rPlayerRect, g_PlayerList.settings[playerInfo.isteamid].bHighlightPlayer ? Color::Red(flAlpha) : cHealthCol);
 	if (g_Config.ints[XOR("nameesp")].val) DrawName(rPlayerRect, pPlayer, g_PlayerList.settings[playerInfo.isteamid].bHighlightPlayer ? Color::Red(flAlpha) : Color::White(flAlpha), playerInfo);
 	if (g_Config.ints[XOR("healthesp")].val) DrawHealth(rPlayerRect, pPlayer, cHealthCol, playerInfo);
+	if (g_Config.ints[XOR("weaponesp")].val) DrawWeapon(rPlayerRect, pPlayer, g_PlayerList.settings[playerInfo.isteamid].bHighlightPlayer ? Color::Red(flAlpha) : Color::White(flAlpha));
 }
 
 void Visuals::DrawSpectatorList() {

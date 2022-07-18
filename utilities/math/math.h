@@ -3,13 +3,20 @@
 // Math defines
 #define M_PI 3.1415926535897932384
 #define M_PI2 M_PI * 2
-#define DEG2RAD(x) x * M_PI/180.f
-#define RAD2DEG(x) x * 180.f/M_PI
 
 class Math {
 public:
+	constexpr float DEG2RAD(const float x) {
+		return (float)(x) * (float)(M_PI / 180.f);
+	}
+	constexpr float RAD2DEG(const float x) {
+		return (float)(x) * (float)(180.f / M_PI);
+	}
+
 	float Clamp(float tNum, float tNumMax, float tNumMin);
 	void Clamp(float* tNum, float tNumMax, float tNumMin);
+
+	bool IntersectLineWithBB(Vec3D& vStart, Vec3D& vEndDelta, Vec3D& vMin, Vec3D& vMax);
 
 	float NormalizeIntoRange(float flVal, float flMax, float flMin);
 	float ScaleNumber(float flVal, float flValMax, float flValMin, float flNewMax, float flNewMin);

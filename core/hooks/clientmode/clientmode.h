@@ -13,14 +13,16 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	g_PlayerList.UpdatePlayerList();
 	g_Misc.UpdateSpectators();
 
-	// set cmd to be globally accessible
-	Game::g_pCmd = cmd;
-
 	// lagcomp stuff
 	if (!bClientModeInit) {
 		g_Backtrack.Init();
 		bClientModeInit = true;
 	}
+
+	// save old move values to be able to normally move when shooting
+	Vec3D vOldViewangles = cmd->viewangles;
+	float flOldForward = cmd->forwardmove;
+	float flOldSide = cmd->sidemove;
 
 	if (Game::g_pLocal->bIsAlive()) {
 		LagRecord pRecord;
@@ -30,9 +32,26 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 		g_Backtrack.ApplyRecord(cmd, &pRecord);
 
 		g_Ragebot.RunAimbot(cmd);
+		g_AntiAim.DoDesync(cmd, bSendPacket);
 	}
 
 	g_Misc.BunnyHop(cmd);
+	g_Math.CorrectMovement(vOldViewangles, cmd, flOldForward, flOldSide);
+
+	cmd->forwardmove = std::clamp(cmd->forwardmove, -450.0f, 450.0f);
+	cmd->sidemove = std::clamp(cmd->sidemove, -450.0f, 450.0f);
+	cmd->upmove = std::clamp(cmd->upmove, -320.0f, 320.0f);
+
+	cmd->viewangles.Normalize();
+	cmd->viewangles.x = std::clamp(cmd->viewangles.x, -89.0f, 89.0f);
+	cmd->viewangles.y = std::clamp(cmd->viewangles.y, -180.0f, 180.0f);
+	cmd->viewangles.z = 0.0f;
+
+	// set cmd to be globally accessible
+	Game::g_pCmd = cmd;
+
+	// choke one tick
+	bSendPacket = !bSendPacket;
 }
 
 void cDoPostScreenSpaceEffects() {

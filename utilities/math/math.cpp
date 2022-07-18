@@ -21,6 +21,48 @@ void Math::Clamp(float* tNum, float tNumMax, float tNumMin) {
         *tNum = tNumMin;
 }
 
+bool Math::IntersectLineWithBB(Vec3D& vStart, Vec3D& vEndDelta, Vec3D& vMin, Vec3D& vMax) {
+	float d1, d2, f;
+	bool startsolid = true;
+	float t1 = -1.0f, t2 = 1.0f;
+
+	for (int i = 0; i < 6; i++) {
+		if (i >= 3) {
+			int j = i - 3;
+
+			d1 = vStart[j] - vMax[j];
+			d2 = d1 + vEndDelta[j];
+		}
+		else {
+			d1 = -vStart[i] + vMin[i];
+			d2 = d1 - vEndDelta[i];
+		}
+
+		if (d1 > 0.0f && d2 > 0.0f)
+			return false;
+		else if (d1 <= 0.0f && d2 <= 0.0f)
+			continue;
+
+		if (d1 > 0)
+			startsolid = false;
+
+		if (d1 > d2) {
+			f = d1;
+			if (f < 0.0f)
+				f = 0.0f;
+
+			f /= d1 - d2;
+			if (f > t1)
+				t1 = f;
+		}
+		else {
+			f = d1 / (d1 - d2);
+			if (f < t2)
+				t2 = f;
+		}
+	}
+}
+
 float Math::NormalizeIntoRange(float flVal, float flMax, float flMin) {
     return (flVal - flMin) / (flMax - flMin);
 }
@@ -33,7 +75,8 @@ float Math::ScaleNumber(float flVal, float flValMax, float flValMin, float flNew
 
 //aimtux
 void Math::CorrectMovement(Vec3D vOldAngles, CUserCmd* cmd, float flOldForward, float flOldSide) {
-	float delta_view;
+	// side/forward move correction
+	float deltaView;
 	float f1;
 	float f2;
 
@@ -48,47 +91,48 @@ void Math::CorrectMovement(Vec3D vOldAngles, CUserCmd* cmd, float flOldForward, 
 		f2 = cmd->viewangles.y;
 
 	if (f2 < f1)
-		delta_view = abs(f2 - f1);
+		deltaView = abs(f2 - f1);
 	else
-		delta_view = 360.0f - abs(f1 - f2);
+		deltaView = 360.0f - abs(f1 - f2);
 
-	delta_view = 360.0f - delta_view;
+	deltaView = 360.0f - deltaView;
 
-	cmd->forwardmove = cos(DEG2RAD(delta_view)) * flOldForward + cos(DEG2RAD(delta_view + 90.f)) * flOldSide;
-	cmd->sidemove = sin(DEG2RAD(delta_view)) * flOldForward + sin(DEG2RAD(delta_view + 90.f)) * flOldSide;
+	cmd->forwardmove = cos(DEG2RAD(deltaView)) * flOldForward + cos(DEG2RAD(deltaView + 90.f)) * flOldSide;
+	cmd->sidemove = sin(DEG2RAD(deltaView)) * flOldForward + sin(DEG2RAD(deltaView + 90.f)) * flOldSide;
 }
 
 void Math::CalcAngle(Vec3D src, Vec3D dst, Vec3D& angles) {
 	// get target vector
 	Vec3D vecDelta = dst - src;
 	VectorAngles(vecDelta, angles);
-	angles.Normalize();
+	//angles.Normalize();
 }
 
 void Math::VectorAngles(Vec3D forward, Vec3D& angles) {
-	float flPitch, flYaw;
+	Vec3D view;
+	float flTmp;
 
-	if (forward.x == 0.f && forward.y == 0.f)
-	{
-		flPitch = (forward.z > 0.f) ? 270.f : 90.f;
-		flYaw = 0.f;
+	if (forward[1] == 0.f && forward[0] == 0.f) {
+		view[0] = 0.f;
+		view[1] = 0.f;
 	}
-	else
-	{
-		flPitch = std::atan2f(-forward.z, forward.Length2D()) * 180.f / M_PI;
+	else {
+		view[1] = RAD2DEG(atan2(forward[1], forward[0]));
 
-		if (flPitch < 0.f)
-			flPitch += 360.f;
+		if (view[1] < 0.f)
+			view[1] += 360.f;
 
-		flYaw = std::atan2f(forward.y, forward.x) * 180.f / M_PI;
+		flTmp = forward[0] * forward[0] + forward[1] * forward[1];
+		view[2] = sqrt(flTmp);
 
-		if (flYaw < 0.f)
-			flYaw += 360.f;
+		//view[2] = 1/fastInverseSquare(forward[0] * forward[0] + forward[1] * forward[1]);
+
+		view[0] = RAD2DEG(atan2(forward[2], view[2]));
 	}
 
-	angles.x = flPitch;
-	angles.y = flYaw;
-	angles.z = 0.f;
+	angles[0] = -view[0];
+	angles[1] = view[1];
+	angles[2] = 0.f;
 }
 
 void Math::SinCos(float r, float* s, float* c) {

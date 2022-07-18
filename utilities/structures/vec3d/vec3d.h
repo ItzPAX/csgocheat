@@ -119,6 +119,10 @@ public:
 		return flLength;
 	}
 
+	bool IsNull() {
+		return this->x == 0 && this->y == 0 && this->z == 0;
+	}
+
 	Vec3D Cross(const Vec3D& other) const {
 		Vec3D res;
 		Crossproduct(*this, other, res);

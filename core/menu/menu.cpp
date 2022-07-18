@@ -92,7 +92,7 @@ void Menu::Draw() {
 	if (!style)
 		ImGui::Render();
 
-	RenderClickableButtons({ XOR("Ragebot"), XOR("Legitbot"), XOR("ESP"), XOR("Misc")}, &g_Menu.iCurrentTab, vSize, style->WindowPadding.x - 3);
+	RenderClickableButtons({ XOR("Ragebot"), XOR("Legitbot"), XOR("AntiAim"), XOR("ESP"), XOR("Misc")}, &g_Menu.iCurrentTab, vSize, style->WindowPadding.x - 4);
 	ImGui::NewLine();
 
 	// Render the playerlist
@@ -109,6 +109,7 @@ void Menu::Draw() {
 			const char* targetmodes[] = { "Damage", "Crosshair", "Distance" };
 			ImGui::Combo(XOR("Target selection"), &g_Config.ints[XOR("targetmode")].val, targetmodes, IM_ARRAYSIZE(targetmodes));
 			ImGui::Checkbox(XOR("Autowall"), (bool*)&g_Config.ints[XOR("autowall")].val);
+			ImGui::Checkbox(XOR("Autoscope"), (bool*)&g_Config.ints[XOR("autoscope")].val);
 			ImGui::Checkbox(XOR("Teamcheck"), (bool*)&g_Config.ints[XOR("teamcheck")].val);
 			ImGui::Checkbox(XOR("Silent"), (bool*)&g_Config.ints[XOR("ragesilent")].val);
 			ImGui::Checkbox(XOR("Autoshoot"), (bool*)&g_Config.ints[XOR("autoshoot")].val);
@@ -169,14 +170,40 @@ void Menu::Draw() {
 		ImGui::EndChild();
 	}
 		  break;
-		  //ESP
+
+		  //ANTIAIM
 	case 2: {
+		ImGui::BeginChild(XOR("Main-Antiaim"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
+		ImGui::Text(XOR("Main AA"));
+		ImGui::Checkbox(XOR("Antiaim"), (bool*)&g_Config.ints[XOR("antiaim")].val);
+		ImGui::Checkbox(XOR("At targets"), (bool*)&g_Config.ints[XOR("attargets")].val);
+		ImGui::EndChild();
+
+		ImGui::SameLine();
+		ImGui::BeginChild(XOR("Mode-Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
+		ImGui::Text(XOR("Mode Configuration"));
+		RenderClickableButtons({ XOR("Standing"), XOR("Moving"), XOR("In air") }, &g_AntiAim.iMenuMode, ImVec2{ vSize.x / 2, vSize.y }, style->WindowPadding.x + 5);
+		ImGui::Checkbox(XOR("Change Pitch"), (bool*)&g_Config.arrints[XOR("changepitch")].val[g_AntiAim.iMenuMode]);
+		if (g_Config.arrints[XOR("changepitch")].val[g_AntiAim.iMenuMode])
+			ImGui::SliderInt(XOR("Pitch"), &g_Config.arrints[XOR("pitch")].val[g_AntiAim.iMenuMode], 0.f, 89.f);
+
+		ImGui::Checkbox(XOR("Change Yaw"), (bool*)&g_Config.arrints[XOR("changeyaw")].val[g_AntiAim.iMenuMode]);
+		if (g_Config.arrints[XOR("changeyaw")].val[g_AntiAim.iMenuMode])
+			ImGui::SliderInt(XOR("Yaw"), &g_Config.arrints[XOR("yaw")].val[g_AntiAim.iMenuMode], 0.f, 180.f);
+		ImGui::SliderInt(XOR("Desync"), &g_Config.arrints[XOR("desyncdelta")].val[g_AntiAim.iMenuMode], 0.f, 58.f);
+		ImGui::EndChild();
+	}
+		  break;
+
+		  //ESP
+	case 3: {
 		ImGui::BeginChild(XOR("Main-ESP"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Main ESP"));
 		ImGui::Checkbox(XOR("Box ESP"), (bool*)&g_Config.ints[XOR("boxesp")].val);
 		ImGui::Checkbox(XOR("Name ESP"), (bool*)&g_Config.ints[XOR("nameesp")].val);
 		ImGui::Checkbox(XOR("Health ESP"), (bool*)&g_Config.ints[XOR("healthesp")].val);
-		
+		ImGui::Checkbox(XOR("Weapon ESP"), (bool*)&g_Config.ints[XOR("weaponesp")].val);
+
 		ImGui::Checkbox(XOR("Thirdperson"), (bool*)&g_Config.ints[XOR("thirdperson")].val);
 		ImGui::Hotkey(XOR("Thirdperson-Key"), g_Config.arrints[XOR("thirdpersonkey")].val);
 
@@ -244,7 +271,7 @@ void Menu::Draw() {
 	}
 		  break;
 		  //MISC
-	case 3: {
+	case 4: {
 		ImGui::BeginChild(XOR("Main-Misc"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Main Misc"));
 		ImGui::Checkbox(XOR("Preserve TrustFactor"), (bool*)&g_Config.ints[XOR("trustfactor")].val); ImGui::HelpMarker(XOR("Disables / changes features of the cheat to not get flagged by VacNET (SEVERELY limits the cheats capabilities!!)"));

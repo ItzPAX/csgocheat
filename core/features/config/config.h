@@ -56,6 +56,7 @@ private:
 	int nameesp;
 	int boxesp;
 	int healthesp;
+	int weaponesp;
 	int thirdperson;
 	int thirdpersonkey[3];
 	int enemyglow;
@@ -65,12 +66,21 @@ private:
 	int weaponglow;
 	float weaponglowcol[4];
 
+	int antiaim;
+	int attargets;
+	int changepitch[3];
+	int pitch[3];
+	int changeyaw[3];
+	int yaw[3];
+	int desyncdelta[3];
+
 	int ragebot;
 	int ragebotkey[3];
 	int targetmode;
 	int autowall;
 	int ragedmg[3];
 	int ragehitchance[3];
+	int autoscope;
 	// SIZE = WEAPONTYPES[3] * HITBOXES[4]
 	int ragehitboxes[3 * 4];
 	int teamcheck;
