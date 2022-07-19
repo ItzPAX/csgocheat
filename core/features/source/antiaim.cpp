@@ -83,7 +83,7 @@ void AntiAim::DoDesync(CUserCmd* cmd, bool bShouldSendPacket) {
 		flOrientation = vViewangles.y;
 
 
-	cmd->viewangles.x = (float)g_Config.arrints[XOR("pitch")].val[iMode];
+	cmd->viewangles.x = (float)g_Config.arrints[XOR("pitch")].val[iMode] + ((bool)g_Config.arrints[XOR("jitter")].val[iMode] ? g_Math.RandomFloat(-10.f, 0.f) : 0.f);
 	cmd->viewangles.y = flOrientation + (float)g_Config.arrints[XOR("yaw")].val[iMode];
 	if (!bShouldSendPacket)
 		cmd->viewangles.y += (float)g_Config.arrints[XOR("desyncdelta")].val[iMode] / 2;

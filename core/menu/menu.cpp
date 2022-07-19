@@ -185,6 +185,7 @@ void Menu::Draw() {
 		ImGui::BeginChild(XOR("Mode-Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Mode Configuration"));
 		RenderClickableButtons({ XOR("Standing"), XOR("Moving"), XOR("In air") }, &g_AntiAim.iMenuMode, ImVec2{ vSize.x / 2, vSize.y }, style->WindowPadding.x + 5);
+		ImGui::Checkbox(XOR("Jitter"), (bool*)&g_Config.arrints[XOR("jitter")].val[g_AntiAim.iMenuMode]);
 		ImGui::Checkbox(XOR("Change Pitch"), (bool*)&g_Config.arrints[XOR("changepitch")].val[g_AntiAim.iMenuMode]);
 		if (g_Config.arrints[XOR("changepitch")].val[g_AntiAim.iMenuMode])
 			ImGui::SliderInt(XOR("Pitch"), &g_Config.arrints[XOR("pitch")].val[g_AntiAim.iMenuMode], 0.f, 89.f);

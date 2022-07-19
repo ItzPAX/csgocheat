@@ -205,6 +205,9 @@
     <ClCompile Include="..\core\features\source\ragebot.cpp">
       <Filter>core\features\source</Filter>
     </ClCompile>
+    <ClCompile Include="..\core\features\config\configv2.cpp">
+      <Filter>core\features\config</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes.h" />
@@ -477,6 +480,9 @@
     </ClInclude>
     <ClInclude Include="..\core\features\header\ragebot.h">
       <Filter>core\features\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\config\configv2.h">
+      <Filter>core\features\config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
