@@ -45,12 +45,12 @@ void Config::Init() {
 	SetupVal(weaponglow, 1, XOR("esp"), XOR("weaponglow"));
 	SetupVal(weaponglowcol, { 0.1f, 0.9f, 0.2f, 0.5f }, 4, XOR("esp"), XOR("weaponglowcol"));
 
-	SetupVal(antiaim, 1, XOR("antiaim"), XOR("antiaim"));
+	SetupVal(antiaim, 0, XOR("antiaim"), XOR("antiaim"));
 	SetupVal(attargets, 1, XOR("antiaim"), XOR("attargets"));
 	SetupVal(pitch, { 89,89,89 }, 3, XOR("antiaim"), XOR("pitch"));
 	SetupVal(yaw, { 180,180,180 }, 3, XOR("antiaim"), XOR("yaw"));
-	SetupVal(changepitch, { 1,1,1 }, 3, XOR("antiaim"), XOR("changepitch"));
-	SetupVal(changeyaw, { 1,1,1 }, 3, XOR("antiaim"), XOR("changeyaw"));
+	SetupVal(changepitch, { 0,0,0 }, 3, XOR("antiaim"), XOR("changepitch"));
+	SetupVal(changeyaw, { 0,0,0 }, 3, XOR("antiaim"), XOR("changeyaw"));
 	SetupVal(desyncdelta, { 30,30,30 }, 3, XOR("antiaim"), XOR("desyncdelta"));
 
 	SetupVal(ragebot, 0, XOR("ragebot"), XOR("ragebot"));
@@ -60,6 +60,8 @@ void Config::Init() {
 	SetupVal(ragedmg, { 20, 10, 25 }, 3, XOR("ragebot"), XOR("ragedmg"));
 	SetupVal(ragehitchance, { 20, 10, 25 }, 3, XOR("ragebot"), XOR("ragehitchance"));
 	SetupVal(ragehitboxes, { 0,0,0,0,0,0,0,0,0,0,0,0 }, 3 * 4, XOR("ragebot"), XOR("ragehitboxes"));
+	SetupVal(multipoint, 1, XOR("ragebot"), XOR("multipoint"));
+	SetupVal(multipointscale, 70.f, XOR("ragebot"), XOR("multipointscale"));
 	SetupVal(autoscope, 1, XOR("ragebot"), XOR("autoscope"));
 	SetupVal(teamcheck, 1, XOR("ragebot"), XOR("teamcheck"));
 	SetupVal(silent, 1, XOR("ragebot"), XOR("ragesilent"));
@@ -130,15 +132,18 @@ void Config::Save(std::string name) {
 }
 
 void Config::Load(int index) {
-	static char path[MAX_PATH];
-	std::string folder, file;
-
 	if (index >= configs.size()) {
 		status = CfgStatus{ true, XOR("Invalid Config selected") };
 		return;
 	}
 
 	std::string name = configs[index];
+	Load(name);
+}
+
+void Config::Load(std::string name) {
+	static char path[MAX_PATH];
+	std::string folder, file;
 	activeconfig = '[' + name + "]";
 
 	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path))) {
@@ -216,6 +221,59 @@ void Config::Delete(int index) {
 		status = CfgStatus{ false, XOR("Deleted Config: ") + name };
 	else
 		status = CfgStatus{ true, XOR("Error deleting Config: ") + name };
+}
+
+void Config::MakeDefault(int index) {
+	static char path[MAX_PATH];
+	std::string folder, file;
+
+	if (index >= configs.size()) {
+		status = CfgStatus{ true, XOR("Invalid Config selected") };
+		return;
+	}
+
+	std::string name = configs[index];
+
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path))) {
+		folder = std::string(path) + XOR("\\raybot\\");
+		file = folder + XOR("default.info");
+	}
+
+	std::ofstream outFile(file);
+	if (outFile.is_open())
+		outFile << configs[index];
+}
+
+std::string Config::GetDefault() {
+	static char path[MAX_PATH];
+	std::string folder, file;
+
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path))) {
+		folder = std::string(path) + XOR("\\raybot\\");
+		file = folder + XOR("default.info");
+	}
+
+	std::ifstream f(file);
+	std::ostringstream ss;
+	ss << f.rdbuf();
+
+	return ss.str();
+}
+
+void Config::LoadDefault() {
+	static char path[MAX_PATH];
+	std::string folder, file;
+
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path))) {
+		folder = std::string(path) + XOR("\\raybot\\");
+		file = folder + XOR("default.info");
+	}
+
+	std::ifstream f(file);
+	std::ostringstream ss;
+	ss << f.rdbuf();
+
+	Load(ss.str());
 }
 
 void Config::SetupVal(int& i, int def, std::string category, std::string name) {

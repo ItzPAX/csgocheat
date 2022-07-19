@@ -42,11 +42,11 @@ struct LagRecord {
 	}
 	 
 	void ApplyToPlayer(Player* pPlayer) {
-		//pPlayer->SetAngles(vAbsAngles);
-		//pPlayer->SetPosition(vAbsOrigin);
+		pPlayer->SetAngles(vAbsAngles);
+		pPlayer->SetPosition(vAbsOrigin);
 
-		//pPlayer->vOrigin() = vOrigin;
-		//pPlayer->vEyeAngles() = vAngles;
+		pPlayer->vOrigin() = vOrigin;
+		pPlayer->vEyeAngles() = vAngles;
 		
 		if (pPlayer->SetupBones(tempMat, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, g_Interface.pGlobalVars->flCurTime))
 			memcpy(tempMat, boneMat, sizeof(Matrix) * MAXSTUDIOBONES);

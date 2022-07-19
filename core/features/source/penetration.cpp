@@ -82,7 +82,7 @@ void Penetration::UTIL_ClipTraceToPlayers(const Vec3D& vecAbsStart, const Vec3D&
 	}
 }
 
-__forceinline bool Penetration::TraceToExit(trace_t& enterTrace, trace_t& exitTrace, Vec3D& vecPosition, Vec3D& vecDirection, Player* pClipPlayer) {
+__forceinline bool Penetration::TraceToExit(trace_t& enterTrace, trace_t& exitTrace, Vec3D& vecPosition, Vec3D& vecDirection, Player* pClipPlayer, FireBulletData_t* pData) {
 	float flMaxDistance = 90.f, flRayExtension = 4.f, flCurrDistance = 0;
 	int iStartContents = 0;
 
@@ -137,7 +137,7 @@ __forceinline bool Penetration::TraceToExit(trace_t& enterTrace, trace_t& exitTr
 			
 			if (exitTrace.DidHit() && !exitTrace.bStartSolid)
 			{
-				if (g_Penetration.IsBreakableEnt(enterTrace.pHitEntity) && g_Penetration.IsBreakableEnt(exitTrace.pHitEntity))
+				if (g_Penetration.IsBreakableEnt(enterTrace.pHitEntity, pData) && g_Penetration.IsBreakableEnt(exitTrace.pHitEntity, pData))
 					return true;
 			
 				if (enterTrace.surface.flags & SURF_NODRAW || !(exitTrace.surface.flags & SURF_NODRAW) && (exitTrace.plane.normal.Dot(vecDirection) <= 1.0f))
@@ -152,7 +152,7 @@ __forceinline bool Penetration::TraceToExit(trace_t& enterTrace, trace_t& exitTr
 			
 			if (!exitTrace.DidHit() || exitTrace.bStartSolid)
 			{
-				if (enterTrace.pHitEntity != nullptr && enterTrace.pHitEntity->iIndex() != 0 && g_Penetration.IsBreakableEnt(enterTrace.pHitEntity))
+				if (enterTrace.pHitEntity != nullptr && enterTrace.pHitEntity->iIndex() != 0 && g_Penetration.IsBreakableEnt(enterTrace.pHitEntity, pData))
 				{
 					// did hit breakable non world entity
 					exitTrace = enterTrace;
@@ -187,7 +187,7 @@ bool Penetration::HandleBulletPenetration(Player* pLocal, CCSWeaponData* pWeapon
 		return false;
 
 	trace_t exitTrace;
-	if (!TraceToExit(data.enterTrace, exitTrace, data.enterTrace.vecEnd, data.vecDirection, pLocal) && !(g_Interface.pEngineTrace->GetPointContents(data.enterTrace.vecEnd, MASK_SHOT_HULL, nullptr) & MASK_SHOT_HULL))
+	if (!TraceToExit(data.enterTrace, exitTrace, data.enterTrace.vecEnd, data.vecDirection, pLocal, &data) && !(g_Interface.pEngineTrace->GetPointContents(data.enterTrace.vecEnd, MASK_SHOT_HULL, nullptr) & MASK_SHOT_HULL))
 		return false;
 
 	const surfacedata_t* pExitSurfaceData = g_Interface.pSurfaceProps->GetSurfaceData(exitTrace.surface.surfaceProps);
@@ -413,27 +413,88 @@ float Penetration::ScaleDamage(Player* plPlayer, float flDamage, float flArmorRa
 	return std::floor(flDamage);
 }
 
-bool Penetration::IsBreakableEnt(Entity* pEnt) {
+bool Penetration::IsBreakableEnt(Entity* pEnt, FireBulletData_t* pData) {
 	using Fn = bool(__fastcall*)(Entity*);
 	static auto fn = reinterpret_cast<Fn>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x55\x8B\xEC\x51\x56\x8B\xF1\x85\xF6\x74\x68\x83\xBE"), XOR("xxxxxxxxxxxxx")));
 
 	if (!pEnt || !pEnt->iIndex())
 		return false;
 
-	auto take_damage{ (char*)((uintptr_t)pEnt + *(size_t*)((uintptr_t)fn + 0x26)) };
-	auto take_damage_backup{ *take_damage };
+	Entity* pWeapon = Game::g_pLocal->pGetActiveWeapon();
+	if (!pWeapon)
+		return false;
 
-	ClientClass* pClass = pEnt->cGetClientClass();
+	CCSWeaponData* data = pWeapon->GetWeaponData();
+	if (!data)
+		return false;
 
-	if (pClass->m_pNetworkName == XOR("CBreakableSurface"))
-		*take_damage = DAMAGE_YES;
-	else if (pClass->m_pNetworkName == XOR("CBaseDoor") || pClass->m_pNetworkName == XOR("CDynamicProp"))
-		*take_damage = DAMAGE_NO;
+	static size_t sizeTakeDamageOff{ *(size_t*)((uintptr_t)fn + 0x26) };
 
-	bool breakable = fn(pEnt);
-	*take_damage = take_damage_backup;
+	// get takedamage and save old takedamage.
 
-	return breakable;
+	char* cTakeDmg, cOldTakeDmg;
+	cTakeDmg = (char*)((uintptr_t)pEnt + sizeTakeDamageOff);
+	cOldTakeDmg = *cTakeDmg;
+
+	// create ray using bullet data
+	Ray_t rRay;
+	Vec3D vecEndPoint = pData->vecPosition + pData->vecDirection * data->flRange;
+	rRay.Init(pData->vecPosition, vecEndPoint);
+
+	// init trace with entity null
+	trace_t tTrace;
+	tTrace.pHitEntity = nullptr;
+
+	// filter out local player
+	CTraceFilter filFilter;
+	filFilter.pSkip = Game::g_pLocal;
+
+	// trace ray and check for entities with mask_solid flag
+	g_Interface.pEngineTrace->TraceRay(rRay, MASK_SOLID, &filFilter, &tTrace);
+
+	if (tTrace.flFraction == 1.0f) {
+		*cTakeDmg = DAMAGE_YES;
+		return true;
+	}
+
+	if (pEnt != nullptr && tTrace.pHitEntity == pEnt) {
+		*cTakeDmg = DAMAGE_YES;
+		return true;
+	}
+
+	// ok, no prop found using our tracing lets try it with indexing
+	if (pData->enterTrace.pHitEntity) {
+
+		ClientClass* pClientClass;
+		pClientClass = pData->enterTrace.pHitEntity->cGetClientClass();
+
+		if (pClientClass) {
+
+			// create cName of each entity
+			const char* cName;
+			cName = pClientClass->m_pNetworkName;
+
+			if ((cName[1] == 'B'
+				&& cName[9] == 'e'
+				&& cName[10] == 'S'
+				&& cName[16] == 'e')
+				|| cName[1] != 'B'
+				|| cName[5] != 'D') {
+				*cTakeDmg = DAMAGE_YES;
+				return true;
+			}
+		}
+	}
+
+	// ok, no prop found using our indexing lets try it with the in game function
+	if (fn(pData->enterTrace.pHitEntity)) {
+		*cTakeDmg = DAMAGE_YES;
+		return true;
+	}
+
+	// we found no prop, set back our old damage and return false
+	*cTakeDmg = cOldTakeDmg;
+	return false;
 }
 
 float Penetration::GetDamage(Player* local, const Vec3D& point, FireBulletData_t& dataOut) {

@@ -161,6 +161,9 @@ void Visuals::DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInf
 }
 
 void Visuals::DrawWeapon(RECT rPlayerRect, Player* pPlayer, Color col) {
+	if (!g_Interface.pEngine->IsInGame())
+		return;
+
 	Entity* weapon = pPlayer->pGetActiveWeapon();
 	if (!weapon)
 		return;

@@ -215,8 +215,8 @@ public:
 	}
 	Vec3D vOrigin() { return g_NetVars.Netvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecOrigin"), this); }
 	int iTeamNum() { return g_NetVars.Netvar<int>(XOR("DT_CSPlayer"), XOR("m_iTeamNum"), this); }
-	int iTickBase() { return g_NetVars.GetNetvar<int>(XOR("DT_CSPlayer"), XOR("m_nTickBase"), this); }
-	float flNextPrimary() { return g_NetVars.GetNetvar<float>(XOR("DT_BaseCombatWeapon"), XOR("m_flNextPrimaryAttack"), this); }
+	int iTickBase() { return g_NetVars.Netvar<int>(XOR("DT_CSPlayer"), XOR("m_nTickBase"), this); }
+	float flNextPrimary() { return g_NetVars.Netvar<float>(XOR("DT_BaseCombatWeapon"), XOR("m_flNextPrimaryAttack"), this); }
 	int iClip() { return g_NetVars.GetNetvar<int>(XOR("DT_CBaseCombatWeapon"), XOR("m_iClip1"), this); }
 	short iItemDefinitionIndex() { return g_NetVars.Netvar<short>(XOR("DT_BaseAttributableItem"), XOR("m_iItemDefinitionIndex"), this); }
 	Vec3D vBombOrigin() { return g_NetVars.Netvar<Vec3D>(XOR("DT_TEPlantBomb"), XOR("m_vecOrigin"), this); }

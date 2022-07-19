@@ -83,6 +83,8 @@ private:
 	int autoscope;
 	// SIZE = WEAPONTYPES[3] * HITBOXES[4]
 	int ragehitboxes[3 * 4];
+	int multipoint;
+	float multipointscale;
 	int teamcheck;
 	int silent;
 	int autoshoot;
@@ -129,8 +131,13 @@ public:
 		std::string name = configs[index];
 		Save(name);
 	}
+
 	void Load(int index);
+	void Load(std::string name);
 	void Delete(int index);
+	void MakeDefault(int index);
+	std::string GetDefault();
+	void LoadDefault();
 	Config() { Init(); activeconfig = "[Default]"; }
 
 	CfgStatus Status() { return status; }

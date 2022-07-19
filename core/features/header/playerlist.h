@@ -17,10 +17,10 @@ class PlayerList {
 private:
 	ImVec2 WindowSize = { 700,500 };
 	ImGuiStyle* style;
-	std::vector<PlayerListEntry> listentries;
 	std::string localplayername;
 public:
 	std::unordered_map<ulong, PlayerListSettings> settings;
+	std::vector<PlayerListEntry> listentries;
 
 	bool bListOpened = false;
 	int iselplayer = 0;

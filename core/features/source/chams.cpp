@@ -40,7 +40,7 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 	if (bEnemy) {
 
 		// backtrack chams
-		if (g_Config.ints[XOR("lagcompchams")].val) {
+		if (g_Config.ints[XOR("lagcompchams")].val && g_Backtrack.deqLagRecords[pPlayer->iIndex()].size() > 3) {
 			if (g_Config.ints[XOR("lagcompchamstype")].val == 1) {
 				for (int i = 0; i < g_Backtrack.deqLagRecords[pPlayer->iIndex()].size(); i++) {
 					if (!g_Backtrack.ValidTick(g_Backtrack.deqLagRecords[pPlayer->iIndex()][i]) || !g_Backtrack.deqLagRecords[pPlayer->iIndex()][i].boneMat)

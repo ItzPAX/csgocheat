@@ -46,6 +46,9 @@ ulong __stdcall Init::InitAll(void* p) {
 		return 0;
 	std::cout << XOR("[ RAYBOT ] Successfully Initialized ConVars\n");
 
+	g_Config.LoadDefault();
+	std::cout << XOR("[ RAYBOT ] Loaded default config: ") << g_Config.GetDefault() << std::endl;
+
 	return 1;
 }
 

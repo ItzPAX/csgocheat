@@ -1,10 +1,5 @@
 #pragma once
 
-struct MultiPoints {
-	std::vector<Vec3D> cSafePoints;
-	std::vector<Vec3D> cUnsafePoints;
-};
-
 class RageBot {
 private:
 	enum ETargetMode : int {
@@ -17,6 +12,9 @@ private:
 
 	Player* GetTargetPlayer();
 	void UpdateHitboxes();
+	void GetMultipoints(std::vector<int> hitboxes, Player* pPlayer, float flScale, std::vector<Vec3D>& multipoints);
+	Vec3D ExtrapolatePlayer(Player* pTarget, Vec3D vAimPos);
+	LagRecord* GetBestRecord(Player* pTarget);
 	bool HitChance();
 	std::vector<int> vAllowedHitboxes;
 

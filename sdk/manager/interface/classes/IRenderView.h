@@ -3,10 +3,10 @@
 
 class IRenderView {
 private:
-	virtual void __pad0();
-	virtual void __pad1();
-	virtual void __pad2();
-	virtual void __pad3();
+	virtual void __pad0() = 0;
+	virtual void __pad1() = 0;
+	virtual void __pad2() = 0;
+	virtual void __pad3() = 0;
 
 public:
 	virtual void SetBlend(float blend) = 0;

@@ -114,6 +114,8 @@ void Menu::Draw() {
 			ImGui::Checkbox(XOR("Silent"), (bool*)&g_Config.ints[XOR("ragesilent")].val);
 			ImGui::Checkbox(XOR("Autoshoot"), (bool*)&g_Config.ints[XOR("autoshoot")].val);
 			ImGui::Checkbox(XOR("Compensate recoil"), (bool*)&g_Config.ints[XOR("compensaterecoil")].val);
+			ImGui::Checkbox(XOR("Multipoint"), (bool*)&g_Config.ints[XOR("multipoint")].val);
+			ImGui::SliderFloat(XOR("Multipoint Scale"), &g_Config.floats[XOR("multipointscale")].val, 0.f, 100.f, "%.0f%", 1.f);
 		}
 		else {
 			ImGui::TextColored(ImVec4(0.9f, 0.2f, 0.2f, 1.f), XOR("Disabled due to Preserve TrustFactor"));
@@ -302,14 +304,18 @@ void Menu::Draw() {
 				g_Config.configs.push_back(p.path().stem().string());
 		}
 
-		char** CConfigArr = new char* [g_Config.configs.size()];
+		std::vector<char*> cstring;
+		std::string defaultname = g_Config.GetDefault();
 		for (size_t i = 0; i < g_Config.configs.size(); i++) {
-			CConfigArr[i] = new char[g_Config.configs[i].size() + 1];
-			strcpy(CConfigArr[i], g_Config.configs[i].c_str());
+			cstring.push_back(const_cast<char*>(g_Config.configs[i].c_str()));
+			if (g_Config.configs[i] == defaultname)
+				strcat(cstring[i], XOR(" [*]"));
 		}
 
 		ImGui::PushItemWidth(-1);
-		ImGui::ListBox(XOR(""), &g_Config.iSelConfig, &CConfigArr[0], g_Config.configs.size(), 5);
+		ImGui::ListBox(XOR(""), &g_Config.iSelConfig, &cstring[0], g_Config.configs.size(), 5);
+		if (ImGui::Button(XOR("Make default"), ImVec2(-1,25.f)))
+			g_Config.MakeDefault(g_Config.iSelConfig);
 		ImGui::NewLine();
 		static std::string name;
 		ImGui::PushStyleColor(ImGuiCol_TextDisabled, IM_COL32(150, 150, 150, 255));
@@ -340,11 +346,6 @@ void Menu::Draw() {
 		if (g_PlayerList.bListOpened ? ImGui::Button(XOR("Close Playerlist"), ImVec2(-1.f, 0.f)) : ImGui::Button(XOR("Open Playerlist"), ImVec2(-1.f, 0.f)))
 			g_PlayerList.bListOpened = !g_PlayerList.bListOpened;
 		ImGui::EndChild();
-
-		for (size_t i = 0; i < g_Config.configs.size(); i++) {
-			delete[] CConfigArr[i];
-		}
-		delete[] CConfigArr;
 	}
 
 		  break;

@@ -12,6 +12,14 @@
 HookManager g_HookManager{ };
 
 #pragma region HookDefs
+namespace IsHLTV {
+	using tIsHLTV = bool(__fastcall*)(void*, void*);
+	tIsHLTV oIsHLTV = nullptr;
+
+	int iIndex = 93;
+	__forceinline bool __fastcall hkIsHLTV(void* thisptr, void* edx);
+}
+
 namespace SvCheats {
 	using tSvCheats = bool(__thiscall*)(void*);
 	tSvCheats oSvCheats = nullptr;
@@ -110,6 +118,7 @@ bool HookManager::AddAllHooks() {
 	g_HookLib.AddHook(HookEntry("materialsystem.dll", g_Interface.pClientMode, DoPostScreenSpaceEffects::hkDoPostScreenSpaceEffects, DoPostScreenSpaceEffects::iIndex, (PVOID*)&DoPostScreenSpaceEffects::oDoPostScreenSpaceEffects));
 	g_HookLib.AddHook(HookEntry("materialsystem.dll", g_Interface.pStudioRender, DrawModel::hkDrawModel, DrawModel::iIndex, (PVOID*)&DrawModel::oDrawModel));
 	g_HookLib.AddHook(HookEntry("panorama.dll", g_Interface.pClient, HudUpdate::hkHudUpdate, HudUpdate::iIndex, (PVOID*)&HudUpdate::oHudUpdate));
+	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pEngine, IsHLTV::hkIsHLTV, IsHLTV::iIndex, (PVOID*)&IsHLTV::oIsHLTV));
 	g_HookLib.AddHook(HookEntry("panorama.dll", g_Interface.pSurface, LockCursor::hkLockCursor, LockCursor::iIndex, (PVOID*)&LockCursor::oLockCursor));
 	ConVar* pSvCheats = g_Interface.pICVar->FindVar(XOR("sv_cheats"));
 	g_HookLib.AddHook(HookEntry("panorama.dll", pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex, (PVOID*)&SvCheats::oSvCheats));
@@ -145,6 +154,21 @@ bool HookManager::ReleaseAll() {
 }
 
 #pragma region HkFunctions
+bool __fastcall IsHLTV::hkIsHLTV(void* thisptr, void* edx) {
+	if (!Game::g_pLocal)
+		return oIsHLTV(thisptr, edx);
+
+	static const auto velocity = g_Tools.SignatureScan(XOR("client.dll"), XOR("\x84\xC0\x75\x38\x8B\x0D\x00\x00\x00\x00\x8B\x01\x8B\x80\x00\x00\x00\x00\xFF\xD0"), XOR("xxxxxx????xxxx????xx"));
+	static const auto layers = g_Tools.SignatureScan(XOR("client.dll"), XOR("\x84\xC0\x75\x0D\xF6\x87"), XOR("xxxxxx"));
+
+	if (_ReturnAddress() == (uint32_t*)(layers))
+		return true;
+
+	if (_ReturnAddress() == (uint32_t*)(velocity))
+		return true;
+	return oIsHLTV(thisptr, edx);
+}
+
 bool __fastcall SvCheats::hkSvCheats(void* ConVar, int edx) {
 	static auto pCamThink = reinterpret_cast<void*>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x85\xC0\x75\x30\x38\x86"), XOR("xxxxxx")));
 
@@ -194,8 +218,11 @@ void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults*
 	g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
 }	
 bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {	
-	if (!g_Interface.pEngine->IsInGame())
+	if (!g_Interface.pEngine->IsInGame()) {
 		Game::g_pLocal = nullptr;
+		g_PlayerList.listentries.clear();
+		g_Misc.pSpectators.clear();
+	}
 
 	Game::g_pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
 
