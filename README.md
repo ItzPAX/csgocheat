@@ -1,7 +1,9 @@
 # csgocheat
 csgo-cheat project by ItzPAX
 
-TODO:
-Menu schön machen
-Vielleicht Semirage features(?)
-Mehr ESP optionen etc.
+A fully features CS:GO internal, featuring:\
+DirectX9 Hook with ImGui\
+Legitbot\
+Ragebot\
+ESP\
+Config System\
