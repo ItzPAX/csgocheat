@@ -185,7 +185,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)pch;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderOutputFile />
@@ -283,6 +283,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\core\features\config\config.cpp" />
+    <ClCompile Include="..\core\features\config\configv2.cpp" />
     <ClCompile Include="..\core\features\source\penetration.cpp" />
     <ClCompile Include="..\core\features\source\inputmgr.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -393,6 +394,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\core\features\config\config.h" />
+    <ClInclude Include="..\core\features\config\configv2.h" />
     <ClInclude Include="..\core\features\header\penetration.h" />
     <ClInclude Include="..\core\features\header\inputmgr.h" />
     <ClInclude Include="..\core\features\header\legitbot.h" />

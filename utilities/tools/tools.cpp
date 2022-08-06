@@ -24,6 +24,27 @@ void Tools::WriteToMemory(const char* addr, const char* src, int size) {
 	NtProtectVirtualMemory(hProc, (LPVOID*)addr, (SIZE_T*)size, oProc, &oProc);							//VirtualProtect((LPVOID)addr, size, oProc, &oProc);
 }
 
+DWORD Tools::SignatureScanEverywhere(const char* pSig, const char* mask) {
+	MODULEINFO mInfo = GetModuleInfo(NULL);
+
+	DWORD base = (DWORD)mInfo.lpBaseOfDll;
+	DWORD size = (DWORD)mInfo.SizeOfImage;
+
+	DWORD patternLength = (DWORD)strlen(mask);
+
+	for (DWORD i = 0; i < size - patternLength; i++) {
+		bool bFound = true;
+		for (DWORD j = 0; j < patternLength; j++) {
+			bFound &= mask[j] == '?' || pSig[j] == *(char*)(base + i + j);
+		}
+
+		if (bFound)
+			return base + i;
+	}
+	
+	return 0;
+}
+
 DWORD Tools::SignatureScan(const char* pModule, const char* pSig, const char* mask) {
 	MODULEINFO mInfo = GetModuleInfo(pModule);
 

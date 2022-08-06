@@ -49,10 +49,11 @@ void Config::Init() {
 
 	SetupVal(antiaim, 0, XOR("antiaim"), XOR("antiaim"));
 	SetupVal(attargets, 1, XOR("antiaim"), XOR("attargets"));
-	SetupVal(pitch, { 89,89,89 }, 3, XOR("antiaim"), XOR("pitch"));
-	SetupVal(yaw, { 180,180,180 }, 3, XOR("antiaim"), XOR("yaw"));
+	SetupVal(jitter, 0, XOR("antiaim"), XOR("jitter"));
 	SetupVal(changepitch, { 0,0,0 }, 3, XOR("antiaim"), XOR("changepitch"));
+	SetupVal(pitch, { 89,89,89 }, 3, XOR("antiaim"), XOR("pitch"));
 	SetupVal(changeyaw, { 0,0,0 }, 3, XOR("antiaim"), XOR("changeyaw"));
+	SetupVal(yaw, { 180,180,180 }, 3, XOR("antiaim"), XOR("yaw"));
 	SetupVal(desyncdelta, { 30,30,30 }, 3, XOR("antiaim"), XOR("desyncdelta"));
 	SetupVal(jitter, { 30,30,30 }, 3, XOR("antiaim"), XOR("jitter"));
 	SetupVal(fakelag, 1, XOR("antiaim"), XOR("fakelag"));
