@@ -13,7 +13,6 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
 		if (!hThread)
 			return 0;
 		CloseHandle(hThread);
-
 		break;
 	}
 

@@ -9,7 +9,7 @@
 #pragma region HookEntries
 enum MODE {
     MODE_NONE,
-    MODE_MARLIN,
+    MODE_EMLIN,
     MODE_VEH,
     MODE_TRUSTEDMODULE
 };
@@ -36,12 +36,12 @@ struct HookEntry {
         cModuleName = modulename; pVirtualTable = vtable; pTargetFunction = targetfunc; iInd = index; iMode = MODE_TRUSTEDMODULE; oFunc = ofunc;
     }
 
-    // MARLIN
+    // EMLIN
     char* psrc;
     char* pdst;
     short ilen;
     HookEntry(char* src, char* dst, short len, PVOID* ofunc) {
-        psrc = src; pdst = dst; ilen = len; iMode = MODE_MARLIN; oFunc = ofunc;
+        psrc = src; pdst = dst; ilen = len; iMode = MODE_EMLIN; oFunc = ofunc;
     }
 };
 
@@ -171,8 +171,9 @@ private:
 
     uintptr_t FindCodeCave(const char* cModuleName, size_t iSize);
 #pragma endregion
-#pragma region MarlinHook
-    uintptr_t MarlinHook(uintptr_t target, uintptr_t trampoline, size_t iSize, bool* enabled);
+    /*NOT FULLY IMPLEMENTED YET FOR x86*/
+#pragma region EmlinHook
+    uintptr_t EmlinHook(uintptr_t target, uintptr_t trampoline, size_t iSize, bool* enabled);
 #pragma endregion
 };
 

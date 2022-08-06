@@ -306,7 +306,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugCheat|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\core\features\source\playerlist.cpp" />
+    <ClCompile Include="..\core\features\source\prediction.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugCheat|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\core\features\source\ragebot.cpp" />
+    <ClCompile Include="..\core\features\source\resolver.cpp" />
     <ClCompile Include="..\core\features\source\visuals.cpp" />
     <ClCompile Include="..\core\hooks\directx\directx.cpp" />
     <ClCompile Include="..\core\hooks\hooks.cpp" />
@@ -396,7 +401,9 @@
     <ClInclude Include="..\core\features\header\chams.h" />
     <ClInclude Include="..\core\features\header\misc.h" />
     <ClInclude Include="..\core\features\header\playerlist.h" />
+    <ClInclude Include="..\core\features\header\prediction.h" />
     <ClInclude Include="..\core\features\header\ragebot.h" />
+    <ClInclude Include="..\core\features\header\resolver.h" />
     <ClInclude Include="..\core\features\header\visuals.h" />
     <ClInclude Include="..\core\hooks\clientmode\clientmode.h" />
     <ClInclude Include="..\core\hooks\client\framestagenotify.h" />
@@ -424,6 +431,7 @@
     <ClInclude Include="..\core\security\security.h" />
     <ClInclude Include="..\includes.h" />
     <ClInclude Include="..\pch\pch.h" />
+    <ClInclude Include="..\sdk\classes\anim.h" />
     <ClInclude Include="..\sdk\classes\convar.h" />
     <ClInclude Include="..\sdk\classes\cusercmd.h" />
     <ClInclude Include="..\sdk\classes\CUtlVector.h" />
@@ -453,8 +461,10 @@
     <ClInclude Include="..\sdk\manager\interface\classes\IInputSystem.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IMaterial.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IMaterialSystem.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IMDLCache.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IPanel.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IPhysicsSurfaceProps.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IPlayerMovement.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IRenderView.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IStudioRender.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\ISurface.h" />

@@ -30,6 +30,8 @@ struct VarMapping_t
 	float						m_lastInterpolationTime;
 };
 
+class CCSGOPlayerAnimState;
+
 class Entity {
 public:
 	enum EntityFlags {
@@ -217,6 +219,7 @@ public:
 	int iTeamNum() { return g_NetVars.Netvar<int>(XOR("DT_CSPlayer"), XOR("m_iTeamNum"), this); }
 	int iTickBase() { return g_NetVars.Netvar<int>(XOR("DT_CSPlayer"), XOR("m_nTickBase"), this); }
 	float flNextPrimary() { return g_NetVars.Netvar<float>(XOR("DT_BaseCombatWeapon"), XOR("m_flNextPrimaryAttack"), this); }
+	float flNextAttack() { return g_NetVars.GetNetvar<float>(XOR("DT_CSPlayer"), XOR("m_flNextAttack"), this); }
 	int iClip() { return g_NetVars.GetNetvar<int>(XOR("DT_CBaseCombatWeapon"), XOR("m_iClip1"), this); }
 	short iItemDefinitionIndex() { return g_NetVars.Netvar<short>(XOR("DT_BaseAttributableItem"), XOR("m_iItemDefinitionIndex"), this); }
 	Vec3D vBombOrigin() { return g_NetVars.Netvar<Vec3D>(XOR("DT_TEPlantBomb"), XOR("m_vecOrigin"), this); }
@@ -237,12 +240,54 @@ public:
 		(*(original_fn**)this)[223](this);
 	}
 
+	void UpdateCollisionBounds() {
+		using original_fn = void(__thiscall*)(void*);
+		(*(original_fn**)this)[340](this);
+	}
+
 	Vec3D vGetBonePosition(int bone) {
 		Matrix BoneMatrix[MAXSTUDIOBONES];
 		if (SetupBones(BoneMatrix, MAXSTUDIOBONES, BONE_USED_BY_HITBOX, g_Interface.pGlobalVars->flCurTime))
 			return Vec3D{ BoneMatrix[bone][0][3], BoneMatrix[bone][1][3], BoneMatrix[bone][2][3] };
 		else
 			return Vec3D();
+	}
+
+	/*FIXMEFIXME*/
+	//void PostThink() {
+	//	using PostThinkVPhysicsFn = bool(__thiscall*)(Player*);
+	//	static auto oPostThinkVPhysics = reinterpret_cast<PostThinkVPhysicsFn>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x55\x8B\xEC\x83\xE4\xF8\x81\xEC\x00\x00\x00\x00\x53\x8B\xD9\x56\x57\x83\xBB"), XOR("xxxxxxxx????xxxxxxx")));
+	//
+	//	using SimulatePlayerSimulatedEntitiesFn = void(__thiscall*)(Player*);
+	//	static auto oSimulatePlayerSimulatedEntities = reinterpret_cast<SimulatePlayerSimulatedEntitiesFn>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x56\x8B\xF1\x57\x8B\xBE\x00\x00\x00\x00\x83\xEF\x01\x78\x74"), XOR("xxxxxx????xxxxx")));
+	//
+	//	if (!oPostThinkVPhysics || !oSimulatePlayerSimulatedEntities)
+	//		return;
+	//
+	//	g_Interface.pMDLCache->BeginLock();
+	//
+	//	if (this->bIsAlive())
+	//	{
+	//		this->UpdateCollisionBounds();
+	//
+	//		if (this->iFlags() & FL_ONGROUND)
+	//			*this->GetFallVelocity() = 0.f;
+	//
+	//		if (this->iSequence() == -1)
+	//			this->SetSequence(0);
+	//
+	//		this->StudioAdvanceFrame();
+	//		oPostThinkVPhysics(this);
+	//	}
+	//
+	//	oSimulatePlayerSimulatedEntities(this);
+	//
+	//	g_Interface.pMDLCache->EndLock();
+	//}
+
+	void PostThink() {
+		using original_fn = Entity * (__thiscall*)(void*);
+		(*(original_fn**)this)[319](this);
 	}
 
 	Vec3D vGetHitboxPos(int hitbox) {
@@ -282,6 +327,52 @@ public:
 		return vEyeOrig;
 	}
 
+	CCSGOPlayerAnimState* GetAnimState() {
+		//std::cout << "m_bIsScoped: " << g_NetVars.GetOffsetDirect(XOR("DT_CSPlayer") << std::endl;
+		return *reinterpret_cast<CCSGOPlayerAnimState**>(this + (g_NetVars.GetOffsetDirect(XOR("DT_CSPlayer"), XOR("m_bIsScoped")) - 0x14));
+	}
+
+	CUserCmd** GetCurrentCommand() {
+		return *reinterpret_cast<CUserCmd***>(this + (g_NetVars.GetOffsetDirect(XOR("CBasePlayer"), XOR("m_hViewEntity")) - 0x4));
+	}
+
+	CUserCmd& GetLastCommand() {
+		static const std::uintptr_t uLastCommandOffset = *reinterpret_cast<std::uintptr_t*>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8D\x8E\x00\x00\x00\x00\x89\x5C\x24\x3C"), XOR("xx????xxxx")) + 0x2);
+		return *reinterpret_cast<CUserCmd*>(reinterpret_cast<std::uintptr_t>(this) + uLastCommandOffset);
+	}
+
+	int GetForcedButtons() {
+		return *reinterpret_cast<int*>(this + (g_NetVars.GetOffsetDirect(XOR("CBasePlayer"), XOR("m_hViewEntity")) - 0x8));
+	}
+
+	int GetButtonDisabled() {
+		return *reinterpret_cast<int*>(this + (g_NetVars.GetOffsetDirect(XOR("CBasePlayer"), XOR("m_hViewEntity")) - 0xC));
+	}
+
+	void SetSequence(int seq) {
+		using original_fn = void(__thiscall*)(void*, int);
+		(*(original_fn**)this)[219](this, seq);
+	}
+
+	void PreThink() {
+		using original_fn = void(__thiscall*)(void*);
+		(*(original_fn**)this)[318](this);
+	}
+
+	void Think() {
+		using original_fn = void(__thiscall*)(void*);
+		(*(original_fn**)this)[139](this);
+	}
+
+	void StudioAdvanceFrame() {
+		using original_fn = void(__thiscall*)(void*);
+		(*(original_fn**)this)[220](this);
+	}
+
+	float* GetFallVelocity() {
+		return reinterpret_cast<float*>(g_NetVars.GetOffsetDirect(XOR("CBasePlayer"), XOR("m_flFallVelocity")) + this);
+	}
+
 	Entity* pGetActiveWeapon() {
 		using original_fn = Entity* (__thiscall*)(void*);
 		return (*(original_fn**)this)[268](this);
@@ -317,12 +408,16 @@ public:
 	bool bHasHelmet() { return g_NetVars.Netvar<bool>(XOR("DT_CSPlayer"), XOR("m_bHasHelmet"), this); }
 	bool bHasHeavyArmor() { return g_NetVars.Netvar<bool>(XOR("DT_CSPlayer"), XOR("m_bHasHeavyArmor"), this); }
 	int iArmor() { return g_NetVars.Netvar<int>(XOR("DT_CSPlayer"), XOR("m_ArmorValue"), this); }
+	int iSequence() { return g_NetVars.Netvar<int>(XOR("CBaseAnimating"), XOR("m_nSequence"), this); }
 
 	Vec3D vEyeAngles() { return g_NetVars.Netvar<Vec3D>(XOR("DT_CSPlayer"), XOR("m_angEyeAngles"), this); }
 	int iShotsFired() { return g_NetVars.Netvar<int>(XOR("DT_CSPlayer"), XOR("m_iShotsFired"), this); }
 	int iFlags() { return g_NetVars.Netvar<int>(XOR("DT_CSPlayer"), XOR("m_fFlags"), this); }
 
-	float flOldSimTime() {
-		return g_NetVars.Netvar<float>(XOR("DT_CSPlayer"), XOR("m_flSimulationTime"), this + 0x4);;
+	int iNextThinkTick() { return g_NetVars.Netvar<int>(XOR("CBasePlayer"), XOR("m_nNextThinkTick"), this); }
+
+	float& flOldSimTime() {
+		const static auto offset = g_NetVars.GetOffsetDirect("DT_BaseEntity", "m_flSimulationTime") + 0x4;
+		return *reinterpret_cast<float*>(this + offset);
 	}
 };

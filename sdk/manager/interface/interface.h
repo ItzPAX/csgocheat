@@ -21,6 +21,8 @@
 #include "classes/IClientLeafSystem.h"
 #include "classes/CGlowObjectManager.h"
 #include "classes/IPhysicsSurfaceProps.h"
+#include "classes/IPlayerMovement.h"
+#include "classes/IMDLCache.h"
 #include "classes/IWeaponSystem.h"
 
 class Interface {
@@ -49,7 +51,11 @@ public:
 	IWeaponSystem* pWeaponSystem;
 	ICvarQuery* pICVarQuery;
 	IEngineTrace* pEngineTrace;
+	PlayerGameMovement* pGameMovement;
+	PlayerMoveHelper* pMoveHelper;
+	PlayerPrediction* pPrediction;
 	IClientLeafSystem* pClientLeafSystem;
+	IMDLCache* pMDLCache;
 	IInput* pInput;
 
 	// TODO: Find Interface entry for this

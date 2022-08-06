@@ -2,6 +2,20 @@
 
 AntiAim g_AntiAim;
 
+bool AntiAim::FL_ShouldSendPacket(CUserCmd* cmd)
+{
+	static int iC = 0;
+
+	if (iC <= g_Config.ints[XOR("fakelag")].val && Game::g_pLocal->bIsAlive() && !(cmd->buttons & CUserCmd::IN_ATTACK) && !(cmd->buttons & CUserCmd::IN_USE))
+	{
+		iC++;
+		return false;
+	}
+
+	iC = 0;
+	return true;
+}
+
 void AntiAim::SetMode() {
 	// Standing
 	if (Game::g_pLocal->iFlags() & Entity::FL_ONGROUND && Game::g_pLocal->vGetVelocity().Length() < 0.1f) {
@@ -85,6 +99,9 @@ void AntiAim::DoDesync(CUserCmd* cmd, bool bShouldSendPacket) {
 
 	cmd->viewangles.x = (float)g_Config.arrints[XOR("pitch")].val[iMode];
 	cmd->viewangles.y = flOrientation + (float)g_Config.arrints[XOR("yaw")].val[iMode];
+
+	cmd->viewangles.y += g_Math.RandomFloat(-g_Config.arrints[XOR("jitter")].val[iMode], g_Config.arrints[XOR("jitter")].val[iMode]);
+
 	if (!bShouldSendPacket)
 		cmd->viewangles.y += (float)g_Config.arrints[XOR("desyncdelta")].val[iMode] / 2;
 	if (bShouldSendPacket)

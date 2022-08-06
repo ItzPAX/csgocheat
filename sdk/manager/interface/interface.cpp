@@ -60,6 +60,9 @@ bool Interface::Init() {
 	pSurfaceProps = (IPhysicsSurfaceProps*)GetInterface(XOR("Vphysics.dll"), XOR("VPhysicsSurfaceProps"));
 	pICVarQuery = (ICvarQuery*)GetInterface(XOR("vstdlib.dll"), XOR("VCvarQuery"));
 	pClientLeafSystem = (IClientLeafSystem*)GetInterface(XOR("client.dll"), XOR("ClientLeafSystem"));
+	pPrediction = (PlayerPrediction*)GetInterface(XOR("client.dll"), XOR("VClientPrediction"));
+	pGameMovement = (PlayerGameMovement*)GetInterface(XOR("client.dll"), XOR("GameMovement"));
+	pMDLCache = (IMDLCache*)GetInterface(XOR("datacache.dll"), XOR("MDLCache"));
 
 	// custom interfaces
 	pGlobalVars = **reinterpret_cast<CGlobalVars***>((*reinterpret_cast<uintptr_t**>(pClient))[11] + 10);
@@ -69,6 +72,7 @@ bool Interface::Init() {
 	pClientMode = **reinterpret_cast<IClientMode***>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8B\x0D\x00\x00\x00\x00\x8B\x01\x5D\xFF\x60\x30"), XOR("xx????xxxxxx")) + 0x02);
 	pInput = *reinterpret_cast<IInput**>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\xB9\x00\x00\x00\x00\xF3\x0F\x11\x04\x24\xFF\x50\x10"), XOR("x????xxxxxxxx")) + 0x01);
 	pWeaponSystem = *reinterpret_cast<IWeaponSystem**>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8B\x35\x00\x00\x00\x00\xFF\x10\x0F\xB7\xC0"), XOR("xx????xxxxx")) + 0x02);
+	pMoveHelper = **reinterpret_cast<PlayerMoveHelper***>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8B\x0D\x00\x00\x00\x00\x8B\x46\x08\x68"), XOR("xx????xxxx")) + 0x02);
 
 	return true;
 }

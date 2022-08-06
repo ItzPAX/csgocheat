@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "includes.h"
 
+
 Config g_Config;
 
 void Config::Init() {
@@ -31,6 +32,7 @@ void Config::Init() {
 	SetupVal(friendlyinviscol, { 0.3f, 0.5f, 0.9f, 1.f }, 4, XOR("chams"), XOR("friendlyinviscol"));
 
 	SetupVal(watermark, 1, XOR("visuals"), XOR("watermark"));
+	SetupVal(aspectartio, 1.25, XOR("misc"), XOR("aspectratio"));
 
 	SetupVal(boxesp, 1, XOR("esp"), XOR("boxesp"));
 	SetupVal(nameesp, 1, XOR("esp"), XOR("nameesp"));
@@ -52,9 +54,12 @@ void Config::Init() {
 	SetupVal(changepitch, { 0,0,0 }, 3, XOR("antiaim"), XOR("changepitch"));
 	SetupVal(changeyaw, { 0,0,0 }, 3, XOR("antiaim"), XOR("changeyaw"));
 	SetupVal(desyncdelta, { 30,30,30 }, 3, XOR("antiaim"), XOR("desyncdelta"));
+	SetupVal(jitter, { 30,30,30 }, 3, XOR("antiaim"), XOR("jitter"));
+	SetupVal(fakelag, 1, XOR("antiaim"), XOR("fakelag"));
 
 	SetupVal(ragebot, 0, XOR("ragebot"), XOR("ragebot"));
 	SetupVal(ragebotkey, { 0, ImGuiHotkeyMode_KEYDOWN, 0 }, 3, XOR("ragebot"), XOR("ragebotkey"));
+	SetupVal(resolver, 0, XOR("ragebot"), XOR("resolver"));
 	SetupVal(targetmode, 0, XOR("ragebot"), XOR("targetmode"));
 	SetupVal(autowall, 1, XOR("ragebot"), XOR("autowall"));
 	SetupVal(ragedmg, { 20, 10, 25 }, 3, XOR("ragebot"), XOR("ragedmg"));

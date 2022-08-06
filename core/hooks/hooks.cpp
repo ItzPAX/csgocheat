@@ -12,6 +12,13 @@
 HookManager g_HookManager{ };
 
 #pragma region HookDefs
+namespace IsPaused {
+	using tIsPaused = bool(__fastcall*)(void*);
+	tIsPaused oIsPaused = nullptr;
+
+	int iIndex = 90;
+	__forceinline bool __fastcall hkIsPaused(void* thisptr);
+}
 namespace IsHLTV {
 	using tIsHLTV = bool(__fastcall*)(void*, void*);
 	tIsHLTV oIsHLTV = nullptr;
@@ -123,6 +130,7 @@ bool HookManager::AddAllHooks() {
 	ConVar* pSvCheats = g_Interface.pICVar->FindVar(XOR("sv_cheats"));
 	g_HookLib.AddHook(HookEntry("panorama.dll", pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex, (PVOID*)&SvCheats::oSvCheats));
 	g_HookLib.AddHook(HookEntry("panorama.dll", g_Interface.pClient, FSN::hkFrameStageNotfy, FSN::iIndex, (PVOID*)&FSN::oFrameStageNotify));
+	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pEngine, IsPaused::hkIsPaused, IsPaused::iIndex, (PVOID*)&IsPaused::oIsPaused));
 
 	g_HookManager.bHooksAdded = true;
 	return true;
@@ -154,18 +162,29 @@ bool HookManager::ReleaseAll() {
 }
 
 #pragma region HkFunctions
+bool __fastcall IsPaused::hkIsPaused(void* thisptr) {
+	static DWORD* return_to_extrapolation = (DWORD*)(g_Tools.SignatureScan("client.dll",
+		XOR("\xFF\xD0\xA1\x00\x00\x00\x00\xB9\x00\x00\x00\x00\xD9\x1D\x00\x00\x00\x00\xFF\x50\x34\x85\xC0\x74\x22\x8B\x0D\x00\x00\x00\x00"), XOR("xxx????x????xx????xxxxxxxxx????")) + 0x29);
+
+	if (_ReturnAddress() == (void*)return_to_extrapolation)
+		return true;
+
+	return oIsPaused(thisptr);
+}
+
 bool __fastcall IsHLTV::hkIsHLTV(void* thisptr, void* edx) {
 	if (!Game::g_pLocal)
 		return oIsHLTV(thisptr, edx);
 
-	static const auto velocity = g_Tools.SignatureScan(XOR("client.dll"), XOR("\x84\xC0\x75\x38\x8B\x0D\x00\x00\x00\x00\x8B\x01\x8B\x80\x00\x00\x00\x00\xFF\xD0"), XOR("xxxxxx????xxxx????xx"));
+	static const auto velocity = g_Tools.SignatureScan(XOR("client.dll"), XOR("\x84\xC0\x75\x38\x8B\x0D\x00\x00\x00\x00\x8B\x01\x8B\x80"), XOR("xxxxxx????xxxx"));
 	static const auto layers = g_Tools.SignatureScan(XOR("client.dll"), XOR("\x84\xC0\x75\x0D\xF6\x87"), XOR("xxxxxx"));
-
+	
 	if (_ReturnAddress() == (uint32_t*)(layers))
 		return true;
 
 	if (_ReturnAddress() == (uint32_t*)(velocity))
 		return true;
+
 	return oIsHLTV(thisptr, edx);
 }
 
@@ -218,13 +237,12 @@ void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults*
 	g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
 }	
 bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {	
+	Game::g_pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
+
 	if (!g_Interface.pEngine->IsInGame()) {
-		Game::g_pLocal = nullptr;
 		g_PlayerList.listentries.clear();
 		g_Misc.pSpectators.clear();
 	}
-
-	Game::g_pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
 
 	if (!cmd || !cmd->command_number)
 		return false;

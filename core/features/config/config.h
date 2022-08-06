@@ -52,6 +52,7 @@ private:
 	float friendlyinviscol[4];
 
 	int watermark;
+	float aspectartio;
 
 	int nameesp;
 	int boxesp;
@@ -73,8 +74,11 @@ private:
 	int changeyaw[3];
 	int yaw[3];
 	int desyncdelta[3];
+	int jitter[3];
+	int fakelag;
 
 	int ragebot;
+	int resolver;
 	int ragebotkey[3];
 	int targetmode;
 	int autowall;

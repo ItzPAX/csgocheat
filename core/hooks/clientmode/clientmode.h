@@ -9,6 +9,11 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	__asm mov pFramePointer, ebp;
 	bool& bSendPacket = *reinterpret_cast<bool*>(*pFramePointer - 0x1C);
 
+	bSendPacket = g_AntiAim.FL_ShouldSendPacket(cmd);
+
+	if (bSendPacket)
+		g_Misc.SetClantag(XOR("LaTeX-Cheat"));
+
 	// update the playerlist
 	g_PlayerList.UpdatePlayerList();
 	g_Misc.UpdateSpectators();
@@ -19,12 +24,18 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 		bClientModeInit = true;
 	}
 
+	cmd->buttons |= CUserCmd::IN_BULLRUSH;
+	g_Misc.BunnyHop(cmd);
+
 	// save old move values to be able to normally move when shooting
 	Vec3D vOldViewangles = cmd->viewangles;
 	float flOldForward = cmd->forwardmove;
 	float flOldSide = cmd->sidemove;
 
 	if (Game::g_pLocal->bIsAlive()) {
+		/*FIXME FIXME FIXME PatternScan wrong*/
+		g_Prediction.Start(cmd, Game::g_pLocal);
+
 		LagRecord pRecord;
 		g_LegitBot.GetTargetRecord(cmd, &pRecord);
 		g_LegitBot.RunAimbot(cmd, &pRecord);
@@ -33,9 +44,10 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 
 		g_Ragebot.RunAimbot(cmd);
 		g_AntiAim.DoDesync(cmd, bSendPacket);
+
+		g_Prediction.End(cmd, Game::g_pLocal);
 	}
 
-	g_Misc.BunnyHop(cmd);
 	g_Math.CorrectMovement(vOldViewangles, cmd, flOldForward, flOldSide);
 
 	cmd->forwardmove = std::clamp(cmd->forwardmove, -450.0f, 450.0f);
@@ -51,7 +63,7 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	Game::g_pCmd = cmd;
 
 	// choke one tick
-	bSendPacket = !bSendPacket;
+	//bSendPacket = !bSendPacket;
 }
 
 void cDoPostScreenSpaceEffects() {

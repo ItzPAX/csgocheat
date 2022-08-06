@@ -236,8 +236,8 @@ bool RageBot::GunReady() {
 	if (!Game::g_pLocal->pGetActiveWeapon() || Game::g_pLocal->pGetActiveWeapon()->iClip() <= 0)
 		return false;
 
-	float flServerTime = Game::g_pLocal->iTickBase() * g_Interface.pGlobalVars->flIntervalPerTick;
-	return Game::g_pLocal->pGetActiveWeapon()->flNextPrimary() <= flServerTime;
+	float flServerTime = static_cast<float>(Game::g_pLocal->iTickBase()) * g_Interface.pGlobalVars->flIntervalPerTick;
+	return flServerTime >= Game::g_pLocal->flNextAttack() && flServerTime >= Game::g_pLocal->pGetActiveWeapon()->flNextPrimary();
 }
 
 bool RageBot::HitChance() {
@@ -320,6 +320,13 @@ void RageBot::RunAimbot(CUserCmd* cmd) {
 	LagRecord backuprecord(pTargetPlayer);
 	if (g_Config.ints[XOR("lagcomp")].val)
 		pTargetRecord->ApplyToPlayer(pTargetPlayer);
+
+	//---------------------------
+	//---------------------------
+	g_Resolver.ResolvePlayer(pTargetPlayer);
+	//---------------------------
+	//---------------------------
+
 
 	if (g_Config.ints[XOR("multipoint")].val)
 		GetMultipoints(vAllowedHitboxes, pTargetPlayer, g_Config.floats[XOR("multipointscale")].val, vAimPoints);

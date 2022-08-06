@@ -161,7 +161,7 @@ void Visuals::DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInf
 }
 
 void Visuals::DrawWeapon(RECT rPlayerRect, Player* pPlayer, Color col) {
-	if (!g_Interface.pEngine->IsInGame())
+	if (!g_Interface.pEngine->IsInGame() || !pPlayer)
 		return;
 
 	Entity* weapon = pPlayer->pGetActiveWeapon();
@@ -346,7 +346,7 @@ void Visuals::OnEndScene() {
 	for (int i = 0; i < pSortedPlayers.size(); i++) {
 		// get and validate player
 		Player* pPlayer = pSortedPlayers[i].pPlayer;
-		if (!pPlayer || pPlayer == Game::g_pLocal || !pPlayer->bIsAlive() || !pPlayer->bIsEnemy(Game::g_pLocal))
+		if (!pPlayer || pPlayer == Game::g_pLocal || !pPlayer->bIsAlive() || !pPlayer->bIsEnemy(Game::g_pLocal) || !pPlayer->bIsPlayer())
 			continue;
 
 		// get player rect

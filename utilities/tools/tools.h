@@ -3,12 +3,10 @@
 #include <Psapi.h>
 
 class Tools {
-private:
-	MODULEINFO GetModuleInfo(const char* szModule);
-
 public:
 	void WriteToMemory(const char* addr, const char* src, int size);
 	DWORD SignatureScan(const char* pModule, const char* pSig, const char* mask);
+	MODULEINFO GetModuleInfo(const char* szModule);
 
 	template <typename T, typename U>
 	T CallVirtual(U base, int index);

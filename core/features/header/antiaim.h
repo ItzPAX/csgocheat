@@ -17,6 +17,7 @@ private:
 public:
 	int iMenuMode = 0;
 	void DoDesync(CUserCmd* cmd, bool bShouldSendPacket);
+	bool FL_ShouldSendPacket(CUserCmd* cmd);
 };
 
 extern AntiAim g_AntiAim;

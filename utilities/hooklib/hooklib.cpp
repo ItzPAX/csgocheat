@@ -48,7 +48,7 @@ BOOL HookLib::EnableAll() {
         case MODE_TRUSTEDMODULE:
             *entry.oFunc = AddHook(entry.cModuleName, entry.pVirtualTable, entry.pTargetFunction, entry.iInd);
             break;
-        case MODE_MARLIN:
+        case MODE_EMLIN:
             *entry.oFunc = AddHook(entry.psrc, entry.pdst, entry.ilen);
             break;
         default:
@@ -161,7 +161,7 @@ LPVOID HookLib::AddHook(PVOID pHkFunc, PVOID pVTable, INT16 iIndex, const char* 
 }
 #pragma endregion
 
-/*REPLACE WITH MARLIN HOOK*/
+/*REPLACE WITH EMLIN HOOK*/
 #pragma region TrampHook
 VOID HookLib::Patch(char* dst, char* src, SIZE_T len) {
     //NtProtectVirtualMemory(hProc, &ppCodeCave, (PSIZE_T)&size, PAGE_EXECUTE_READWRITE, &oProc);
@@ -275,7 +275,7 @@ void* HookLib::AddHook(const char* cModuleName, void* pVirtualTable, void* pTarg
 #pragma endregion
 
 /*TODO:*/
-uintptr_t HookLib::MarlinHook(uintptr_t target, uintptr_t trampoline, size_t iSize, bool* enabled)
+uintptr_t HookLib::EmlinHook(uintptr_t target, uintptr_t trampoline, size_t iSize, bool* enabled)
 {
     DWORD oProt;
 

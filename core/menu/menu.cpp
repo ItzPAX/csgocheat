@@ -108,6 +108,7 @@ void Menu::Draw() {
 			ImGui::Hotkey(XOR("Ragebot-Key"), g_Config.arrints[XOR("ragebotkey")].val);
 			const char* targetmodes[] = { "Damage", "Crosshair", "Distance" };
 			ImGui::Combo(XOR("Target selection"), &g_Config.ints[XOR("targetmode")].val, targetmodes, IM_ARRAYSIZE(targetmodes));
+			ImGui::Checkbox(XOR("Resolver"), (bool*)&g_Config.ints[XOR("resolver")].val);
 			ImGui::Checkbox(XOR("Autowall"), (bool*)&g_Config.ints[XOR("autowall")].val);
 			ImGui::Checkbox(XOR("Autoscope"), (bool*)&g_Config.ints[XOR("autoscope")].val);
 			ImGui::Checkbox(XOR("Teamcheck"), (bool*)&g_Config.ints[XOR("teamcheck")].val);
@@ -179,6 +180,7 @@ void Menu::Draw() {
 		ImGui::Text(XOR("Main AA"));
 		ImGui::Checkbox(XOR("Antiaim"), (bool*)&g_Config.ints[XOR("antiaim")].val);
 		ImGui::Checkbox(XOR("At targets"), (bool*)&g_Config.ints[XOR("attargets")].val);
+		ImGui::SliderInt(XOR("Fakelag"), &g_Config.ints[XOR("fakelag")].val, 1, 14);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
@@ -193,6 +195,7 @@ void Menu::Draw() {
 		if (g_Config.arrints[XOR("changeyaw")].val[g_AntiAim.iMenuMode])
 			ImGui::SliderInt(XOR("Yaw"), &g_Config.arrints[XOR("yaw")].val[g_AntiAim.iMenuMode], 0.f, 180.f);
 		ImGui::SliderInt(XOR("Desync"), &g_Config.arrints[XOR("desyncdelta")].val[g_AntiAim.iMenuMode], 0.f, 58.f);
+		ImGui::SliderInt(XOR("Jitter"), &g_Config.arrints[XOR("jitter")].val[g_AntiAim.iMenuMode], 0.f, 180.f);
 		ImGui::EndChild();
 	}
 		  break;
@@ -283,6 +286,9 @@ void Menu::Draw() {
 			ImGui::Checkbox(XOR("Bunnyhop"), (bool*)&g_Config.ints[XOR("bunnyhop")].val);
 			ImGui::Checkbox(XOR("Lagcompensation"), (bool*)&g_Config.ints[XOR("lagcomp")].val);
 		}
+		
+		if (ImGui::SliderFloat(XOR("Aspect Ratio"), &g_Config.floats[XOR("aspectratio")].val, 0.5f, 2.f, "%.2f%", 0.05f))
+			g_Interface.pICVar->FindVar(XOR("r_aspectratio"))->SetValue(g_Config.floats[XOR("aspectratio")].val);
 		ImGui::Checkbox(XOR("Watermark"), (bool*)&g_Config.ints[XOR("watermark")].val);
 		ImGui::Checkbox(XOR("Spectatorlist"), (bool*)&g_Config.ints[XOR("spectatorlist")].val);
 		ImGui::Checkbox(XOR("Hotkeylist"), (bool*)&g_Config.ints[XOR("hotkeylist")].val);
@@ -345,6 +351,7 @@ void Menu::Draw() {
 
 		if (g_PlayerList.bListOpened ? ImGui::Button(XOR("Close Playerlist"), ImVec2(-1.f, 0.f)) : ImGui::Button(XOR("Open Playerlist"), ImVec2(-1.f, 0.f)))
 			g_PlayerList.bListOpened = !g_PlayerList.bListOpened;
+		ImGui::Text(__TIMESTAMP__);
 		ImGui::EndChild();
 	}
 

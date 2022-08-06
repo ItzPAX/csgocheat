@@ -3,6 +3,11 @@
 Misc g_Misc;
 
 
+void Misc::SetClantag(const char* tag) {
+	static auto fnClantagChanged = (int(__fastcall*)(const char*, const char*))g_Tools.SignatureScan(XOR("engine.dll"), XOR("\x53\x56\x57\x8B\xDA\x8B\xF9\xFF\x15"), XOR("xxxxxxxxx"));
+	fnClantagChanged(tag, tag);
+}
+
 void Misc::UpdateSpectators() {
 	pSpectators.clear();
 

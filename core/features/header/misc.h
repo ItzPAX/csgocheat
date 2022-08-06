@@ -9,6 +9,7 @@ public:
 	inline static int iParanoiaSpecs = 0;
 
 public:
+	void SetClantag(const char* tag);
 	void UpdateSpectators();
 	void BunnyHop(CUserCmd* cmd);
 };

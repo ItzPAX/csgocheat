@@ -13,7 +13,6 @@ namespace Game {
 }
 
 // defines
-#define FLOAT_MAX				3.402823E+38
 #define MAX_PLAYERS				65
 
 #define TICK_INTERVAL			(g_Interface.pGlobalVars->flIntervalPerTick)
@@ -47,6 +46,7 @@ using uchar = unsigned char;
 #include "sdk/structs/surfacedata.h"
 #include "sdk/classes/INetChannelInfo.h"
 #include "sdk/classes/convar.h"
+#include "sdk/classes/anim.h"
 
 // includes
 #include "utilities/tools/tools.h"
@@ -58,6 +58,8 @@ using uchar = unsigned char;
 #include "sdk/manager/netvars/netvars.h"
 
 // features
+#include "core/features/header/resolver.h"
+#include "core/features/header/prediction.h"
 #include "core/features/header/ragebot.h"
 #include "core/features/header/penetration.h"
 #include "core/features/header/inputmgr.h"

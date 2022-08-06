@@ -8,7 +8,7 @@ void cEndScene() {
 	g_Visuals.GoofyAhhCrosshair();
 
 	// call visuals
-	if (Game::g_pLocal)
+	if (Game::g_pLocal && g_Interface.pEngine->IsInGame())
 		g_Visuals.OnEndScene();
 	g_Visuals.DrawWatermark();
 }
