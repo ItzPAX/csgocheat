@@ -64,7 +64,6 @@ using uchar = unsigned char;
 #include "core/features/header/penetration.h"
 #include "core/features/header/inputmgr.h"
 #include "core/features/config/config.h"
-#include "core/features/config/configv2.h"
 #include "core/features/header/backtrack.h"
 #include "core/features/header/playerlist.h"
 #include "core/menu/menu.h"

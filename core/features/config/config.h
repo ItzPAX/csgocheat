@@ -69,7 +69,6 @@ private:
 
 	int antiaim;
 	int attargets;
-	int jitter;
 	int changepitch[3];
 	int pitch[3];
 	int changeyaw[3];

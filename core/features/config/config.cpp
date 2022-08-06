@@ -49,7 +49,6 @@ void Config::Init() {
 
 	SetupVal(antiaim, 0, XOR("antiaim"), XOR("antiaim"));
 	SetupVal(attargets, 1, XOR("antiaim"), XOR("attargets"));
-	SetupVal(jitter, 0, XOR("antiaim"), XOR("jitter"));
 	SetupVal(changepitch, { 0,0,0 }, 3, XOR("antiaim"), XOR("changepitch"));
 	SetupVal(pitch, { 89,89,89 }, 3, XOR("antiaim"), XOR("pitch"));
 	SetupVal(changeyaw, { 0,0,0 }, 3, XOR("antiaim"), XOR("changeyaw"));

@@ -205,8 +205,11 @@
     <ClCompile Include="..\core\features\source\ragebot.cpp">
       <Filter>core\features\source</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\features\config\configv2.cpp">
-      <Filter>core\features\config</Filter>
+    <ClCompile Include="..\core\features\source\prediction.cpp">
+      <Filter>core\features\source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\core\features\source\resolver.cpp">
+      <Filter>core\features\source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -481,8 +484,20 @@
     <ClInclude Include="..\core\features\header\ragebot.h">
       <Filter>core\features\header</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\features\config\configv2.h">
-      <Filter>core\features\config</Filter>
+    <ClInclude Include="..\sdk\classes\anim.h">
+      <Filter>sdk\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IMDLCache.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IPlayerMovement.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\header\prediction.h">
+      <Filter>core\features\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\header\resolver.h">
+      <Filter>core\features\header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
