@@ -18,6 +18,9 @@ private:
 	inline static std::vector<RECT> rPlayerRects;
 	inline static std::vector<PlayerDist> pSortedPlayers;
 
+	Player* pFlexEnt;
+	ITexture* pBuffer;
+
 public:
 	// local stuff
 	void ThirdPerson();
@@ -30,7 +33,7 @@ public:
 	void DrawName(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);
 	void DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);
 	void DrawWeapon(RECT rPlayerRect, Player* pPlayer, Color col);
-	void BombESP();
+	void RenderFlex();
 
 	// Main Funcs
 	void DrawDormant(Player* pPlayer, RECT rPlayerRect);

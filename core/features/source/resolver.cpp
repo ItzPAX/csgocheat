@@ -5,6 +5,9 @@ Resolver g_Resolver;
 
 void Resolver::ResolvePlayer(Player* p)
 {
+	if (!g_Config.ints[XOR("resolver")].val)
+		return;
+
 	int rside = g_Math.RandomFloat(0, 2);
 
 	switch (rside)

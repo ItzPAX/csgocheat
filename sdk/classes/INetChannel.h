@@ -4,6 +4,8 @@
 #define FLOW_INCOMING	1
 #define MAX_FLOWS		2		// in & out
 
+class INetMessage;
+
 class INetChannelInfo
 {
 public:
@@ -54,4 +56,67 @@ public:
 	virtual void		GetRemoteFramerate(float* pflFrameTime, float* pflFrameTimeStdDeviation) const = 0;
 
 	virtual float		GetTimeoutSeconds() const = 0;
+};
+
+class INetChannel
+{
+public:
+	std::byte	pad0[0x14];				//0x0000
+	bool		bProcessingMessages;	//0x0014
+	bool		bShouldDelete;			//0x0015
+	bool		bStopProcessing;		//0x0016
+	std::byte	pad1[0x1];				//0x0017
+	int			iOutSequenceNr;			//0x0018 last send outgoing sequence number
+	int			iInSequenceNr;			//0x001C last received incoming sequence number
+	int			iOutSequenceNrAck;		//0x0020 last received acknowledge outgoing sequence number
+	int			iOutReliableState;		//0x0024 state of outgoing reliable data (0/1) flip flop used for loss detection
+	int			iInReliableState;		//0x0028 state of incoming reliable data
+	int			iChokedPackets;			//0x002C number of choked packets
+	std::byte	pad2[0x414];			//0x0030
+
+	bool SendNetMsg(INetMessage& msg, bool rel = false, bool audio = false) 
+	{
+		using original_fn = void(__thiscall*)(INetChannel*, INetMessage&, bool, bool);
+		(*(original_fn**)this)[40](this, msg, rel, audio);
+	}
+
+	int	SendDatagram(bf_write* pDatagram)
+	{
+		using original_fn = void(__thiscall*)(INetChannel*, bf_write*);
+		(*(original_fn**)this)[46](this, pDatagram);
+	}
+
+	bool Transmit(bool bOnlyReliable = false)
+	{
+		using original_fn = void(__thiscall*)(INetChannel*, bool);
+		(*(original_fn**)this)[46](this, bOnlyReliable);
+	}
+}; // Size: 0x0444
+
+// @credits: https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/public/inetmessage.h
+class INetMessage
+{
+public:
+	virtual					~INetMessage() { }
+	virtual void			SetNetChannel(void* pNetChannel) = 0;
+	virtual void			SetReliable(bool bState) = 0;
+	virtual bool			Process() = 0;
+	virtual	bool			ReadFromBuffer(bf_read& buffer) = 0;
+	virtual	bool			WriteToBuffer(bf_write& buffer) = 0;
+	virtual bool			IsReliable() const = 0;
+	virtual int				GetType() const = 0;
+	virtual int				GetGroup() const = 0;
+	virtual const char* GetName() const = 0;
+	virtual INetChannel* GetNetChannel() const = 0;
+	virtual const char* ToString() const = 0;
+	virtual size_t		GetSize() const = 0;
+};
+
+class CCLCMsg_Move
+{
+private:
+	byte pad0[0x8];
+public:
+	int nBackupCommands;
+	int nNewCommands;
 };

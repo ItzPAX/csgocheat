@@ -334,10 +334,14 @@ enum EClassID : std::int32_t
 	SporeTrail,
 };
 
+class IClientNetworkable;
+typedef IClientNetworkable* (*CreateClientClassFn)(int entnum, int serialNum);
+typedef IClientNetworkable* (*CreateEventFn)();
+
 class ClientClass {
 public:
-	void*			m_pCreateFn;
-	void*			m_pCreateEventFn;	// Only called for event objects.
+	CreateClientClassFn			m_pCreateFn;
+	CreateClientClassFn			m_pCreateEventFn;	// Only called for event objects.
 	const char*		m_pNetworkName;
 	RecvTable*		m_pRecvTable;
 	ClientClass*	m_pNext;

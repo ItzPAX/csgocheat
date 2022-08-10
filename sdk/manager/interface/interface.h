@@ -23,7 +23,9 @@
 #include "classes/IPhysicsSurfaceProps.h"
 #include "classes/IPlayerMovement.h"
 #include "classes/IMDLCache.h"
+#include "classes/IMatRenderContext.h"
 #include "classes/IWeaponSystem.h"
+#include "sdk/classes/view_shared.h"
 
 class Interface {
 private:
@@ -55,14 +57,16 @@ public:
 	PlayerMoveHelper* pMoveHelper;
 	PlayerPrediction* pPrediction;
 	IClientLeafSystem* pClientLeafSystem;
+	INetChannel* pNetChannel;
 	IMDLCache* pMDLCache;
+	IClientState* pClientState;
 	IInput* pInput;
 
 	// TODO: Find Interface entry for this
 	IClientRenderable* pRenderable;
 
 public:
-	void* GetInterface(const char* dllname, const char* interfacename);
+	void* GetInterface(const char* dllname, const char* interfacename, bool bruteforce = true);
 	bool Init(); // init all interfaces
 };
 

@@ -100,6 +100,9 @@
     <Filter Include="core\features\config">
       <UniqueIdentifier>{03802dfa-b442-4d24-af8c-e998203697f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="utilities\structs\vec4d">
+      <UniqueIdentifier>{e2685fcf-d944-45ca-ac84-13e35408543c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dllentry.cpp" />
@@ -379,7 +382,7 @@
     <ClInclude Include="..\sdk\classes\convar.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\sdk\classes\INetChannelInfo.h">
+    <ClInclude Include="..\sdk\classes\INetChannel.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
     <ClInclude Include="..\core\features\header\backtrack.h">
@@ -498,6 +501,18 @@
     </ClInclude>
     <ClInclude Include="..\core\features\header\resolver.h">
       <Filter>core\features\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\manager\interface\classes\IMatRenderContext.h">
+      <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utilities\structures\vec4d\vec4d.h">
+      <Filter>utilities\structs\vec4d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\classes\view_shared.h">
+      <Filter>sdk\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\classes\bitbuf.h">
+      <Filter>sdk\classes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

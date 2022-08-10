@@ -189,6 +189,11 @@ public:
 		return (*(original_fn**)this)[483](this);
 	}
 
+	void InitializeAsClientEntity(const char* path, RenderGroup_t rendergroup) {
+		using original_fn = void(__thiscall*)(void*, const char*, RenderGroup_t);
+		(*(original_fn**)this)[96](this, path, rendergroup);
+	}
+
 	float GetSpread() {
 		using original_fn = float(__thiscall*)(void*);
 		return (*(original_fn**)this)[453](this);
@@ -245,6 +250,11 @@ public:
 		(*(original_fn**)this)[340](this);
 	}
 
+	void FrameAdvance(float t) {
+		using original_fn = void(__thiscall*)(void*, float);
+		(*(original_fn**)this)[218](this, t);
+	}
+
 	Vec3D vGetBonePosition(int bone) {
 		Matrix BoneMatrix[MAXSTUDIOBONES];
 		if (SetupBones(BoneMatrix, MAXSTUDIOBONES, BONE_USED_BY_HITBOX, g_Interface.pGlobalVars->flCurTime))
@@ -253,41 +263,35 @@ public:
 			return Vec3D();
 	}
 
-	/*FIXMEFIXME*/
-	//void PostThink() {
-	//	using PostThinkVPhysicsFn = bool(__thiscall*)(Player*);
-	//	static auto oPostThinkVPhysics = reinterpret_cast<PostThinkVPhysicsFn>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x55\x8B\xEC\x83\xE4\xF8\x81\xEC\x00\x00\x00\x00\x53\x8B\xD9\x56\x57\x83\xBB"), XOR("xxxxxxxx????xxxxxxx")));
-	//
-	//	using SimulatePlayerSimulatedEntitiesFn = void(__thiscall*)(Player*);
-	//	static auto oSimulatePlayerSimulatedEntities = reinterpret_cast<SimulatePlayerSimulatedEntitiesFn>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x56\x8B\xF1\x57\x8B\xBE\x00\x00\x00\x00\x83\xEF\x01\x78\x74"), XOR("xxxxxx????xxxxx")));
-	//
-	//	if (!oPostThinkVPhysics || !oSimulatePlayerSimulatedEntities)
-	//		return;
-	//
-	//	g_Interface.pMDLCache->BeginLock();
-	//
-	//	if (this->bIsAlive())
-	//	{
-	//		this->UpdateCollisionBounds();
-	//
-	//		if (this->iFlags() & FL_ONGROUND)
-	//			*this->GetFallVelocity() = 0.f;
-	//
-	//		if (this->iSequence() == -1)
-	//			this->SetSequence(0);
-	//
-	//		this->StudioAdvanceFrame();
-	//		oPostThinkVPhysics(this);
-	//	}
-	//
-	//	oSimulatePlayerSimulatedEntities(this);
-	//
-	//	g_Interface.pMDLCache->EndLock();
-	//}
-
 	void PostThink() {
-		using original_fn = Entity * (__thiscall*)(void*);
-		(*(original_fn**)this)[319](this);
+		using PostThinkVPhysicsFn = bool(__thiscall*)(Player*);
+		static auto oPostThinkVPhysics = reinterpret_cast<PostThinkVPhysicsFn>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x55\x8B\xEC\x83\xE4\xF8\x81\xEC\x00\x00\x00\x00\x53\x8B\xD9\x56\x57\x83\xBB"), XOR("xxxxxxxx????xxxxxxx")));
+		
+		using SimulatePlayerSimulatedEntitiesFn = void(__thiscall*)(Player*);
+		static auto oSimulatePlayerSimulatedEntities = reinterpret_cast<SimulatePlayerSimulatedEntitiesFn>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x56\x8B\xF1\x57\x8B\xBE\x00\x00\x00\x00\x83\xEF\x01\x78\x74"), XOR("xxxxxx????xxxxx")));
+
+		if (!oPostThinkVPhysics || !oSimulatePlayerSimulatedEntities)
+			return;
+		
+		//g_Interface.pMDLCache->BeginLock();
+		
+		if (this->bIsAlive())
+		{
+			this->UpdateCollisionBounds();
+
+			if (this->iFlags() & FL_ONGROUND)
+				*this->GetFallVelocity() = 0.f;
+
+			if (this->iSequence() == -1)
+				this->SetSequence(0);
+
+			this->StudioAdvanceFrame();
+			oPostThinkVPhysics(this);
+		}
+		
+		oSimulatePlayerSimulatedEntities(this);
+	
+		//g_Interface.pMDLCache->EndLock();
 	}
 
 	Vec3D vGetHitboxPos(int hitbox) {
@@ -369,10 +373,6 @@ public:
 		(*(original_fn**)this)[220](this);
 	}
 
-	float* GetFallVelocity() {
-		return reinterpret_cast<float*>(g_NetVars.GetOffsetDirect(XOR("CBasePlayer"), XOR("m_flFallVelocity")) + this);
-	}
-
 	Entity* pGetActiveWeapon() {
 		using original_fn = Entity* (__thiscall*)(void*);
 		return (*(original_fn**)this)[268](this);
@@ -383,6 +383,12 @@ public:
 		static original_fn set_angles_fn = (original_fn)((DWORD)g_Tools.SignatureScan(XOR("client.dll"), XOR("\x55\x8B\xEC\x83\xE4\xF8\x83\xEC\x64\x53\x56\x57\x8B\xF1"), XOR("xxxxxxxxxxxxxx")));
 		set_angles_fn(this, vAngles);
 	}
+
+	int DrawModel(int flags, uint8_t alpha) {
+		using original_fn = int(__thiscall*)(void*, int, uint8_t);
+		return (*(original_fn**)pRenderable())[9](pRenderable(), flags, alpha);
+	}
+
 	void SetPosition(Vec3D vPosition) {
 		using original_fn = void(__thiscall*)(void*, const Vec3D&);
 		static original_fn set_position_fn = (original_fn)((DWORD)g_Tools.SignatureScan(XOR("client.dll"), XOR("\x55\x8B\xEC\x83\xE4\xF8\x51\x53\x56\x57\x8B\xF1\xE8"),XOR("xxxxxxxxxxxxx")));
@@ -409,6 +415,7 @@ public:
 	bool bHasHeavyArmor() { return g_NetVars.Netvar<bool>(XOR("DT_CSPlayer"), XOR("m_bHasHeavyArmor"), this); }
 	int iArmor() { return g_NetVars.Netvar<int>(XOR("DT_CSPlayer"), XOR("m_ArmorValue"), this); }
 	int iSequence() { return g_NetVars.Netvar<int>(XOR("CBaseAnimating"), XOR("m_nSequence"), this); }
+	float* GetFallVelocity() { return reinterpret_cast<float*>(uintptr_t(this) + g_NetVars.GetOffsetDirect(XOR("DT_BasePlayer"), XOR("m_flFallVelocity"))); }
 
 	Vec3D vEyeAngles() { return g_NetVars.Netvar<Vec3D>(XOR("DT_CSPlayer"), XOR("m_angEyeAngles"), this); }
 	int iShotsFired() { return g_NetVars.Netvar<int>(XOR("DT_CSPlayer"), XOR("m_iShotsFired"), this); }

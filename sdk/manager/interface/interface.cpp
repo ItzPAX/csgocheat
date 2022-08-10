@@ -5,38 +5,42 @@
 
 Interface g_Interface{ };
 
-void* Interface::GetInterface(const char* dllname, const char* interfacename) {
+void* Interface::GetInterface(const char* dllname, const char* interfacename, bool bruteforce) {
 	tCreateInterface CreateInterface = (tCreateInterface)GetProcAddress(GetModuleHandle(dllname), XOR("CreateInterface"));
 
 	int iReturnCode;
 	void* pInterface = nullptr;
 
 	// Bruteforce that mf
-	int iTries = 0;
-	while (iTries <= 999) {
-		std::string temp = interfacename;
-		std::string toadd = "";
-	
-		if (iTries < 10) {
-			toadd = XOR("00");
-			toadd += std::to_string(iTries);
-		}
-		else if (iTries < 100) {
-			toadd = XOR("0");
-			toadd += std::to_string(iTries);
-		}
-		else {
-			toadd = XOR("");
-			toadd += std::to_string(iTries);
-		}
-	
-		temp += toadd;
-		pInterface = CreateInterface(temp.c_str(), &iReturnCode);
-		iTries++;
+	if (bruteforce) {
+		int iTries = 0;
+		while (iTries <= 999) {
+			std::string temp = interfacename;
+			std::string toadd = "";
 
-		if (pInterface && iReturnCode == 0)
-			break;
+			if (iTries < 10) {
+				toadd = XOR("00");
+				toadd += std::to_string(iTries);
+			}
+			else if (iTries < 100) {
+				toadd = XOR("0");
+				toadd += std::to_string(iTries);
+			}
+			else {
+				toadd = XOR("");
+				toadd += std::to_string(iTries);
+			}
+
+			temp += toadd;
+			pInterface = CreateInterface(temp.c_str(), &iReturnCode);
+			iTries++;
+
+			if (pInterface && iReturnCode == 0)
+				break;
+		}
 	}
+	else 
+		pInterface = CreateInterface(interfacename, &iReturnCode);
 	return pInterface;
 }
 
@@ -73,6 +77,7 @@ bool Interface::Init() {
 	pInput = *reinterpret_cast<IInput**>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\xB9\x00\x00\x00\x00\xF3\x0F\x11\x04\x24\xFF\x50\x10"), XOR("x????xxxxxxxx")) + 0x01);
 	pWeaponSystem = *reinterpret_cast<IWeaponSystem**>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8B\x35\x00\x00\x00\x00\xFF\x10\x0F\xB7\xC0"), XOR("xx????xxxxx")) + 0x02);
 	pMoveHelper = **reinterpret_cast<PlayerMoveHelper***>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8B\x0D\x00\x00\x00\x00\x8B\x46\x08\x68"), XOR("xx????xxxx")) + 0x02);
+	pClientState = **reinterpret_cast<IClientState***>(g_Tools.SignatureScan(XOR("engine.dll"), XOR("\xA1\x00\x00\x00\x00\x8B\x88\x00\x00\x00\x00\x85\xC9\x75\x07"), XOR("x????xx????xxxx")) + 0x01);
 
 	return true;
 }

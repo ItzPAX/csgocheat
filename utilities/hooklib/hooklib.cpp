@@ -238,13 +238,23 @@ uintptr_t HookLib::FindCodeCave(const char* cModuleName, size_t iSize) {
     return 0x0;
 }
 
-void* HookLib::AddHook(const char* cModuleName, void* pVirtualTable, void* pTargetFunction, size_t iIndex) {
+void* HookLib::AddHook(const char* cModuleName, void* pVirtualTable, void* pTargetFunction, size_t iIndex, bool overwrite, const char* interfacename) {
     // get addr of the VTableEntry
     uintptr_t pVTable = *((uintptr_t*)pVirtualTable);
     uintptr_t pEntry = pVTable + (sizeof(uintptr_t) * iIndex);
     uintptr_t pOrig = *((uintptr_t*)pEntry);
 
-    uintptr_t pCodeCave = FindCodeCave(cModuleName, SIZE);
+    uintptr_t pCodeCave = 0;
+    if (!overwrite)
+        pCodeCave = FindCodeCave(cModuleName, SIZE);
+
+    else {
+        std::string name = interfacename;
+        name.append(std::to_string(iIndex));
+        if (!pCodeCaves[name])
+            pCodeCaves[name] = FindCodeCave(cModuleName, SIZE);
+        pCodeCave = pCodeCaves[name];
+    }
 
     uintptr_t pRelAddr = (uintptr_t)pTargetFunction - pCodeCave - SIZE;
 

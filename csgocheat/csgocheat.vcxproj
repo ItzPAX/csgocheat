@@ -162,7 +162,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)pch;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -185,7 +185,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)pch;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderOutputFile />
@@ -432,12 +432,14 @@
     <ClInclude Include="..\includes.h" />
     <ClInclude Include="..\pch\pch.h" />
     <ClInclude Include="..\sdk\classes\anim.h" />
+    <ClInclude Include="..\sdk\classes\bitbuf.h" />
     <ClInclude Include="..\sdk\classes\convar.h" />
     <ClInclude Include="..\sdk\classes\cusercmd.h" />
     <ClInclude Include="..\sdk\classes\CUtlVector.h" />
     <ClInclude Include="..\sdk\classes\entity.h" />
     <ClInclude Include="..\sdk\classes\IInterpolatedVar.h" />
-    <ClInclude Include="..\sdk\classes\INetChannelInfo.h" />
+    <ClInclude Include="..\sdk\classes\INetChannel.h" />
+    <ClInclude Include="..\sdk\classes\view_shared.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\CBaseHandle.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\CGlobalVars.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\DebugOverlay.h" />
@@ -461,6 +463,7 @@
     <ClInclude Include="..\sdk\manager\interface\classes\IInputSystem.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IMaterial.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IMaterialSystem.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IMatRenderContext.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IMDLCache.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IPanel.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IPhysicsSurfaceProps.h" />
@@ -484,6 +487,7 @@
     <ClInclude Include="..\utilities\structures\color\color.h" />
     <ClInclude Include="..\utilities\structures\vec2d\vec2d.h" />
     <ClInclude Include="..\utilities\structures\vec3d\vec3d.h" />
+    <ClInclude Include="..\utilities\structures\vec4d\vec4d.h" />
     <ClInclude Include="..\utilities\structures\vecaligned\vecaligned.h" />
     <ClInclude Include="..\utilities\tools\tools.h" />
     <ClInclude Include="..\utilities\tools\xorstr.h" />

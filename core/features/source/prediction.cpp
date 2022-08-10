@@ -51,7 +51,7 @@ void Prediction::Start(CUserCmd* ucmd, Player* player) {
 	g_Interface.pPrediction->bInPrediction = true;
 
 	ucmd->buttons |= player->GetForcedButtons();
-	ucmd->buttons &= ~player->GetButtonDisabled(); // MAY WANT TO DO THIS LATER!!!
+	//ucmd->buttons &= ~player->GetButtonDisabled(); // MAY WANT TO DO THIS LATER!!!
 
 	g_Interface.pGameMovement->StartTrackPredictionErrors(player);
 

@@ -162,6 +162,11 @@ bool HookManager::ReleaseAll() {
 }
 
 #pragma region HkFunctions
+bool __fastcall SendNetMsg::hkSendNetMsg(void* thisptr, void* edx, INetMessage& msg, bool rel, bool audio) {
+	std::cout << "[+] msg.GetName() -> " << msg.GetName() << std::endl;
+	return oSendNetMsg(thisptr, msg, rel, audio);
+}
+
 bool __fastcall IsPaused::hkIsPaused(void* thisptr) {
 	static DWORD* return_to_extrapolation = (DWORD*)(g_Tools.SignatureScan("client.dll",
 		XOR("\xFF\xD0\xA1\x00\x00\x00\x00\xB9\x00\x00\x00\x00\xD9\x1D\x00\x00\x00\x00\xFF\x50\x34\x85\xC0\x74\x22\x8B\x0D\x00\x00\x00\x00"), XOR("xxx????x????xx????xxxxxxxxx????")) + 0x29);

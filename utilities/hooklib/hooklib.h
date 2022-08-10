@@ -5,6 +5,8 @@
 #include <iostream>
 #include <TlHelp32.h>
 #include <Psapi.h>
+#include <unordered_map>
+#include <string>
 
 #pragma region HookEntries
 enum MODE {
@@ -77,6 +79,7 @@ private:
     std::vector<uintptr_t>   pBaseFnc;
     std::vector<uintptr_t>   pPointerDestructor;
     std::vector<uintptr_t>   pOrigFncAddr;
+    std::unordered_map<std::string, uintptr_t> pCodeCaves;
     std::vector<INT16>       nIndex;
     std::vector<CodeCave>    cCodeCaves;
     PVOID                    pVEHHandle;
@@ -143,13 +146,13 @@ public:
     // Disable all hooks
     BOOL DisableAll() { return true; };
 
-private:
+public:
     BOOL DestroyPointers(int index = NOT_FOUND);
 
     // VEH Hook Call
     void* AddHook(PVOID pHkFunc, PVOID pVTable, INT16 iIndex, const char* sName = "");
     // For TrustedModule
-    void* AddHook(const char* cModuleName, void* pVTable, void* pTargetFunction, size_t iIndex);
+    void* AddHook(const char* cModuleName, void* pVTable, void* pTargetFunction, size_t iIndex, bool overwrite = false, const char* interfacename = "");
     // For TrampHook
     void* AddHook(char* src, char* dst, short len);
 

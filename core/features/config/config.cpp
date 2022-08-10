@@ -133,7 +133,13 @@ void Config::Save(std::string name) {
 			WritePrivateProfileString(value.second.category.c_str(), basename.c_str(), std::to_string(value.second.val[i]).c_str(), file.c_str());
 		}
 	}
-	status = CfgStatus{ false, XOR("Saved Config: ") + name };
+
+	if (std::filesystem::exists(name)) {
+		status = CfgStatus{ false, XOR("Saved Config: ") + name };
+	}
+	else {
+		status = CfgStatus{ true, XOR("Couldn't create Config: ") + name };
+	}
 }
 
 void Config::Load(int index) {

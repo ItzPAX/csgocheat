@@ -25,12 +25,14 @@ using ushort = unsigned short;
 using uchar = unsigned char;
 
 // structs & math
+#include "utilities/structures/vec4d/vec4d.h"
 #include "utilities/structures/vec3d/vec3d.h"
 #include "utilities/structures/vec2d/vec2d.h"
 #include "utilities/structures/vecaligned/vecaligned.h"
 #include "utilities/structures/color/color.h"
 #include "utilities/structures/matrix/matrix.h"
 #include "utilities/math/math.h"
+#include "sdk/classes/bitbuf.h"
 
 // sdk
 #include "sdk/structs/shareddefs.h"
@@ -44,9 +46,10 @@ using uchar = unsigned char;
 #include "sdk/classes/entity.h"
 #include "sdk/classes/cusercmd.h"
 #include "sdk/structs/surfacedata.h"
-#include "sdk/classes/INetChannelInfo.h"
+#include "sdk/classes/INetChannel.h"
 #include "sdk/classes/convar.h"
 #include "sdk/classes/anim.h"
+#include "sdk/classes/view_shared.h"
 
 // includes
 #include "utilities/tools/tools.h"

@@ -3,6 +3,26 @@
 Misc g_Misc;
 
 
+CreateClientClassFn Misc::GetFlexCreateFn() {
+	auto clientclass = g_Interface.pClient->GetAllClasses();
+	while (clientclass->m_ClassID != CBaseFlex)
+		clientclass = clientclass->m_pNext;
+
+	return clientclass->m_pCreateFn;
+}
+
+Player* Misc::CreateFlex(int entry, int serial) {
+	static auto flex_create_fn = GetFlexCreateFn();
+	if (flex_create_fn) {
+		flex_create_fn(entry, serial);
+		const auto flex = reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntity(entry));
+		flex->InitializeAsClientEntity("models/player/custom_player/legacy/ctm_sas_varianta.mdl", RenderGroup_t::RENDER_GROUP_OPAQUE);
+		//flex->AddEffects(0x20);
+		return flex;
+	}
+	return nullptr;
+}
+
 void Misc::SetClantag(const char* tag) {
 	static auto fnClantagChanged = (int(__fastcall*)(const char*, const char*))g_Tools.SignatureScan(XOR("engine.dll"), XOR("\x53\x56\x57\x8B\xDA\x8B\xF9\xFF\x15"), XOR("xxxxxxxxx"));
 	fnClantagChanged(tag, tag);

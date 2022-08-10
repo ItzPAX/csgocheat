@@ -178,24 +178,34 @@ void Menu::Draw() {
 	case 2: {
 		ImGui::BeginChild(XOR("Main-Antiaim"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Main AA"));
-		ImGui::Checkbox(XOR("Antiaim"), (bool*)&g_Config.ints[XOR("antiaim")].val);
-		ImGui::Checkbox(XOR("At targets"), (bool*)&g_Config.ints[XOR("attargets")].val);
-		ImGui::SliderInt(XOR("Fakelag"), &g_Config.ints[XOR("fakelag")].val, 1, 14);
+		if (!g_Config.ints[XOR("trustfactor")].val) {
+			ImGui::Checkbox(XOR("Antiaim"), (bool*)&g_Config.ints[XOR("antiaim")].val);
+			ImGui::Checkbox(XOR("At targets"), (bool*)&g_Config.ints[XOR("attargets")].val);
+			ImGui::SliderInt(XOR("Fakelag"), &g_Config.ints[XOR("fakelag")].val, 1, 14);
+		}
+		else {
+			ImGui::TextColored(ImVec4(0.9f, 0.2f, 0.2f, 1.f), XOR("Disabled due to Preserve TrustFactor"));
+		}
 		ImGui::EndChild();
 
 		ImGui::SameLine();
 		ImGui::BeginChild(XOR("Mode-Config"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Mode Configuration"));
-		RenderClickableButtons({ XOR("Standing"), XOR("Moving"), XOR("In air") }, &g_AntiAim.iMenuMode, ImVec2{ vSize.x / 2, vSize.y }, style->WindowPadding.x + 5);
-		ImGui::Checkbox(XOR("Change Pitch"), (bool*)&g_Config.arrints[XOR("changepitch")].val[g_AntiAim.iMenuMode]);
-		if (g_Config.arrints[XOR("changepitch")].val[g_AntiAim.iMenuMode])
-			ImGui::SliderInt(XOR("Pitch"), &g_Config.arrints[XOR("pitch")].val[g_AntiAim.iMenuMode], 0.f, 89.f);
+		if (!g_Config.ints[XOR("trustfactor")].val) {
+			RenderClickableButtons({ XOR("Standing"), XOR("Moving"), XOR("In air") }, &g_AntiAim.iMenuMode, ImVec2{ vSize.x / 2, vSize.y }, style->WindowPadding.x + 5);
+			ImGui::Checkbox(XOR("Change Pitch"), (bool*)&g_Config.arrints[XOR("changepitch")].val[g_AntiAim.iMenuMode]);
+			if (g_Config.arrints[XOR("changepitch")].val[g_AntiAim.iMenuMode])
+				ImGui::SliderInt(XOR("Pitch"), &g_Config.arrints[XOR("pitch")].val[g_AntiAim.iMenuMode], 0.f, 89.f);
 
-		ImGui::Checkbox(XOR("Change Yaw"), (bool*)&g_Config.arrints[XOR("changeyaw")].val[g_AntiAim.iMenuMode]);
-		if (g_Config.arrints[XOR("changeyaw")].val[g_AntiAim.iMenuMode])
-			ImGui::SliderInt(XOR("Yaw"), &g_Config.arrints[XOR("yaw")].val[g_AntiAim.iMenuMode], 0.f, 180.f);
-		ImGui::SliderInt(XOR("Desync"), &g_Config.arrints[XOR("desyncdelta")].val[g_AntiAim.iMenuMode], 0.f, 58.f);
-		ImGui::SliderInt(XOR("Jitter"), &g_Config.arrints[XOR("jitter")].val[g_AntiAim.iMenuMode], 0.f, 180.f);
+			ImGui::Checkbox(XOR("Change Yaw"), (bool*)&g_Config.arrints[XOR("changeyaw")].val[g_AntiAim.iMenuMode]);
+			if (g_Config.arrints[XOR("changeyaw")].val[g_AntiAim.iMenuMode])
+				ImGui::SliderInt(XOR("Yaw"), &g_Config.arrints[XOR("yaw")].val[g_AntiAim.iMenuMode], 0.f, 180.f);
+			ImGui::SliderInt(XOR("Desync"), &g_Config.arrints[XOR("desyncdelta")].val[g_AntiAim.iMenuMode], 0.f, 58.f);
+			ImGui::SliderInt(XOR("Jitter"), &g_Config.arrints[XOR("jitter")].val[g_AntiAim.iMenuMode], 0.f, 180.f);
+		}
+		else {
+			ImGui::TextColored(ImVec4(0.9f, 0.2f, 0.2f, 1.f), XOR("Disabled due to Preserve TrustFactor"));
+		}
 		ImGui::EndChild();
 	}
 		  break;
@@ -230,11 +240,10 @@ void Menu::Draw() {
 		ImGui::SameLine();
 		ImGui::BeginChild(XOR("Chams"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Chams"));
-		static const char* pChamMode[] = { "Enemy", "Local", "Friendly" };
-		ImGui::Combo(XOR("Cham Mode"), &g_Chams.iChamsMode, pChamMode, IM_ARRAYSIZE(pChamMode));
-
-		static const char* pChamTypes[] = { "debugambientcube", "debugdrawflat" };
+		static const char* pChamTypes[] = { "debugambientcube", "debugdrawflat", "[+] Add" };
 		ImGui::Combo(XOR("Chams Type"), &g_Config.ints[XOR("chamtype")].val, pChamTypes, IM_ARRAYSIZE(pChamTypes));
+
+		RenderClickableButtons({ XOR("Enemy"), XOR("Local"), XOR("Friendly") }, & g_Chams.iChamsMode, ImVec2{ vSize.x / 2, vSize.y }, style->WindowPadding.x + 5);
 
 		switch(g_Chams.iChamsMode) {
 		case 0: {
@@ -351,7 +360,9 @@ void Menu::Draw() {
 
 		if (g_PlayerList.bListOpened ? ImGui::Button(XOR("Close Playerlist"), ImVec2(-1.f, 0.f)) : ImGui::Button(XOR("Open Playerlist"), ImVec2(-1.f, 0.f)))
 			g_PlayerList.bListOpened = !g_PlayerList.bListOpened;
-		ImGui::Text(__TIMESTAMP__);
+		ImGui::Text(XOR("Build date: "));
+		ImGui::SameLine();
+		ImGui::Text(XOR(__TIMESTAMP__));
 		ImGui::EndChild();
 	}
 

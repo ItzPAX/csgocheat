@@ -2,7 +2,16 @@
 #include "includes.h"
 #include "pch.h"
 
+namespace SendNetMsg {
+	using tSendNetMsg = bool(__thiscall*)(void*, INetMessage&, bool, bool);
+	tSendNetMsg oSendNetMsg = nullptr;
+
+	int iIndex = 40;
+	__forceinline bool __fastcall hkSendNetMsg(void* thisptr, void* edx, INetMessage& msg, bool rel, bool audio);
+}
+
 static bool bClientModeInit = false;
+static int iHooksAdded = 0;
 void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 
 	uintptr_t* pFramePointer;
@@ -32,8 +41,14 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	float flOldForward = cmd->forwardmove;
 	float flOldSide = cmd->sidemove;
 
+	g_Interface.pNetChannel = g_Interface.pClientState->pNetChannel;
+
+	if (g_Interface.pNetChannel && iHooksAdded != 1) {
+		SendNetMsg::oSendNetMsg = (SendNetMsg::tSendNetMsg)g_HookLib.AddHook("client.dll", g_Interface.pNetChannel, SendNetMsg::hkSendNetMsg, SendNetMsg::iIndex, true, "INetChannel");
+		iHooksAdded++;
+	}
+
 	if (Game::g_pLocal->bIsAlive()) {
-		/*FIXME FIXME FIXME PatternScan wrong*/
 		g_Prediction.Start(cmd, Game::g_pLocal);
 
 		LagRecord pRecord;
