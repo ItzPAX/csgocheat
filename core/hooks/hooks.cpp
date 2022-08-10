@@ -164,6 +164,7 @@ bool HookManager::ReleaseAll() {
 #pragma region HkFunctions
 bool __fastcall SendNetMsg::hkSendNetMsg(void* thisptr, void* edx, INetMessage& msg, bool rel, bool audio) {
 	std::cout << "[+] msg.GetName() -> " << msg.GetName() << std::endl;
+	std::cout << "[+] msg.ToString() -> " << msg.ToString() << std::endl;
 	return oSendNetMsg(thisptr, msg, rel, audio);
 }
 
