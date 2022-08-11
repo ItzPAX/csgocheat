@@ -3,11 +3,11 @@
 #include "pch.h"
 
 namespace SendNetMsg {
-	using tSendNetMsg = bool(__thiscall*)(void*, INetMessage&, bool, bool);
+	using tSendNetMsg = bool(__thiscall*)(void*, INetMessage*, bool, bool);
 	tSendNetMsg oSendNetMsg = nullptr;
 
 	int iIndex = 40;
-	__forceinline bool __fastcall hkSendNetMsg(void* thisptr, void* edx, INetMessage& msg, bool rel, bool audio);
+	__forceinline bool __fastcall hkSendNetMsg(void* thisptr, void* edx, INetMessage* msg, bool rel, bool audio);
 }
 
 static bool bClientModeInit = false;
@@ -44,7 +44,7 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	g_Interface.pNetChannel = g_Interface.pClientState->pNetChannel;
 
 	if (g_Interface.pNetChannel && iHooksAdded == 2) {
-		SendNetMsg::oSendNetMsg = (SendNetMsg::tSendNetMsg)g_HookLib.AddHook("client.dll", g_Interface.pNetChannel, SendNetMsg::hkSendNetMsg, SendNetMsg::iIndex, true, "INetChannel");
+		//SendNetMsg::oSendNetMsg = (SendNetMsg::tSendNetMsg)g_HookLib.AddHook("client.dll", g_Interface.pNetChannel, SendNetMsg::hkSendNetMsg, SendNetMsg::iIndex, true, "INetChannel");
 	}
 	iHooksAdded++;
 

@@ -10,7 +10,7 @@ class INetChannelInfo
 {
 public:
 
-	enum {
+	enum NETMsg{
 		GENERIC = 0,	// must be first and is default group
 		LOCALPLAYER,	// bytes for local player entity update
 		OTHERPLAYERS,	// bytes for other players update
@@ -112,11 +112,9 @@ public:
 	virtual size_t		GetSize() const = 0;
 };
 
-class CCLCMsg_Move
+struct CCLCMsg_Move
 {
-private:
-	byte pad0[0x8];
-public:
-	int nBackupCommands;
-	int nNewCommands;
+	char pad[0xc];
+	int iBackupCommands;
+	int iNewCommands;
 };

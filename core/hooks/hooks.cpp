@@ -161,10 +161,23 @@ bool HookManager::ReleaseAll() {
 	return true;
 }
 
+//bool x = 0;
 #pragma region HkFunctions
-bool __fastcall SendNetMsg::hkSendNetMsg(void* thisptr, void* edx, INetMessage& msg, bool rel, bool audio) {
-	std::cout << "[+] msg.GetName() -> " << msg.GetName() << std::endl;
-	std::cout << "[+] msg.ToString() -> " << msg.ToString() << std::endl;
+bool __fastcall SendNetMsg::hkSendNetMsg(void* thisptr, void* edx, INetMessage* msg, bool rel, bool audio) {
+
+	/*if (strcmp(msg->GetName(), "CCLCMsg_Move") == 0)
+	{
+		if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
+		{
+			CCLCMsg_Move* data = (CCLCMsg_Move*)msg;
+			//x = !x;
+			data->iBackupCommands = 0;
+			data->iNewCommands = 1;
+
+			std::cout << msg->ToString() << std::endl;
+		}
+	}*/
+
 	return oSendNetMsg(thisptr, msg, rel, audio);
 }
 
