@@ -98,7 +98,7 @@ class INetMessage
 {
 public:
 	virtual					~INetMessage() { }
-	virtual void			SetNetChannel(void* pNetChannel) = 0;
+	virtual void			SetNetChannel(INetChannel* pNetChannel) = 0;
 	virtual void			SetReliable(bool bState) = 0;
 	virtual bool			Process() = 0;
 	virtual	bool			ReadFromBuffer(bf_read& buffer) = 0;
@@ -106,15 +106,82 @@ public:
 	virtual bool			IsReliable() const = 0;
 	virtual int				GetType() const = 0;
 	virtual int				GetGroup() const = 0;
-	virtual const char* GetName() const = 0;
-	virtual INetChannel* GetNetChannel() const = 0;
-	virtual const char* ToString() const = 0;
-	virtual size_t		GetSize() const = 0;
+	virtual const char*		GetName() const = 0;
+	virtual INetChannel*	GetNetChannel() const = 0;
+	virtual const char*		ToString() const = 0;
+	virtual size_t			GetSize() const = 0;
+};
+
+struct CCLCMsg_ClientInfo
+{
+	char pad[0xC];
+	uint32_t send_table_crc;
+	uint32_t server_count;
+	bool is_hltv;
+	bool is_replay;
+	uint32_t friends_id;
+	const char* friends_name;
+	uint32_t custom_files;
 };
 
 struct CCLCMsg_Move
 {
-	char pad[0xc];
-	int iBackupCommands;
-	int iNewCommands;
+	char pad[0xC];
+	int backup_commands;
+	int new_commands;
+};
+
+struct CCLCMsg_FileCRCCheck
+{
+	char pad[0xC];
+	int code_path;
+	//NOT COMPLETE
+};
+
+struct CCLCMsg_LoadingProgress
+{
+	char pad[0xC];
+	int progress = 1;
+};
+
+struct CCLCMsg_RespondCvarValue
+{
+	char pad[0xC];
+	int cookie;										// QueryCvarCookie_t
+	int status_code;								// EQueryCvarValueStatus
+	const char* name;
+	const char* value;
+};
+
+enum VoiceDataFormat_t
+{
+	VOICEDATA_FORMAT_STEAM = 0,						//steam uses SILK
+	VOICEDATA_FORMAT_ENGINE = 1						// was speex, switching to celt
+};
+
+struct CCLCMsg_VoiceData
+{
+	char pad[0xC];
+	const char* data;
+	uint64_t xuid;
+	VoiceDataFormat_t format;
+	int sequence_bytes;								// This is a TCP-style sequence number, so it includes the current packet length.  So it's actually the offset within the compressed data stream of the next packet to follow (if any).
+	uint32_t section_number;
+	uint32_t uncompressed_sample_offset;
+};
+
+struct CNETMsg_StringCmd
+{
+	char pad[0xC];
+	const char* command;
+};
+
+struct CNETMsg_Tick
+{
+	char pad[0xC];
+	uint32_t tick;									// current tick count
+	uint32_t host_computationtime;					// Host frame computation time in usec (1/1,000,000th sec) - will be say 4 ms when server is running at 25% CPU load for 64-tick server
+	uint32_t host_computationtime_std_deviation;    // Host frame computation time stddev in usec (1/1,000,000th sec)
+	uint32_t host_framestarttime_std_deviation;		// Host frame start time stddev in usec (1/1,000,000th sec) - measures how precisely we can wake up from sleep when meeting server framerate
+	uint32_t hltv_replay_flags;						// 0 or absent by default, 1 when hltv replay is in progress - used to fix client state in case of server crashes of full frame updates
 };

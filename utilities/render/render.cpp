@@ -84,14 +84,14 @@ void Render::DrawOutlinedRect(int x, int y, int w, int h, Color _col) {
 	DrawLine(x, y + h, x + w, y + h, 1, _col);
 }
 
-void Render::Text(LPD3DXFONT font, const char* text, float x, float y, Color _col) {
+void Render::Text(LPD3DXFONT font, const char* text, float x, float y, Color _col, DWORD alignment) {
 	RECT rect;
 
 	SetRect(&rect, x + 1, y + 1, x + 1, y + 1);
-	font->DrawTextA(NULL, text, -1, &rect, DT_CENTER | DT_NOCLIP, D3DCOLOR_ARGB((int)_col.rgba[3], 0, 0, 0));
+	font->DrawTextA(NULL, text, -1, &rect, alignment | DT_NOCLIP, D3DCOLOR_ARGB((int)_col.rgba[3], 0, 0, 0));
 
 	SetRect(&rect, x, y, x, y);
-	font->DrawTextA(NULL, text, -1, &rect, DT_CENTER | DT_NOCLIP, D3DCOLOR_ARGB((int)_col.rgba[3], (int)_col.rgba[0], (int)_col.rgba[1], (int)_col.rgba[2]));
+	font->DrawTextA(NULL, text, -1, &rect, alignment | DT_NOCLIP, D3DCOLOR_ARGB((int)_col.rgba[3], (int)_col.rgba[0], (int)_col.rgba[1], (int)_col.rgba[2]));
 }
 
 Vec2D Render::TextSize(LPD3DXFONT font, const char* text) {

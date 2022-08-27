@@ -44,6 +44,60 @@ enum MaterialMatrixMode_t
 const int NUM_MODEL_TRANSFORMS = 53;
 const int MATERIAL_MODEL_MAX = MATERIAL_MODEL + NUM_MODEL_TRANSFORMS;
 
+//-----------------------------------------------------------------------------
+// allowed stencil operations. These match the d3d operations
+//-----------------------------------------------------------------------------
+enum ShaderStencilOp_t
+{
+#if !defined( _X360 )
+	SHADER_STENCILOP_KEEP = 1,
+	SHADER_STENCILOP_ZERO = 2,
+	SHADER_STENCILOP_SET_TO_REFERENCE = 3,
+	SHADER_STENCILOP_INCREMENT_CLAMP = 4,
+	SHADER_STENCILOP_DECREMENT_CLAMP = 5,
+	SHADER_STENCILOP_INVERT = 6,
+	SHADER_STENCILOP_INCREMENT_WRAP = 7,
+	SHADER_STENCILOP_DECREMENT_WRAP = 8,
+#else
+	SHADER_STENCILOP_KEEP = D3DSTENCILOP_KEEP,
+	SHADER_STENCILOP_ZERO = D3DSTENCILOP_ZERO,
+	SHADER_STENCILOP_SET_TO_REFERENCE = D3DSTENCILOP_REPLACE,
+	SHADER_STENCILOP_INCREMENT_CLAMP = D3DSTENCILOP_INCRSAT,
+	SHADER_STENCILOP_DECREMENT_CLAMP = D3DSTENCILOP_DECRSAT,
+	SHADER_STENCILOP_INVERT = D3DSTENCILOP_INVERT,
+	SHADER_STENCILOP_INCREMENT_WRAP = D3DSTENCILOP_INCR,
+	SHADER_STENCILOP_DECREMENT_WRAP = D3DSTENCILOP_DECR,
+#endif
+	SHADER_STENCILOP_FORCE_DWORD = 0x7fffffff
+};
+
+
+enum ShaderStencilFunc_t
+{
+#if !defined( _X360 )
+	SHADER_STENCILFUNC_NEVER = 1,
+	SHADER_STENCILFUNC_LESS = 2,
+	SHADER_STENCILFUNC_EQUAL = 3,
+	SHADER_STENCILFUNC_LEQUAL = 4,
+	SHADER_STENCILFUNC_GREATER = 5,
+	SHADER_STENCILFUNC_NOTEQUAL = 6,
+	SHADER_STENCILFUNC_GEQUAL = 7,
+	SHADER_STENCILFUNC_ALWAYS = 8,
+#else
+	SHADER_STENCILFUNC_NEVER = D3DCMP_NEVER,
+	SHADER_STENCILFUNC_LESS = D3DCMP_LESS,
+	SHADER_STENCILFUNC_EQUAL = D3DCMP_EQUAL,
+	SHADER_STENCILFUNC_LEQUAL = D3DCMP_LESSEQUAL,
+	SHADER_STENCILFUNC_GREATER = D3DCMP_GREATER,
+	SHADER_STENCILFUNC_NOTEQUAL = D3DCMP_NOTEQUAL,
+	SHADER_STENCILFUNC_GEQUAL = D3DCMP_GREATEREQUAL,
+	SHADER_STENCILFUNC_ALWAYS = D3DCMP_ALWAYS,
+#endif
+
+	SHADER_STENCILFUNC_FORCE_DWORD = 0x7fffffff
+};
+
+
 enum MaterialPrimitiveType_t
 {
 	MATERIAL_POINTS = 0x0,
@@ -150,6 +204,44 @@ struct UberlightState_t
 	float m_fHeight;
 	float m_fHedge;
 	float m_fRoundness;
+};
+
+//-----------------------------------------------------------------------------
+// Stencil state
+//-----------------------------------------------------------------------------
+struct ShaderStencilState_t
+{
+	bool m_bEnable;
+	ShaderStencilOp_t m_FailOp;
+	ShaderStencilOp_t m_ZFailOp;
+	ShaderStencilOp_t m_PassOp;
+	ShaderStencilFunc_t m_CompareFunc;
+	int m_nReferenceValue;
+	unsigned int m_nTestMask;
+	unsigned int m_nWriteMask;
+
+#if defined( _X360 )
+	bool m_bHiStencilEnable;
+	bool m_bHiStencilWriteEnable;
+	ShaderHiStencilFunc_t m_HiStencilCompareFunc;
+	int m_nHiStencilReferenceValue;
+#endif
+
+	ShaderStencilState_t()
+	{
+		m_bEnable = false;
+		m_PassOp = m_FailOp = m_ZFailOp = SHADER_STENCILOP_KEEP;
+		m_CompareFunc = SHADER_STENCILFUNC_ALWAYS;
+		m_nReferenceValue = 0;
+		m_nTestMask = m_nWriteMask = 0xFFFFFFFF;
+
+#if defined( _X360 )
+		m_bHiStencilEnable = false;
+		m_bHiStencilWriteEnable = false;
+		m_HiStencilCompareFunc = SHADER_HI_STENCILFUNC_EQUAL;
+		m_nHiStencilReferenceValue = 0;
+#endif
+	}
 };
 
 class ITexture;
@@ -315,6 +407,11 @@ public:
 		return (*(original_fn**)this)[7](this);
 	}
 
+	void DepthRange(float zNear, float zFar) {
+		using original_fn = void* (__thiscall*)(void*, float, float);
+		(*(original_fn**)this)[11](this, zNear, zFar);
+	}
+
 	void ClearBuffers(bool bClearColor, bool bClearDepth, bool bClearStencil = false)
 	{
 		using original_fn = void(__thiscall*)(void*, bool, bool, bool);
@@ -373,6 +470,11 @@ public:
 	{
 		using original_fn = void(__thiscall*)(void*);
 		(*(original_fn**)this)[120](this);
+	}
+
+	void SetStencilState(const ShaderStencilState_t& state) {
+		using original_fn = void(__thiscall*)(void*, const ShaderStencilState_t&);
+		(*(original_fn**)this)[128](this, state);
 	}
 
 	void SetLightingOrigin(/*Vector vecLightingOrigin*/float x, float y, float z)

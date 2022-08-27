@@ -79,16 +79,21 @@ void Visuals::DrawWatermark() {
 	int ping = 0;
 	auto nci = g_Interface.pEngine->GetNetChannelInfo();
 	if (nci)
-		ping = 1 / g_Interface.pEngine->GetNetChannelInfo()->GetLatency(FLOW_INCOMING);
+		ping = g_Interface.pEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) * 1000;
 	int fps = 1 / g_Interface.pGlobalVars->flAbsFrametime;
 
 	std::string watermark = XOR("RayBot by ItzPAX | Ping: ");
 	watermark += std::to_string(ping);
 	watermark += XOR(" | FPS: ");
+
+	std::string copy(watermark);
+	copy += XOR("100");
+
 	watermark += std::to_string(fps);
-	Vec2D size = g_Render.TextSize(g_Render.pEspFont, watermark.c_str());
+
+	Vec2D size = g_Render.TextSize(g_Render.pEspFont, copy.c_str());
 	g_Render.DrawFilledRect(g_DirectX.iWindowWidth - size.x - 15, 6, size.x + 10, size.y + 5, Color(50.f, 50.f, 50.f, 200.f));
-	g_Render.Text(g_Render.pEspFont, watermark.c_str(), g_DirectX.iWindowWidth - (size.x / 2) - 10, 8, Color::White());
+	g_Render.Text(g_Render.pEspFont, watermark.c_str(), g_DirectX.iWindowWidth - size.x - 10, 8, Color::White(), DT_LEFT);
 }
 
 void Visuals::GoofyAhhCrosshair() {
@@ -198,10 +203,12 @@ void Visuals::RenderFlex() {
 	float flWidthRatio = 0.75f; //(w/h) / (4/3); (512/512) / 4 / 3
 	pFlexEnt->FrameAdvance(g_Interface.pGlobalVars->flCurTime);
 	CMatRenderContextPtr render_ctx(g_Interface.pMaterialSystem->GetRenderContext());
-	std::cout << &render_ctx << std::endl;
 
 	if (!pBuffer)
 		pBuffer = g_Interface.pMaterialSystem->CreateRenderTargetFF("esp_preview", 200, 200, RenderTargetSizeMode_t::RT_SIZE_DEFAULT, ImageFormat::IMAGE_FORMAT_ARGB8888);
+
+	if (!pBuffer)
+		return;
 
 	std::cout << "here3\n";
 
@@ -260,12 +267,12 @@ void Visuals::RenderFlex() {
 	render_ctx->ClearBuffers(true, false, false);
 	std::cout << "here4\n";
 
-	float color[3] = { 1.0f, 1.0f, 1.0f };
-	g_Interface.pRenderView->SetColorModulation(color);
-	g_Interface.pRenderView->SetBlend(1.0f);
-	pFlexEnt->SetPosition(Vec3D(0.1f, 0.1f, 0.1f)); //Shouldn't be (0,0,0), so do (0.1f,0.1f,0.1f)
-	pFlexEnt->SetAngles(Vec3D(0, -90, 0)); //It will make player look to the right for your new view
-	pFlexEnt->DrawModel(1, 255);
+	//float color[3] = { 1.0f, 1.0f, 1.0f };
+	//g_Interface.pRenderView->SetColorModulation(color);
+	//g_Interface.pRenderView->SetBlend(1.0f);
+	//pFlexEnt->SetPosition(Vec3D(0.1f, 0.1f, 0.1f)); //Shouldn't be (0,0,0), so do (0.1f,0.1f,0.1f)
+	//pFlexEnt->SetAngles(Vec3D(0, -90, 0)); //It will make player look to the right for your new view
+	//pFlexEnt->DrawModel(1, 255);
 	g_Interface.pRenderView->PopView(render_ctx, dummyFrustum);
 	render_ctx->BindLocalCubemap(NULL);
 }

@@ -16,7 +16,7 @@ Player* Misc::CreateFlex(int entry, int serial) {
 	if (flex_create_fn) {
 		flex_create_fn(entry, serial);
 		const auto flex = reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntity(entry));
-		flex->InitializeAsClientEntity("models/player/custom_player/legacy/ctm_sas_varianta.mdl", RenderGroup_t::RENDER_GROUP_OPAQUE);
+		flex->InitializeAsClientEntity("models/player/custom_player/z-piks.ru/cod_ghosts/us_space.mdl", RenderGroup_t::RENDER_GROUP_OPAQUE);
 		//flex->AddEffects(0x20);
 		return flex;
 	}
