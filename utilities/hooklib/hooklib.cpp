@@ -206,6 +206,8 @@ void* HookLib::AddHook(char* src, char* dst, short len) {
     }
     return nullptr;
 }
+
+
 #pragma endregion
 #pragma region TrustedModule
 uintptr_t HookLib::FindCodeCave(const char* cModuleName, size_t iSize) {

@@ -97,27 +97,6 @@ namespace LockCursor {
 }
 #pragma endregion
 
-#pragma region others
-void patch_insecure()
-{
-	DWORD oldProt;
-	BYTE hissaPatch[6] = { 0xB8, 0x01, 0x00,0x00, 0x00, 0xC3 };
-	auto pHost_IsSecureServerAllowed = g_Tools.SignatureScan(XOR("engine.dll"), XOR("\x5E\xC3\x32\xC0\xA2"), XOR("xxxxx")) - 0x42;
-	if (pHost_IsSecureServerAllowed)
-	{
-		VirtualProtect((LPVOID)pHost_IsSecureServerAllowed, 6, PAGE_EXECUTE_READWRITE, &oldProt);
-		memcpy((void*)pHost_IsSecureServerAllowed, hissaPatch, 6);
-		VirtualProtect((LPVOID)pHost_IsSecureServerAllowed, 6, oldProt, &oldProt);
-		std::cout << "[*] -insecure spoofed! happy cheating :)" << std::endl;
-	}
-	else
-	{
-		std::cout << "[-] -insecure could not be spoofed.. :(" << std::endl;
-	}
-}
-
-#pragma endregion
-
 
 bool HookManager::AddAllHooks() {
 	// override hooks placed by vac
@@ -149,10 +128,6 @@ bool HookManager::AddAllHooks() {
 	g_HookLib.AddHook(HookEntry("panorama.dll", pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex, (PVOID*)&SvCheats::oSvCheats));
 	g_HookLib.AddHook(HookEntry("panorama.dll", g_Interface.pClient, FSN::hkFrameStageNotfy, FSN::iIndex, (PVOID*)&FSN::oFrameStageNotify));
 	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pEngine, IsPaused::hkIsPaused, IsPaused::iIndex, (PVOID*)&IsPaused::oIsPaused));
-
-	//spoof -insecure (vac bypass)
-	patch_insecure();
-
 
 	g_HookManager.bHooksAdded = true;
 	return true;
