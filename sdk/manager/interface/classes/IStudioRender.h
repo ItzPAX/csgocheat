@@ -387,4 +387,16 @@ public:
 		using fn = bool (__thiscall*)(void*);
 		return (*(fn**)this)[34](this);
 	}
+
+	void SetAmbientLightColors(const Vec4D* pAmbientOnlyColors)
+	{
+		using fn = void(__thiscall*)(void*, const Vec4D*);
+		(*(fn**)this)[20](this, pAmbientOnlyColors);
+	}
+
+	void SetLocalLights(int nLights, const LightDesc_t* pLights)
+	{
+		using fn = void(__thiscall*)(void*, int, const LightDesc_t*);
+		(*(fn**)this)[22](this, nLights, pLights);
+	}
 };

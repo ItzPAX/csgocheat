@@ -6,7 +6,7 @@ bool AntiAim::FL_ShouldSendPacket(CUserCmd* cmd)
 {
 	static int iC = 0;
 
-	if (iC <= g_Config.ints[XOR("fakelag")].val && Game::g_pLocal->bIsAlive() && !(cmd->buttons & CUserCmd::IN_ATTACK) && !(cmd->buttons & CUserCmd::IN_USE))
+	if (iC <= /*g_Config.ints[XOR("fakelag")].val*/ 14 && Game::g_pLocal->bIsAlive() && !(cmd->buttons & CUserCmd::IN_ATTACK) && !(cmd->buttons & CUserCmd::IN_USE))
 	{
 		iC++;
 		return false;

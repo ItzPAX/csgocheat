@@ -26,6 +26,10 @@
 #include "classes/IMatRenderContext.h"
 #include "classes/IWeaponSystem.h"
 #include "sdk/classes/view_shared.h"
+#include "classes/IMemAlloc.h"
+#include "classes/IGameResources.h"
+
+class IRenderView;
 
 class Interface {
 private:
@@ -61,6 +65,8 @@ public:
 	IMDLCache* pMDLCache;
 	IClientState* pClientState;
 	IInput* pInput;
+	IGameResources* pGameResources;
+	IMemAlloc* pMemAlloc;
 
 	// TODO: Find Interface entry for this
 	IClientRenderable* pRenderable;

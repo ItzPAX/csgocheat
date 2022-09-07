@@ -1,7 +1,7 @@
 #pragma once
 #include "includes.h"
 
-class DirectX {
+class DX {
 public:
 	inline static LPDIRECT3DDEVICE9 pDevice = nullptr;
 	int iWindowHeight = 0, iWindowWidth = 0;
@@ -13,4 +13,4 @@ public:
 };
 
 // extern vars and class for hooking and drawing
-extern DirectX g_DirectX;
+extern DX g_DirectX;

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "includes.h"
+#include <DirectXMath.h>
 
 Math g_Math{ };
 
@@ -218,6 +219,25 @@ float Math::GetFOV(const Vec3D& viewAngle, const Vec3D& aimAngle) {
 	AngleVector2(aimAngle, vAng);
 
 	return RAD2DEG(acos(vAim.Dot(vAim) / vAim.LengthSqr()));
+}
+
+void Math::AngleMatrix(const Vec3D& angView, Matrix& matOutput, const Vec3D& vecOrigin) {
+	float sp, sy, sr, cp, cy, cr;
+
+	DirectX::XMScalarSinCos(&sp, &cp, DEG2RAD(angView.x));
+	DirectX::XMScalarSinCos(&sy, &cy, DEG2RAD(angView.y));
+	DirectX::XMScalarSinCos(&sr, &cr, DEG2RAD(angView.z));
+
+	matOutput.SetForward(Vec3D(cp * cy, cp * sy, -sp));
+
+	const float crcy = cr * cy;
+	const float crsy = cr * sy;
+	const float srcy = sr * cy;
+	const float srsy = sr * sy;
+
+	matOutput.SetLeft(Vec3D(sp * srcy - crsy, sp * srsy + crcy, sr * cp));
+	matOutput.SetUp(Vec3D(sp * crcy + srsy, sp * crsy - srcy, cr * cp));
+	matOutput.SetOrigin(vecOrigin);
 }
 
 bool Math::IsInRect(ImVec2 pos, ImVec2 size) {

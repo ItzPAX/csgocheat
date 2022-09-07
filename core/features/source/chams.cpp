@@ -109,7 +109,7 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 		// vis chams
 		if (g_Config.ints[XOR("localchams")].val) {
 			OverrideMaterial(g_Config.ints[XOR("chamtype")].val, g_Config.arrfloats[XOR("localcol")].val);
-			pRenderContext->SetStencilState(GenerateStenctilState(true));
+			pRenderContext->SetStencilState(GenerateStenctilState(false));
 
 			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 		}

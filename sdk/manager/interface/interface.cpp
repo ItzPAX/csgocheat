@@ -68,8 +68,11 @@ bool Interface::Init() {
 	pGameMovement = (PlayerGameMovement*)GetInterface(XOR("client.dll"), XOR("GameMovement"));
 	pMDLCache = (IMDLCache*)GetInterface(XOR("datacache.dll"), XOR("MDLCache"));
 
-	// custom interfaces
+	// interfaces grabbed through other interfaces
 	pGlobalVars = **reinterpret_cast<CGlobalVars***>((*reinterpret_cast<uintptr_t**>(pClient))[11] + 10);
+
+	// function interfaces
+	pMemAlloc = *reinterpret_cast<IMemAlloc**>(GetProcAddress(GetModuleHandleA(XOR("tier0.dll")), XOR("g_pMemAlloc")));
 
 	// sig interfaces 
 	pGlow = *reinterpret_cast<CGlowObjectManager**>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x0F\x11\x05\x00\x00\x00\x00\x83\xC8\x01"), XOR("xxx????xxx")) + 0x03);
@@ -78,6 +81,7 @@ bool Interface::Init() {
 	pWeaponSystem = *reinterpret_cast<IWeaponSystem**>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8B\x35\x00\x00\x00\x00\xFF\x10\x0F\xB7\xC0"), XOR("xx????xxxxx")) + 0x02);
 	pMoveHelper = **reinterpret_cast<PlayerMoveHelper***>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8B\x0D\x00\x00\x00\x00\x8B\x46\x08\x68"), XOR("xx????xxxx")) + 0x02);
 	pClientState = **reinterpret_cast<IClientState***>(g_Tools.SignatureScan(XOR("engine.dll"), XOR("\xA1\x00\x00\x00\x00\x8B\x88\x00\x00\x00\x00\x85\xC9\x75\x07"), XOR("x????xx????xxxx")) + 0x01);
+	//pGameResources = *reinterpret_cast<IGameResources**>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x8B\x06\x8B\xCE\x53\x57\x8B"), XOR("xxxxxxx")) + 0x01); // grab via CClientScoreBoardDialog::GetPlayerScoreInfo
 
 	return true;
 }

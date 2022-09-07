@@ -236,7 +236,12 @@ bool ImGui::Hotkey(const char* label, int* hotkeyent, const ImVec2& size_arg)
     ImVec2 width = (frame_bb.Max - frame_bb.Min);
     width.y = 0;
 
-    ImGui::RenderFrame(frame_bb.Min + (width / 2), frame_bb.Max, ImGui::GetColorU32(style.Colors[ImGuiCol_FrameBg]), true, style.FrameRounding);
+    if (hovered && !user_clicked)
+        ImGui::RenderFrame(frame_bb.Min + (width / 2), frame_bb.Max, ImGui::GetColorU32(style.Colors[ImGuiCol_FrameBgHovered]), true, style.FrameRounding);
+    else if (!hovered && !user_clicked)
+        ImGui::RenderFrame(frame_bb.Min + (width / 2), frame_bb.Max, ImGui::GetColorU32(style.Colors[ImGuiCol_FrameBg]), true, style.FrameRounding);
+    else if (hovered && user_clicked)
+        ImGui::RenderFrame(frame_bb.Min + (width / 2), frame_bb.Max, ImGui::GetColorU32(style.Colors[ImGuiCol_FrameBgActive]), true, style.FrameRounding);
 
     if (hotkeyent[ImGuiHotkeyInd_KEY] != 0 && g.ActiveId != id) {
         strcpy_s(buf_display, KeyNames[hotkeyent[ImGuiHotkeyInd_KEY]]);

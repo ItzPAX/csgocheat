@@ -89,7 +89,7 @@ public:
 	bool Transmit(bool bOnlyReliable = false)
 	{
 		using original_fn = void(__thiscall*)(INetChannel*, bool);
-		(*(original_fn**)this)[46](this, bOnlyReliable);
+		(*(original_fn**)this)[47](this, bOnlyReliable);
 	}
 }; // Size: 0x0444
 

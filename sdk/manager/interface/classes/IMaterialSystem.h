@@ -167,6 +167,11 @@ public:
 		return (*(fn**)this)[97](this, name, w, h, sizeMode, format, depth, textureFlags, renderTargetFlags);
 	}
 
+	ImageFormat GetBackBufferFormat() {
+		using fn = ImageFormat(__thiscall*)(IMaterialSystem*);
+		return (*(fn**)this)[36](this);
+	}
+
 	IMaterial* FindMaterial(char const* material_name, const char* group_name, bool complain = true, const char* complain_prefix = 0) {
 		using fn = IMaterial * (__thiscall*)(IMaterialSystem*, char const*, const char*, bool, const char*);
 		return (*(fn**)this)[84](this, material_name, group_name, complain, complain_prefix);
@@ -192,9 +197,19 @@ public:
 		return (*(fn**)this)[90](this);
 	}
 
-	ITexture* FindTexture(const char* name, const char* groupname, int complain = true, int unk = 1) {
+	void BeginRenderTargetAllocation() {
+		using fn = void(__thiscall*)(IMaterialSystem*);
+		(*(fn**)this)[94](this);
+	}
+
+	void FinishRenderTargetAllocation() {
+		using fn = void(__thiscall*)(IMaterialSystem*);
+		(*(fn**)this)[136](this);
+	}
+
+	ITexture* FindTexture(const char* name, const char* groupname, int complain = true, int addcreationflags = 0) {
 		using fn = ITexture*(__thiscall*)(IMaterialSystem*, const char*, const char*, int, int);
-		return (*(fn**)this)[91](this, name, groupname, complain, unk);
+		return (*(fn**)this)[91](this, name, groupname, complain, addcreationflags);
 	}
 
 	IMatRenderContext* GetRenderContext() {

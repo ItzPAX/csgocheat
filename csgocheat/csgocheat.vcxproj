@@ -283,6 +283,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\core\features\config\config.cpp" />
+    <ClCompile Include="..\core\features\source\model.cpp" />
     <ClCompile Include="..\core\features\source\penetration.cpp" />
     <ClCompile Include="..\core\features\source\inputmgr.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -393,6 +394,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\core\features\config\config.h" />
+    <ClInclude Include="..\core\features\header\model.h" />
     <ClInclude Include="..\core\features\header\penetration.h" />
     <ClInclude Include="..\core\features\header\inputmgr.h" />
     <ClInclude Include="..\core\features\header\legitbot.h" />
@@ -458,6 +460,7 @@
     <ClInclude Include="..\sdk\manager\interface\classes\IEngineTrace.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IGameConsole.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\CGlowObjectManager.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IGameResources.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IHandleEntity.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IInput.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IInputSystem.h" />
@@ -465,6 +468,7 @@
     <ClInclude Include="..\sdk\manager\interface\classes\IMaterialSystem.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IMatRenderContext.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IMDLCache.h" />
+    <ClInclude Include="..\sdk\manager\interface\classes\IMemAlloc.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IPanel.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IPhysicsSurfaceProps.h" />
     <ClInclude Include="..\sdk\manager\interface\classes\IPlayerMovement.h" />

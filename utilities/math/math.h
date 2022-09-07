@@ -39,6 +39,8 @@ public:
 	void AngleVector4(Vec3D& angles, Vec3D* forward, Vec3D* right, Vec3D* up);
 	float GetFOV(const Vec3D& viewAngle, const Vec3D& aimAngle);
 
+	void AngleMatrix(const Vec3D& angView, Matrix& matOutput, const Vec3D& vecOrigin);
+
 	bool IsInRect(ImVec2 pos, ImVec2 size);
 };
 

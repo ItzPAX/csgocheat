@@ -2,26 +2,15 @@
 #include "includes.h"
 #include "pch.h"
 
-namespace SendNetMsg {
-	using tSendNetMsg = bool(__thiscall*)(void*, INetMessage*, bool, bool);
-	tSendNetMsg oSendNetMsg = nullptr;
-
-	int iIndex = 40;
-	__forceinline bool __fastcall hkSendNetMsg(void* thisptr, void* edx, INetMessage* msg, bool rel, bool audio);
-}
-
 static bool bClientModeInit = false;
-static int iHooksAdded = 0;
 void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 
 	uintptr_t* pFramePointer;
 	__asm mov pFramePointer, ebp;
-	bool& bSendPacket = *reinterpret_cast<bool*>(*pFramePointer - 0x1C);
+	bool* bSendPacket = reinterpret_cast<bool*>(*pFramePointer - 0x1C);
 
-	bSendPacket = g_AntiAim.FL_ShouldSendPacket(cmd);
-
-	if (bSendPacket)
-		g_Misc.SetClantag(XOR("LaTeX-Cheat"));
+	if (bSendPacket && !g_Misc.clantag.empty())
+		g_Misc.SetClantag(g_Misc.clantag.c_str());
 
 	// update the playerlist
 	g_PlayerList.UpdatePlayerList();
@@ -43,11 +32,6 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 
 	g_Interface.pNetChannel = g_Interface.pClientState->pNetChannel;
 
-	//if (g_Interface.pNetChannel && iHooksAdded == 0)
-	//	SendNetMsg::oSendNetMsg = (SendNetMsg::tSendNetMsg)g_HookLib.AddHook("client.dll", g_Interface.pNetChannel, SendNetMsg::hkSendNetMsg, SendNetMsg::iIndex, true, "INetChannel");
-	
-	//iHooksAdded++;
-
 	if (Game::g_pLocal->bIsAlive()) {
 		g_Prediction.Start(cmd, Game::g_pLocal);
 
@@ -58,7 +42,7 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 		g_Backtrack.ApplyRecord(cmd, &pRecord);
 
 		g_Ragebot.RunAimbot(cmd);
-		g_AntiAim.DoDesync(cmd, bSendPacket);
+		g_AntiAim.DoDesync(cmd, *bSendPacket);
 
 		g_Prediction.End(cmd, Game::g_pLocal);
 	}
@@ -77,8 +61,8 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	// set cmd to be globally accessible
 	Game::g_pCmd = cmd;
 
-	// choke one tick
-	//bSendPacket = !bSendPacket;
+	// fakelag
+	*bSendPacket = g_AntiAim.FL_ShouldSendPacket(cmd);
 }
 
 void cDoPostScreenSpaceEffects() {

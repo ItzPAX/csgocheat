@@ -11,6 +11,8 @@ void cEndScene() {
 	if (Game::g_pLocal && g_Interface.pEngine->IsInGame())
 		g_Visuals.OnEndScene();
 	g_Visuals.DrawWatermark();
+
+	g_PrevModel.Instance();
 }
 
 void cMenu() {

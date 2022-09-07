@@ -2,9 +2,9 @@
 #include "includes.h"
 #include "directx.h"
 
-DirectX g_DirectX{ };
+DX g_DirectX{ };
 
-HWND DirectX::GetProcessWindow() {
+HWND DX::GetProcessWindow() {
 	window = FindWindow(NULL, XOR("Counter-Strike: Global Offensive - Direct3D 9"));
 
 	g_Interface.pEngine->GetScreenSize(iWindowWidth, iWindowHeight);
@@ -12,7 +12,7 @@ HWND DirectX::GetProcessWindow() {
 	return window;
 }
 
-bool DirectX::GetD3D9Device(void** pTable, size_t size) {
+bool DX::GetD3D9Device(void** pTable, size_t size) {
 	if (!pTable)
 		return false;
 

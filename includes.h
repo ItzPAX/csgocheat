@@ -75,6 +75,7 @@ using uchar = unsigned char;
 #include "core/features/header/legitbot.h"
 #include "core/features/header/misc.h"
 #include "core/features/header/antiaim.h"
+#include "core/features/header/model.h"
 
 #include "csgocheat/Syscalls.h"
 

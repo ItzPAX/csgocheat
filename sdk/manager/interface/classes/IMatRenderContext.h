@@ -395,6 +395,12 @@ public:
 		(*(original_fn**)this)[5](this, pTexture);
 	}
 
+	void SetIntRenderingParameter(int a1, int a2)
+	{
+		using original_fn = void(__thiscall*)(void*, int, int);
+		(*(original_fn**)this)[126](this, a1, a2);
+	}
+
 	void SetRenderTarget(ITexture* pTexture)
 	{
 		using original_fn = void(__thiscall*)(void*, ITexture*);
@@ -593,7 +599,35 @@ public:
 };
 
 class ITexture {
+private:
+	template <typename T, typename ... args_t>
+	constexpr T CallVFunc(void* thisptr, std::size_t nIndex, args_t... argList)
+	{
+		using VirtualFn = T(__thiscall*)(void*, decltype(argList)...);
+		return (*static_cast<VirtualFn**>(thisptr))[nIndex](thisptr, argList...);
+	}
+private:
+	std::byte	pad0[0x50];		 // 0x0000
 public:
-	char pad[0x50];
-	Texture_t** m_pTextureHandles;
+	Texture_t** pTextureHandles; // 0x0050
+
+	int GetActualWidth()
+	{
+		return CallVFunc<int>(this, 3);
+	}
+
+	int GetActualHeight()
+	{
+		return CallVFunc<int>(this, 4);
+	}
+
+	void IncrementReferenceCount()
+	{
+		CallVFunc<void>(this, 10);
+	}
+
+	void DecrementReferenceCount()
+	{
+		CallVFunc<void>(this, 11);
+	}
 };

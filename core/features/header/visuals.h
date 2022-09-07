@@ -33,7 +33,6 @@ public:
 	void DrawName(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);
 	void DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInfo& info);
 	void DrawWeapon(RECT rPlayerRect, Player* pPlayer, Color col);
-	void RenderFlex();
 
 	// Main Funcs
 	void DrawDormant(Player* pPlayer, RECT rPlayerRect);

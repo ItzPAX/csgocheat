@@ -32,6 +32,27 @@ struct Matrix {
 		Init(x, y, z, origin);
 	}
 
+	constexpr void SetForward(const Vec3D& vecForward)
+	{
+		MatVal[0][0] = vecForward.x;
+		MatVal[1][0] = vecForward.y;
+		MatVal[2][0] = vecForward.z;
+	}
+
+	constexpr void SetLeft(const Vec3D& vecLeft)
+	{
+		MatVal[0][1] = vecLeft.x;
+		MatVal[1][1] = vecLeft.y;
+		MatVal[2][1] = vecLeft.z;
+	}
+
+	constexpr void SetUp(const Vec3D& vecUp)
+	{
+		MatVal[0][2] = vecUp.x;
+		MatVal[1][2] = vecUp.y;
+		MatVal[2][2] = vecUp.z;
+	}
+
 	inline void SetOrigin(Vec3D const& p) {
 		MatVal[0][3] = p.x;
 		MatVal[1][3] = p.y;

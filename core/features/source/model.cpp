@@ -1,0 +1,130 @@
+#include "includes.h"
+#include "pch.h"
+
+#include "sdk/manager/interface/classes/IRenderView.h"
+
+PreviewModel g_PrevModel;
+
+Vec4D aWhiteArray[6] =
+{
+	Vec4D(0.4f, 0.4f, 0.4f, 1.0f),
+	Vec4D(0.4f, 0.4f, 0.4f, 1.0f),
+	Vec4D(0.4f, 0.4f, 0.4f, 1.0f),
+	Vec4D(0.4f, 0.4f, 0.4f, 1.0f),
+	Vec4D(0.4f, 0.4f, 0.4f, 1.0f),
+	Vec4D(0.4f, 0.4f, 0.4f, 1.0f),
+};
+
+float_t aColorModulation[3] =
+{
+	1.0f,
+	1.0f,
+	1.0f
+};
+
+void PreviewModel::Instance()
+{
+	if (!g_Menu.bToggled)
+		return;
+
+	if (!m_PreviewTexture)
+	{
+		g_Interface.pMaterialSystem->BeginRenderTargetAllocation();
+
+		m_PreviewTexture = g_Interface.pMaterialSystem->CreateRenderTargetFF(
+			XOR("Preview"),
+			350, 575,
+			RT_SIZE_NO_CHANGE,
+			g_Interface.pMaterialSystem->GetBackBufferFormat(),
+			MATERIAL_RT_DEPTH_SHARED,
+			TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT,
+			CREATERENDERTARGETFLAGS_HDR
+		);
+
+		g_Interface.pMaterialSystem->FinishRenderTargetAllocation();
+	}
+
+	std::cout << "here1\n";
+
+	if (!m_CubemapTexture)
+		m_CubemapTexture = g_Interface.pMaterialSystem->FindTexture(XOR("editor/cubemap.hdr"), XOR(TEXTURE_GROUP_CUBE_MAP));
+
+	static auto pCreateModel = g_Tools.SignatureScan(XOR("client.dll"), XOR("\x53\x8B\xD9\x56\x57\x8D\x4B\x04\xC7\x03\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x6A"), XOR("xxxxxxxxxx????x????x"));
+	auto CreateModel = reinterpret_cast<void(__thiscall*)(void*)>(pCreateModel);
+	if (!m_PreviewModel)
+	{
+		m_PreviewModel = static_cast<C_MergedMDL*>(g_Interface.pMemAlloc->Alloc(0x75C));
+		CreateModel(m_PreviewModel);
+
+		m_PreviewModel->SetMDL(XOR("models/player/custom_player/uiplayer/animset_uiplayer.mdl"));
+		m_PreviewModel->SetMergedMDL(XOR("models/player/custom_player/legacy/ctm_fbi_variantb.mdl"));
+		m_PreviewModel->SetMergedMDL(XOR("models/weapons/w_pist_elite.mdl"));
+
+		m_PreviewModel->SetSequence(32, false);
+		m_PreviewModel->SetupBonesForAttachmentQueries();
+	}
+
+	std::cout << "here2\n";
+
+	m_PreviewModel->RootMDL.flTime += g_Interface.pGlobalVars->flFrameTime / 2.0f;
+
+	m_ViewSetup.x = 0;
+	m_ViewSetup.y = 0;
+	m_ViewSetup.width = 350;
+	m_ViewSetup.height = 575;
+	m_ViewSetup.m_bOrtho = false;
+	m_ViewSetup.fov = 70.f;
+	m_ViewSetup.origin = Vec3D(-65.0f, 2.0f, 50);
+	m_ViewSetup.angles = Vec3D(0, 0, 0);
+	m_ViewSetup.zNear = 7.0f;
+	m_ViewSetup.zFar = 1000.f;
+	m_ViewSetup.m_bDoBloomAndToneMapping = true;
+
+	CMatRenderContextPtr pRenderContext(g_Interface.pMaterialSystem);
+
+	pRenderContext->PushRenderTargetAndViewport();
+	pRenderContext->SetRenderTarget(m_PreviewTexture);
+
+	pRenderContext->BindLocalCubemap(m_CubemapTexture);
+	pRenderContext->SetLightingOrigin(-65.0f, 2.0f, 50.0f);
+	pRenderContext->SetIntRenderingParameter(10, 0);
+
+	Frustum_t dummyFrustum;
+	g_Interface.pRenderView->Push3DView(pRenderContext, m_ViewSetup, VIEW_CLEAR_COLOR | VIEW_CLEAR_DEPTH | VIEW_CLEAR_STENCIL, m_PreviewTexture, dummyFrustum);
+
+	pRenderContext->ClearColor4ub(false, false, false, false);
+	pRenderContext->ClearBuffers(true, true, true);
+	pRenderContext->SetAmbientLightCube(aWhiteArray);
+
+	g_Interface.pStudioRender->SetAmbientLightColors(aWhiteArray);
+	g_Interface.pStudioRender->SetLocalLights(0, nullptr);
+
+	std::cout << "here3\n";
+
+	Matrix matPlayerView;
+	g_Math.AngleMatrix(Vec3D(0, -180.f, 0), matPlayerView, Vec3D(0, 0, 0));
+
+	g_Interface.pModelRender->SuppressEngineLighting(true);
+	m_PreviewModel->Draw(matPlayerView); /*FIXMEFIXME Crashes when ingame*/
+	g_Interface.pModelRender->SuppressEngineLighting(false);
+
+	g_Interface.pRenderView->PopView(pRenderContext, dummyFrustum);
+	pRenderContext->BindLocalCubemap(nullptr);
+
+	pRenderContext->PopRenderTargetAndViewport();
+	pRenderContext->Release();
+
+	std::cout << "here4\n";
+}
+
+void C_MergedMDL::SetupBonesForAttachmentQueries()
+{
+	static auto pSetupBonesForAttachmentQueries = g_Tools.SignatureScan(XOR("client.dll"), XOR("\x55\x8B\xEC\x83\xEC\x14\x83\x3D\x00\x00\x00\x00\x00\x53"), XOR("xxxxxxxx?????x"));
+	return ((void(__thiscall*)(void*))(pSetupBonesForAttachmentQueries))(this);
+}
+
+void C_MergedMDL::SetMergedMDL(const char* szModelPath, CCustomMaterialOwner* pCustomMaterialOwner, void* pProxyData)
+{
+	static auto pSetMergedMDL = g_Tools.SignatureScan(XOR("client.dll"), XOR("\x55\x8B\xEC\x57\x8B\xF9\x8B\x0D\x00\x00\x00\x00\x85\xC9\x75"), XOR("xxxxxxxx????xxx"));
+	return ((void(__thiscall*)(void*, const char*, CCustomMaterialOwner*, void*, bool))(pSetMergedMDL))(this, szModelPath, pCustomMaterialOwner, pProxyData, false);
+}

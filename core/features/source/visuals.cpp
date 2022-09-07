@@ -4,6 +4,8 @@
 Visuals g_Visuals;
 
 void Visuals::ThirdPerson() {
+	g_Interface.pICVar->FindVar(XOR("cam_collision"))->SetValue(true);
+
 	if (!g_Config.ints[XOR("thirdperson")].val) {
 		g_Interface.pInput->CAM_ToFirstPerson();
 		return;
@@ -192,91 +194,6 @@ void Visuals::DrawWeapon(RECT rPlayerRect, Player* pPlayer, Color col) {
 	g_Render.Text(g_Render.pEspFont, seglist[1].c_str(), rPlayerRect.right + 4.f + size.x / 2, rPlayerRect.top, Color::White(col.rgba[3]));
 }
 
-void Visuals::RenderFlex() {
-	if (!pFlexEnt)
-		pFlexEnt = g_Misc.CreateFlex(0, 0);
-
-	if (!pFlexEnt)
-		return;
-
-	std::cout << "here1\n";
-	float flWidthRatio = 0.75f; //(w/h) / (4/3); (512/512) / 4 / 3
-	pFlexEnt->FrameAdvance(g_Interface.pGlobalVars->flCurTime);
-	CMatRenderContextPtr render_ctx(g_Interface.pMaterialSystem->GetRenderContext());
-
-	if (!pBuffer)
-		pBuffer = g_Interface.pMaterialSystem->CreateRenderTargetFF("esp_preview", 200, 200, RenderTargetSizeMode_t::RT_SIZE_DEFAULT, ImageFormat::IMAGE_FORMAT_ARGB8888);
-
-	if (!pBuffer)
-		return;
-
-	std::cout << "here3\n";
-
-	int vp_x = 0, vp_y = 0, vp_w = 1920, vp_h = 1080;
-	//render_ctx->GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
-	CViewSetup view;
-	view.x =/*x +*/ 20 + vp_x;
-	view.y = /*y + */ 20 + vp_y;
-	view.width = vp_w;
-	view.height = vp_h;
-	view.m_bOrtho = false;
-	// scale the FOV for aspect ratios other than 4/3	
-	/*
-	float halfAngleRadians = 54 * (0.5f * M_PI / 180.0f);
-	float t = tan(halfAngleRadians);
-	t *= flWidthRatio;
-	float retDegrees = (180.0f / M_PI) * atan(t);
-	*/
-	view.fov = /*retDegrees * 2.0f*/20;
-	view.origin = /*entity_origin + */Vec3D(-220, -4, 35); //This is used for (0,0,0) pos entity
-	view.angles.Init(0,0,0);
-	view.zNear = 7;
-	view.zFar = 1000;
-	view.m_bDoBloomAndToneMapping = true;
-	view.m_flAspectRatio = 1.f;
-	static auto pCubemapTexture = g_Interface.pMaterialSystem->FindTexture("editor/cubemap.hdr", NULL, true);
-	render_ctx->BindLocalCubemap(pCubemapTexture);
-	render_ctx->SetLightingOrigin(0, 0, 0);
-
-	static Vec3D white[6] =
-	{
-		Vec3D(0.4, 0.4, 0.4),
-		Vec3D(0.4, 0.4, 0.4),
-		Vec3D(0.4, 0.4, 0.4),
-		Vec3D(0.4, 0.4, 0.4),
-		Vec3D(0.4, 0.4, 0.4),
-		Vec3D(0.4, 0.4, 0.4),
-	};
-
-	static Vec4D whites[6] =
-	{
-		Vec4D(0.4, 0.4, 0.4, 1.f),
-		Vec4D(0.4, 0.4, 0.4, 1.f),
-		Vec4D(0.4, 0.4, 0.4, 1.f),
-		Vec4D(0.4, 0.4, 0.4, 1.f),
-		Vec4D(0.4, 0.4, 0.4, 1.f),
-		Vec4D(0.4, 0.4, 0.4, 1.f),
-	};
-	render_ctx->SetAmbientLightCube(whites);
-	g_Interface.pStudioRender->SetAmbientLightColors(white);
-	std::cout << "here3\n";
-
-	Frustum_t dummyFrustum;
-	g_Interface.pRenderView->Push3DView(render_ctx, view, 0, pBuffer, dummyFrustum);
-	render_ctx->ClearColor4ub(0, 0, 0, 0);
-	render_ctx->ClearBuffers(true, false, false);
-	std::cout << "here4\n";
-
-	//float color[3] = { 1.0f, 1.0f, 1.0f };
-	//g_Interface.pRenderView->SetColorModulation(color);
-	//g_Interface.pRenderView->SetBlend(1.0f);
-	//pFlexEnt->SetPosition(Vec3D(0.1f, 0.1f, 0.1f)); //Shouldn't be (0,0,0), so do (0.1f,0.1f,0.1f)
-	//pFlexEnt->SetAngles(Vec3D(0, -90, 0)); //It will make player look to the right for your new view
-	//pFlexEnt->DrawModel(1, 255);
-	g_Interface.pRenderView->PopView(render_ctx, dummyFrustum);
-	render_ctx->BindLocalCubemap(NULL);
-}
-
 void Visuals::DrawDormant(Player* pPlayer, RECT rPlayerRect) {
 	// opacity should reach 1 in 3000 milliseconds.
 	constexpr float flFrequency = 1.f / 3.f;
@@ -433,6 +350,8 @@ void Visuals::DrawHotkeyList() {
 }
 
 void Visuals::OnEndScene() {
+	g_Interface.pICVar->FindVar(XOR("r_aspectratio"))->SetValue(g_Config.floats[XOR("aspectratio")].val);
+
 	for (int i = 0; i < pSortedPlayers.size(); i++) {
 		// get and validate player
 		Player* pPlayer = pSortedPlayers[i].pPlayer;
@@ -456,6 +375,4 @@ void Visuals::OnEndScene() {
 			DrawPlayer(pPlayer, rPlayerRect);
 		}
 	}
-
-	//RenderFlex();
 }

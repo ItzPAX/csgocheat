@@ -12,6 +12,13 @@
 HookManager g_HookManager{ };
 
 #pragma region HookDefs
+namespace DrawModel {
+	using tDrawModel = void(__fastcall*)(void*, void*, DrawModelResults*, const DrawModelInfo&, Matrix*, float*, float*, const Vec3D&, int);
+	tDrawModel oDrawModel = nullptr;
+
+	int iIndex = 29;
+	__forceinline void __fastcall hkDrawModel(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags);
+}
 namespace IsPaused {
 	using tIsPaused = bool(__fastcall*)(void*);
 	tIsPaused oIsPaused = nullptr;
@@ -26,7 +33,6 @@ namespace IsHLTV {
 	int iIndex = 93;
 	__forceinline bool __fastcall hkIsHLTV(void* thisptr, void* edx);
 }
-
 namespace SvCheats {
 	using tSvCheats = bool(__thiscall*)(void*);
 	tSvCheats oSvCheats = nullptr;
@@ -34,7 +40,6 @@ namespace SvCheats {
 	int iIndex = 13;
 	__forceinline bool __fastcall hkSvCheats(void* ConVar, int edx);
 }
-
 namespace DoPostScreenSpaceEffects {
 	using tDoPostScreenSpaceEffects = void(__fastcall*)(IClientMode*, int, const void*);
 	tDoPostScreenSpaceEffects oDoPostScreenSpaceEffects = nullptr;
@@ -42,7 +47,6 @@ namespace DoPostScreenSpaceEffects {
 	int iIndex = 44;
 	__forceinline void __fastcall hkDoPostScreenSpaceEffects(IClientMode* icmptr, int edx, const void* pViewSetup);
 }
-
 namespace FSN {
 	using tFrameStageNotify = void(__thiscall*)(void*, IBaseClientDLL::ClientFrameStage_t);
 	tFrameStageNotify oFrameStageNotify = nullptr;
@@ -50,20 +54,12 @@ namespace FSN {
 	int iIndex = 37;
 	__forceinline void __stdcall hkFrameStageNotfy(IBaseClientDLL::ClientFrameStage_t curStage);
 }
-
 namespace HudUpdate {
 	using tHudUpdate = void(__stdcall*)(bool);
 	tHudUpdate oHudUpdate = nullptr;
 
 	int iIndex = 11;
 	__forceinline void __stdcall hkHudUpdate(bool bActive);
-}
-namespace DrawModel {
-	using tDrawModel = void(__fastcall*)(void*, void*, DrawModelResults*, const DrawModelInfo&, Matrix*, float*, float*, const Vec3D&, int);
-	tDrawModel oDrawModel = nullptr;
-
-	int iIndex = 29;
-	__forceinline void __fastcall hkDrawModel(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags);
 }
 namespace WndProc {
 	using tWndProc = LRESULT(__stdcall*)(HWND, UINT, WPARAM, LPARAM);
@@ -162,12 +158,6 @@ bool HookManager::ReleaseAll() {
 }
 
 #pragma region HkFunctions
-bool __fastcall SendNetMsg::hkSendNetMsg(void* thisptr, void* edx, INetMessage* msg, bool rel, bool audio) {
-	std::cout << "GetName() -> " << msg->GetName() << std::endl;
-	
-	return oSendNetMsg(thisptr, msg, rel, audio);
-}
-
 bool __fastcall IsPaused::hkIsPaused(void* thisptr) {
 	static DWORD* return_to_extrapolation = (DWORD*)(g_Tools.SignatureScan("client.dll",
 		XOR("\xFF\xD0\xA1\x00\x00\x00\x00\xB9\x00\x00\x00\x00\xD9\x1D\x00\x00\x00\x00\xFF\x50\x34\x85\xC0\x74\x22\x8B\x0D\x00\x00\x00\x00"), XOR("xxx????x????xx????xxxxxxxxx????")) + 0x29);
@@ -230,6 +220,7 @@ void __stdcall HudUpdate::hkHudUpdate(bool bActive) {
 	cHudUpdate();
 	oHudUpdate(bActive);
 }
+
 void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags = STUDIORENDER_DRAW_ENTIRE_MODEL) {
 	if (!Game::g_pLocal)
 		return oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);

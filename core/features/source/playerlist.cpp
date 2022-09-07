@@ -48,6 +48,7 @@ void PlayerList::DrawPlayerList() {
 		ImGui::Checkbox(XOR("Prioritize Player"), &settings[pinfo.isteamid].bPrioritizePlayer);
 		ImGui::Checkbox(XOR("Hightlight Player"), &settings[pinfo.isteamid].bHighlightPlayer);
 		ImGui::Checkbox(XOR("Exclude from Paranoia Mode"), &settings[pinfo.isteamid].bIgnoreFromParanoia);
+		//ImGui::Checkbox(XOR("Set as Clantag Target"), &settings[pinfo.isteamid].bTargetForClantag);
 
 		// get playerinfo struct and dump it to a string
 		static std::string info = "";

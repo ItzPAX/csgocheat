@@ -11,6 +11,7 @@ struct PlayerListSettings {
 	bool bPrioritizePlayer = false;
 	bool bHighlightPlayer = false;
 	bool bIgnoreFromParanoia = false;
+	bool bTargetForClantag = false;
 };
 
 class PlayerList {

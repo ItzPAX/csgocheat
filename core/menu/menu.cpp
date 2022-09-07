@@ -89,6 +89,7 @@ void Menu::Render() {
 
 void Menu::Draw() {
 	ImVec2 vSize = ImGui::GetWindowSize();
+	ImVec2 vPos = ImGui::GetWindowPos();
 	if (!style)
 		ImGui::Render();
 
@@ -97,6 +98,16 @@ void Menu::Draw() {
 
 	// Render the playerlist
 	g_PlayerList.DrawPlayerList();
+
+	if (g_PrevModel.GetTexture())
+	{
+		ImGui::GetForegroundDrawList()->AddImage(
+			g_PrevModel.GetTexture()->pTextureHandles[0]->texture_ptr,
+			ImVec2(vPos.x + 610 + 150, vPos.y - 130),
+			ImVec2(vPos.x + 610 + 150 + g_PrevModel.GetTexture()->GetActualWidth(), vPos.y + g_PrevModel.GetTexture()->GetActualHeight() - 130),
+			ImVec2(0, 0), ImVec2(1, 1),
+			ImColor(1.0f, 1.0f, 1.0f, 1.0f));
+	}
 
 	switch (g_Menu.iCurrentTab) {
 		// RAGEBOT
@@ -296,8 +307,8 @@ void Menu::Draw() {
 			ImGui::Checkbox(XOR("Lagcompensation"), (bool*)&g_Config.ints[XOR("lagcomp")].val);
 		}
 		
-		if (ImGui::SliderFloat(XOR("Aspect Ratio"), &g_Config.floats[XOR("aspectratio")].val, 0.5f, 2.f, "%.2f%", 0.05f))
-			g_Interface.pICVar->FindVar(XOR("r_aspectratio"))->SetValue(g_Config.floats[XOR("aspectratio")].val);
+		ImGui::SliderFloat(XOR("Aspect Ratio"), &g_Config.floats[XOR("aspectratio")].val, 0.5f, 2.f, "%.2f%", 0.05f);
+		ImGui::InputText(XOR("Clantag"), &g_Misc.clantag);
 		ImGui::Checkbox(XOR("Watermark"), (bool*)&g_Config.ints[XOR("watermark")].val);
 		ImGui::Checkbox(XOR("Spectatorlist"), (bool*)&g_Config.ints[XOR("spectatorlist")].val);
 		ImGui::Checkbox(XOR("Hotkeylist"), (bool*)&g_Config.ints[XOR("hotkeylist")].val);
