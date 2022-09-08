@@ -571,25 +571,61 @@ public:
 
 class CMatRenderContextPtr : public CRefPtr<IMatRenderContext>
 {
-	typedef CRefPtr<IMatRenderContext> BaseClass;
+	typedef CRefPtr<IMatRenderContext> CBaseClass;
 public:
-	CMatRenderContextPtr() {}
-	CMatRenderContextPtr(IMatRenderContext* pInit) : BaseClass(pInit) { if (BaseClass::m_pObject) BaseClass::m_pObject->BeginRender(); }
-	CMatRenderContextPtr(IMaterialSystem* pFrom) : BaseClass(pFrom->GetRenderContext()) { if (BaseClass::m_pObject) BaseClass::m_pObject->BeginRender(); }
-	~CMatRenderContextPtr() { if (BaseClass::m_pObject) BaseClass::m_pObject->EndRender(); }
+	CMatRenderContextPtr() = default;
 
-	IMatRenderContext* operator=(IMatRenderContext* p) { if (p) p->BeginRender(); return BaseClass::operator=(p); }
+	CMatRenderContextPtr(IMatRenderContext* pInit) : CBaseClass(pInit)
+	{
+		if (CBaseClass::m_pObject != nullptr)
+			CBaseClass::m_pObject->BeginRender();
+	}
 
-	void SafeRelease() { if (BaseClass::m_pObject) BaseClass::m_pObject->EndRender(); BaseClass::SafeRelease(); }
-	void AssignAddRef(IMatRenderContext* pFrom) { if (BaseClass::m_pObject) BaseClass::m_pObject->EndRender(); BaseClass::AssignAddRef(pFrom); BaseClass::m_pObject->BeginRender(); }
+	CMatRenderContextPtr(IMaterialSystem* pFrom) : CBaseClass(pFrom->GetRenderContext())
+	{
+		if (CBaseClass::m_pObject != nullptr)
+			CBaseClass::m_pObject->BeginRender();
+	}
 
-	void GetFrom(IMaterialSystem* pFrom) { AssignAddRef(pFrom->GetRenderContext()); }
+	~CMatRenderContextPtr()
+	{
+		if (CBaseClass::m_pObject != nullptr)
+			CBaseClass::m_pObject->EndRender();
+	}
 
+	IMatRenderContext* operator=(IMatRenderContext* pSecondContext)
+	{
+		if (pSecondContext != nullptr)
+			pSecondContext->BeginRender();
+
+		return CBaseClass::operator=(pSecondContext);
+	}
+
+	void SafeRelease()
+	{
+		if (CBaseClass::m_pObject != nullptr)
+			CBaseClass::m_pObject->EndRender();
+
+		CBaseClass::SafeRelease();
+	}
+
+	void AssignAddReference(IMatRenderContext* pFrom)
+	{
+		if (CBaseClass::m_pObject)
+			CBaseClass::m_pObject->EndRender();
+
+		CBaseClass::AssignAddRef(pFrom);
+		CBaseClass::m_pObject->BeginRender();
+	}
+
+	void GetFrom(IMaterialSystem* pFrom)
+	{
+		AssignAddReference(pFrom->GetRenderContext());
+	}
 
 private:
-	CMatRenderContextPtr(const CMatRenderContextPtr& from);
-	void operator=(const CMatRenderContextPtr& from);
-
+	CMatRenderContextPtr(const CMatRenderContextPtr& pRefPtr);
+	void operator=(const CMatRenderContextPtr& pSecondRefPtr);
 };
 
 class Texture_t {

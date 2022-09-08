@@ -47,7 +47,7 @@ public:
     std::byte	pad[0x3C]; // 0x0000
     MDLHandle_t	hModelHandle; // 0x003C
     std::byte	pad0[0x8]; // 0x003E
-    float		Color[3]; // 0x0046
+    std::byte	pad4[0x4]; // 0x0046
     std::byte	pad1[0x2]; // 0x004A
     int			nSkin; // 0x004C
     int			nBody; // 0x0050

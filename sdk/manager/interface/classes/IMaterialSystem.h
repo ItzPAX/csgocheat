@@ -207,8 +207,8 @@ public:
 		(*(fn**)this)[136](this);
 	}
 
-	ITexture* FindTexture(const char* name, const char* groupname, int complain = true, int addcreationflags = 0) {
-		using fn = ITexture*(__thiscall*)(IMaterialSystem*, const char*, const char*, int, int);
+	ITexture* FindTexture(const char* name, const char* groupname, bool complain = true, int addcreationflags = 0) {
+		using fn = ITexture*(__thiscall*)(IMaterialSystem*, const char*, const char*, bool, int);
 		return (*(fn**)this)[91](this, name, groupname, complain, addcreationflags);
 	}
 

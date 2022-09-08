@@ -5,7 +5,7 @@
 
 PreviewModel g_PrevModel;
 
-Vec4D aWhiteArray[6] =
+std::array < Vec4D, 6 > aWhiteArray =
 {
 	Vec4D(0.4f, 0.4f, 0.4f, 1.0f),
 	Vec4D(0.4f, 0.4f, 0.4f, 1.0f),
@@ -15,7 +15,7 @@ Vec4D aWhiteArray[6] =
 	Vec4D(0.4f, 0.4f, 0.4f, 1.0f),
 };
 
-float_t aColorModulation[3] =
+std::array < float_t, 3 > aColorModulation =
 {
 	1.0f,
 	1.0f,
@@ -44,8 +44,6 @@ void PreviewModel::Instance()
 		g_Interface.pMaterialSystem->FinishRenderTargetAllocation();
 	}
 
-	std::cout << "here1\n";
-
 	if (!m_CubemapTexture)
 		m_CubemapTexture = g_Interface.pMaterialSystem->FindTexture(XOR("editor/cubemap.hdr"), XOR(TEXTURE_GROUP_CUBE_MAP));
 
@@ -58,27 +56,25 @@ void PreviewModel::Instance()
 
 		m_PreviewModel->SetMDL(XOR("models/player/custom_player/uiplayer/animset_uiplayer.mdl"));
 		m_PreviewModel->SetMergedMDL(XOR("models/player/custom_player/legacy/ctm_fbi_variantb.mdl"));
-		m_PreviewModel->SetMergedMDL(XOR("models/weapons/w_pist_elite.mdl"));
+		m_PreviewModel->SetMergedMDL(XOR("models/weapons/w_snip_awp.mdl"));
 
-		m_PreviewModel->SetSequence(32, false);
+		m_PreviewModel->SetSequence(119, false);
 		m_PreviewModel->SetupBonesForAttachmentQueries();
 	}
 
-	std::cout << "here2\n";
-
 	m_PreviewModel->RootMDL.flTime += g_Interface.pGlobalVars->flFrameTime / 2.0f;
 
-	m_ViewSetup.x = 0;
-	m_ViewSetup.y = 0;
-	m_ViewSetup.width = 350;
-	m_ViewSetup.height = 575;
-	m_ViewSetup.m_bOrtho = false;
-	m_ViewSetup.fov = 70.f;
-	m_ViewSetup.origin = Vec3D(-65.0f, 2.0f, 50);
-	m_ViewSetup.angles = Vec3D(0, 0, 0);
-	m_ViewSetup.zNear = 7.0f;
-	m_ViewSetup.zFar = 1000.f;
-	m_ViewSetup.m_bDoBloomAndToneMapping = true;
+	m_ViewSetup.iX = 0;
+	m_ViewSetup.iY = 0;
+	m_ViewSetup.iWidth = 350;
+	m_ViewSetup.iHeight = 575;
+	m_ViewSetup.bOrtho = false;
+	m_ViewSetup.flFOV = 70.f;
+	m_ViewSetup.vecOrigin = Vec3D(-65.0f, 2.0f, 50);
+	m_ViewSetup.angView = Vec3D(0, 0, 0);
+	m_ViewSetup.flNearZ = 7.0f;
+	m_ViewSetup.flFarZ = 1000.f;
+	m_ViewSetup.bDoBloomAndToneMapping = true;
 
 	CMatRenderContextPtr pRenderContext(g_Interface.pMaterialSystem);
 
@@ -94,18 +90,19 @@ void PreviewModel::Instance()
 
 	pRenderContext->ClearColor4ub(false, false, false, false);
 	pRenderContext->ClearBuffers(true, true, true);
-	pRenderContext->SetAmbientLightCube(aWhiteArray);
+	pRenderContext->SetAmbientLightCube(aWhiteArray.data());
 
-	g_Interface.pStudioRender->SetAmbientLightColors(aWhiteArray);
+	g_Interface.pStudioRender->SetAmbientLightColors(aWhiteArray.data());
 	g_Interface.pStudioRender->SetLocalLights(0, nullptr);
 
-	std::cout << "here3\n";
-
-	Matrix matPlayerView;
+	Matrix matPlayerView = { };
 	g_Math.AngleMatrix(Vec3D(0, -180.f, 0), matPlayerView, Vec3D(0, 0, 0));
 
 	g_Interface.pModelRender->SuppressEngineLighting(true);
-	m_PreviewModel->Draw(matPlayerView); /*FIXMEFIXME Crashes when ingame*/
+
+	g_Chams.OverrideMaterial(g_Config.ints[XOR("chamtype")].val, g_Config.arrfloats[XOR("enemyviscol")].val);
+
+	m_PreviewModel->Draw(matPlayerView); /*FIX: Call Instance() in PaintTraverse*/
 	g_Interface.pModelRender->SuppressEngineLighting(false);
 
 	g_Interface.pRenderView->PopView(pRenderContext, dummyFrustum);
@@ -113,8 +110,6 @@ void PreviewModel::Instance()
 
 	pRenderContext->PopRenderTargetAndViewport();
 	pRenderContext->Release();
-
-	std::cout << "here4\n";
 }
 
 void C_MergedMDL::SetupBonesForAttachmentQueries()

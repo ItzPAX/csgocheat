@@ -12,6 +12,14 @@
 HookManager g_HookManager{ };
 
 #pragma region HookDefs
+namespace PaintTraverse {
+	using tPaintTraverse = void(__thiscall*)(IPanel*, unsigned int, bool, bool);
+	tPaintTraverse oPaintTraverse = nullptr;
+
+	int iIndex = 41;
+	__forceinline void __stdcall hkPaintTraverse(unsigned int iPanel, bool bForceRepaint, bool bAllowForce);
+}
+
 namespace DrawModel {
 	using tDrawModel = void(__fastcall*)(void*, void*, DrawModelResults*, const DrawModelInfo&, Matrix*, float*, float*, const Vec3D&, int);
 	tDrawModel oDrawModel = nullptr;
@@ -128,6 +136,7 @@ bool HookManager::AddAllHooks() {
 	g_HookLib.AddHook(HookEntry("panorama.dll", pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex, (PVOID*)&SvCheats::oSvCheats));
 	g_HookLib.AddHook(HookEntry("panorama.dll", g_Interface.pClient, FSN::hkFrameStageNotfy, FSN::iIndex, (PVOID*)&FSN::oFrameStageNotify));
 	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pEngine, IsPaused::hkIsPaused, IsPaused::iIndex, (PVOID*)&IsPaused::oIsPaused));
+	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pPanel, PaintTraverse::hkPaintTraverse, PaintTraverse::iIndex, (PVOID*)&PaintTraverse::oPaintTraverse));
 
 	g_HookManager.bHooksAdded = true;
 	return true;
@@ -159,6 +168,17 @@ bool HookManager::ReleaseAll() {
 }
 
 #pragma region HkFunctions
+void __stdcall PaintTraverse::hkPaintTraverse(unsigned int iPanel, bool bForceRepaint, bool bAllowForce) {
+	// render prev. model
+	const char* szPanelToDraw = g_Interface.pPanel->GetPanelName(iPanel);
+
+	if (strstr(szPanelToDraw, XOR("MatSystemTopPanel"))) {
+		g_PrevModel.Instance();
+	}
+
+	oPaintTraverse(g_Interface.pPanel, iPanel, bForceRepaint, bAllowForce);
+}
+
 bool __fastcall IsPaused::hkIsPaused(void* thisptr) {
 	static DWORD* return_to_extrapolation = (DWORD*)(g_Tools.SignatureScan("client.dll",
 		XOR("\xFF\xD0\xA1\x00\x00\x00\x00\xB9\x00\x00\x00\x00\xD9\x1D\x00\x00\x00\x00\xFF\x50\x34\x85\xC0\x74\x22\x8B\x0D\x00\x00\x00\x00"), XOR("xxx????x????xx????xxxxxxxxx????")) + 0x29);
@@ -236,7 +256,6 @@ void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults*
 }	
 bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {	
 	Game::g_pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
-
 	if (!g_Interface.pEngine->IsInGame()) {
 		g_PlayerList.listentries.clear();
 		g_Misc.pSpectators.clear();
@@ -248,9 +267,11 @@ bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) 
 	if (!Game::g_pLocal)
 		return oCreateMove(flInputSampleTime, cmd);
 
+	bool res = oCreateMove(flInputSampleTime, cmd);
+
 	// relay function
 	cCreateMove(flInputSampleTime, cmd);
-	return false;
+	return res;
 }
 HRESULT __stdcall HkDirectX::hkEndScene(LPDIRECT3DDEVICE9 o_pDevice) {
 	if (!g_DirectX.pDevice)
