@@ -283,6 +283,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\core\features\config\config.cpp" />
+    <ClCompile Include="..\core\features\source\chamcreator.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\core\features\source\model.cpp" />
     <ClCompile Include="..\core\features\source\penetration.cpp" />
     <ClCompile Include="..\core\features\source\inputmgr.cpp">
@@ -394,6 +397,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\core\features\config\config.h" />
+    <ClInclude Include="..\core\features\header\chamcreator.h" />
     <ClInclude Include="..\core\features\header\model.h" />
     <ClInclude Include="..\core\features\header\penetration.h" />
     <ClInclude Include="..\core\features\header\inputmgr.h" />

@@ -36,11 +36,11 @@ private:
 		return state;
 	}
 
+public:
 	// original drawmodel function
 	using tDrawModel = void(__fastcall*)(void*, void*, DrawModelResults*, const DrawModelInfo&, Matrix*, float*, float*, const Vec3D&, int);
 	tDrawModel c_oDrawModel = nullptr;
 
-public:
 	enum Materials {
 		DEFAULT,
 		FLAT

@@ -9,7 +9,7 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	__asm mov pFramePointer, ebp;
 	bool* bSendPacket = reinterpret_cast<bool*>(*pFramePointer - 0x1C);
 
-	if (bSendPacket && !g_Misc.clantag.empty())
+	if (*bSendPacket && !g_Misc.clantag.empty())
 		g_Misc.SetClantag(g_Misc.clantag.c_str());
 
 	// update the playerlist

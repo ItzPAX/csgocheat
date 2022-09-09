@@ -217,6 +217,9 @@
     <ClCompile Include="..\core\features\source\model.cpp">
       <Filter>core\features\source</Filter>
     </ClCompile>
+    <ClCompile Include="..\core\features\source\chamcreator.cpp">
+      <Filter>core\features\source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes.h" />
@@ -525,6 +528,9 @@
     </ClInclude>
     <ClInclude Include="..\sdk\manager\interface\classes\IMemAlloc.h">
       <Filter>sdk\manager\interface\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\features\header\chamcreator.h">
+      <Filter>core\features\header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

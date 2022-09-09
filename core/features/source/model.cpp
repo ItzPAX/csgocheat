@@ -15,13 +15,6 @@ std::array < Vec4D, 6 > aWhiteArray =
 	Vec4D(0.4f, 0.4f, 0.4f, 1.0f),
 };
 
-std::array < float_t, 3 > aColorModulation =
-{
-	1.0f,
-	1.0f,
-	1.0f
-};
-
 void PreviewModel::Instance()
 {
 	if (!g_Menu.bToggled)
@@ -96,12 +89,9 @@ void PreviewModel::Instance()
 	g_Interface.pStudioRender->SetLocalLights(0, nullptr);
 
 	Matrix matPlayerView = { };
-	g_Math.AngleMatrix(Vec3D(0, -180.f, 0), matPlayerView, Vec3D(0, 0, 0));
+	g_Math.AngleMatrix(Vec3D(0, -180.f * sin(g_Interface.pGlobalVars->flCurTime / 2), 0), matPlayerView, Vec3D(0, 0, 0));
 
 	g_Interface.pModelRender->SuppressEngineLighting(true);
-
-	g_Chams.OverrideMaterial(g_Config.ints[XOR("chamtype")].val, g_Config.arrfloats[XOR("enemyviscol")].val);
-
 	m_PreviewModel->Draw(matPlayerView); /*FIX: Call Instance() in PaintTraverse*/
 	g_Interface.pModelRender->SuppressEngineLighting(false);
 

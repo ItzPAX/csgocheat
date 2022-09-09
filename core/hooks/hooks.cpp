@@ -267,11 +267,9 @@ bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) 
 	if (!Game::g_pLocal)
 		return oCreateMove(flInputSampleTime, cmd);
 
-	bool res = oCreateMove(flInputSampleTime, cmd);
-
 	// relay function
 	cCreateMove(flInputSampleTime, cmd);
-	return res;
+	return false;
 }
 HRESULT __stdcall HkDirectX::hkEndScene(LPDIRECT3DDEVICE9 o_pDevice) {
 	if (!g_DirectX.pDevice)

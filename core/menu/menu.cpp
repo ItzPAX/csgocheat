@@ -252,8 +252,10 @@ void Menu::Draw() {
 		ImGui::SameLine();
 		ImGui::BeginChild(XOR("Chams"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Chams"));
-		static const char* pChamTypes[] = { "debugambientcube", "debugdrawflat", "[+] Add" };
-		ImGui::Combo(XOR("Chams Type"), &g_Config.ints[XOR("chamtype")].val, pChamTypes, IM_ARRAYSIZE(pChamTypes));
+		std::vector<const char*> pChamTypes; pChamTypes.push_back("debugambientcube"); pChamTypes.push_back("debugdrawflat");
+		/*CHAMCREATOR PUSH BACK CUSTOM MATERIALS*/
+		pChamTypes.push_back("[+] Add");
+		ImGui::Combo(XOR("Chams Type"), &g_Config.ints[XOR("chamtype")].val, &pChamTypes[0], pChamTypes.size());
 
 		RenderClickableButtons({ XOR("Enemy"), XOR("Local"), XOR("Friendly") }, & g_Chams.iChamsMode, ImVec2{ vSize.x / 2, vSize.y }, style->WindowPadding.x + 5);
 
