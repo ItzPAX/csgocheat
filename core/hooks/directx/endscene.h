@@ -5,7 +5,7 @@
 
 void cEndScene() {
 	// goofy ahh (by emlin)
-	g_Visuals.GoofyAhhCrosshair();
+	//g_Visuals.GoofyAhhCrosshair();
 
 	// call visuals
 	if (Game::g_pLocal && g_Interface.pEngine->IsInGame())
