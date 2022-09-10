@@ -34,6 +34,17 @@ void cFrameStageNotify(IBaseClientDLL::ClientFrameStage_t curStage) {
 			auto deadflag = g_NetVars.GetOffsetDirect(XOR("DT_CSPlayer"), XOR("deadflag"));
 			*(Vec3D*)(Game::g_pLocal + deadflag + 0x4) = Game::g_pCmd->viewangles;
 		}
+
+		if (Game::g_pLocal && Game::g_pLocal->bIsAlive() && g_Config.ints[XOR("novisualrecoil")].val) {
+			Vec3D vAimPunch = Game::g_pLocal->vGetAimPunchAngle();
+			Vec3D VViewPunch = Game::g_pLocal->vGetViewPunchAngle();
+
+			auto pAimPunch = g_NetVars.GetOffsetDirect(XOR("DT_BasePlayer"), XOR("m_aimPunchAngle"));
+			*(Vec3D*)(Game::g_pLocal + pAimPunch) = { 0,0,0 };
+
+			auto pViewPunch = g_NetVars.GetOffsetDirect(XOR("DT_BasePlayer"), XOR("m_viewPunchAngle"));
+			*(Vec3D*)(Game::g_pLocal + pViewPunch) = { 0,0,0 };
+		}
 		break;
 	}
 }

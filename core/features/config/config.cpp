@@ -13,6 +13,8 @@ void Config::Init() {
 	SetupVal(hotkeylist, 0, XOR("misc"), XOR("hotkeylist"));
 	SetupVal(paranoia, 1, XOR("misc"), XOR("paranoia"));
 	SetupVal(trustfactor, 0, XOR("misc"), XOR("trustfactor"));
+	SetupVal(playerfov, 100, XOR("misc"), XOR("playerfov"));
+	SetupVal(viewmodelfov, 100, XOR("misc"), XOR("viewmodelfov"));
 
 	SetupVal(chamtype, 0, XOR("chams"), XOR("chamtype"));
 
@@ -46,6 +48,7 @@ void Config::Init() {
 	SetupVal(friendlyglowcol, { 0.2f, 0.4f, 0.8f, 0.7f }, 4, XOR("esp"), XOR("friendlyglowcol"));
 	SetupVal(weaponglow, 1, XOR("esp"), XOR("weaponglow"));
 	SetupVal(weaponglowcol, { 0.1f, 0.9f, 0.2f, 0.5f }, 4, XOR("esp"), XOR("weaponglowcol"));
+	SetupVal(novisualrecoil, 1, XOR("esp"), XOR("novisualrecoil"));
 
 	SetupVal(antiaim, 0, XOR("antiaim"), XOR("antiaim"));
 	SetupVal(attargets, 1, XOR("antiaim"), XOR("attargets"));

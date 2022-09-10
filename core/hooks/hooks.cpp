@@ -103,6 +103,22 @@ namespace LockCursor {
 	int iIndex = 67;
 	__forceinline void __stdcall hkLockCursor();
 }
+
+namespace GetViewmodelFov {
+	using tGetViewmodelFov = float(__stdcall*)();
+	tGetViewmodelFov oGetViewmodelFov = nullptr;
+
+	int iIndex = 35;
+	__forceinline float __stdcall hkGetViewmodelFov();
+}
+
+namespace OverrideView {
+	using tOverrideView = void(__thiscall*)(void* ecx, CViewSetup* setup);
+	tOverrideView oOverrideView = nullptr;
+
+	int iIndex = 18;
+	__forceinline void __fastcall hkOverrideView(void* ecx, void* edx, CViewSetup* setup);
+}
 #pragma endregion
 
 
@@ -137,6 +153,16 @@ bool HookManager::AddAllHooks() {
 	g_HookLib.AddHook(HookEntry("panorama.dll", g_Interface.pClient, FSN::hkFrameStageNotfy, FSN::iIndex, (PVOID*)&FSN::oFrameStageNotify));
 	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pEngine, IsPaused::hkIsPaused, IsPaused::iIndex, (PVOID*)&IsPaused::oIsPaused));
 	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pPanel, PaintTraverse::hkPaintTraverse, PaintTraverse::iIndex, (PVOID*)&PaintTraverse::oPaintTraverse));
+
+	g_HookLib.AddHook(HookEntry("client.dll", g_Interface.pClientMode, GetViewmodelFov::hkGetViewmodelFov, GetViewmodelFov::iIndex, (PVOID*)&GetViewmodelFov::oGetViewmodelFov));
+	g_HookLib.AddHook(HookEntry("client.dll", g_Interface.pClientMode, OverrideView::hkOverrideView, OverrideView::iIndex, (PVOID*)&OverrideView::oOverrideView));
+
+	//sniper crosshair
+	DWORD oldProt;
+	DWORD itzpaxTrashbin = g_Tools.SignatureScan(XOR("client.dll"), XOR("\x83\xF8\x05\x75\x17"), XOR("xxxxx")) + 0x3;
+	VirtualProtect((LPVOID)itzpaxTrashbin, 1, PAGE_EXECUTE_READWRITE, &oldProt);
+	*reinterpret_cast<BYTE*>(itzpaxTrashbin) = 0xEB;
+	VirtualProtect((LPVOID)itzpaxTrashbin, 1, oldProt, &oldProt);
 
 	g_HookManager.bHooksAdded = true;
 	return true;
@@ -330,5 +356,22 @@ LRESULT __stdcall WndProc::hkWndProc(const HWND hwnd, UINT uMsg, WPARAM wParam, 
 	// menu closed restore normal input
 	CallWindowProc(WndProc::oWndProc, hwnd, uMsg, wParam, lParam);
 	return true;
+}
+
+float __stdcall GetViewmodelFov::hkGetViewmodelFov()
+{
+	if(!Game::g_pLocal->bIsScoped())
+		return (float)g_Config.ints[XOR("viewmodelfov")].val;
+
+	return GetViewmodelFov::oGetViewmodelFov();
+}
+
+void __fastcall OverrideView::hkOverrideView(void* ecx, void* edx, CViewSetup* setup)
+{
+	// Whatever value you like, don't let those CIA monkeys tell you what to do!
+	if (!Game::g_pLocal->bIsScoped())
+		setup->flFOV = (float)g_Config.ints[XOR("playerfov")].val;
+
+	return oOverrideView(ecx, setup);
 }
 #pragma endregion These Functions call the real functions in different cpp files withing the hooks dir

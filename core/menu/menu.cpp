@@ -93,7 +93,7 @@ void Menu::Draw() {
 	if (!style)
 		ImGui::Render();
 
-	RenderClickableButtons({ XOR("Ragebot"), XOR("Legitbot"), XOR("AntiAim"), XOR("ESP"), XOR("Misc")}, &g_Menu.iCurrentTab, vSize, style->WindowPadding.x - 4);
+	RenderClickableButtons({ XOR("Ragebot"), XOR("Legitbot"), XOR("AntiAim"), XOR("Visuals"), XOR("Misc")}, &g_Menu.iCurrentTab, vSize, style->WindowPadding.x - 4);
 	ImGui::NewLine();
 
 	// Render the playerlist
@@ -225,11 +225,16 @@ void Menu::Draw() {
 		}
 
 		ImGui::BeginChild(XOR("Main-ESP"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
-		ImGui::Text(XOR("Main ESP"));
+		ImGui::Text(XOR("Main-ESP"));
 		ImGui::Checkbox(XOR("Box ESP"), (bool*)&g_Config.ints[XOR("boxesp")].val);
 		ImGui::Checkbox(XOR("Name ESP"), (bool*)&g_Config.ints[XOR("nameesp")].val);
 		ImGui::Checkbox(XOR("Health ESP"), (bool*)&g_Config.ints[XOR("healthesp")].val);
 		ImGui::Checkbox(XOR("Weapon ESP"), (bool*)&g_Config.ints[XOR("weaponesp")].val);
+
+		ImGui::SliderInt(XOR("FOV"), &g_Config.ints[XOR("playerfov")].val, 50, 200, "%i");
+		ImGui::SliderInt(XOR("Viewmodel FOV"), &g_Config.ints[XOR("viewmodelfov")].val, 50, 200, "%i");
+
+		ImGui::Checkbox(XOR("No Visual Recoil"), (bool*)&g_Config.ints[XOR("novisualrecoil")].val);
 
 		ImGui::Checkbox(XOR("Thirdperson"), (bool*)&g_Config.ints[XOR("thirdperson")].val);
 		ImGui::Hotkey(XOR("Thirdperson-Key"), g_Config.arrints[XOR("thirdpersonkey")].val);

@@ -16,6 +16,9 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	g_PlayerList.UpdatePlayerList();
 	g_Misc.UpdateSpectators();
 
+	//fov
+	//g_Misc.SetFovShit(cmd);
+
 	// lagcomp stuff
 	if (!bClientModeInit) {
 		g_Backtrack.Init();

@@ -406,6 +406,7 @@ public:
 	Vec3D vGetVelocity() { return g_NetVars.Netvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecVelocity[0]"), this); }
 	Vec3D vGetViewOffset() { return g_NetVars.Netvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_vecViewOffset[0]"), this); }
 	Vec3D vGetAimPunchAngle() { return g_NetVars.Netvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_aimPunchAngle"), this); }
+	Vec3D vGetViewPunchAngle() { return g_NetVars.Netvar<Vec3D>(XOR("DT_BasePlayer"), XOR("m_viewPunchAngle "), this); }
 	float flSimTime() { return g_NetVars.Netvar<float>(XOR("DT_CSPlayer"), XOR("m_flSimulationTime"), this); }
 	int iGetHitboxSet() { return g_NetVars.Netvar<int>(XOR("DT_BasePlayer"), XOR("m_nHitboxSet"), this); }
 	bool bIsDefusing() { return g_NetVars.Netvar<bool>(XOR("DT_CSPlayer"), XOR("m_bIsDefusing"), this); }

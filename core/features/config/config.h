@@ -34,6 +34,8 @@ private:
 	int hotkeylist;
 	int paranoia;
 	int trustfactor;
+	int playerfov;
+	int viewmodelfov;
 
 	int chamtype;
 	int enemychamsvis;
@@ -66,6 +68,7 @@ private:
 	float friendlyglowcol[4];
 	int weaponglow;
 	float weaponglowcol[4];
+	int novisualrecoil;
 
 	int antiaim;
 	int attargets;
