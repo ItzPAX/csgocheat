@@ -84,7 +84,7 @@ void LegitBot::GetTargetRecord(CUserCmd* cmd, LagRecord* pBestRecord) {
 
 	*pBestRecord = g_Backtrack.deqLagRecords[iBestPlayerInd].front();
 
-	if (!g_Config.ints[XOR("lagcomp")].val || g_Config.ints[XOR("trustfactor")].val) {
+	if (!g_Config.ints[XOR("lagcomp")].val/* || g_Config.ints[XOR("trustfactor")].val*/) {
 		pTargetRecord = &g_Backtrack.deqLagRecords[iBestPlayerInd].front();
 		return;
 	}
