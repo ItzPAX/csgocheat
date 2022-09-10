@@ -159,10 +159,10 @@ bool HookManager::AddAllHooks() {
 
 	//sniper crosshair
 	DWORD oldProt;
-	DWORD itzpaxTrashbin = g_Tools.SignatureScan(XOR("client.dll"), XOR("\x83\xF8\x05\x75\x17"), XOR("xxxxx")) + 0x3;
-	VirtualProtect((LPVOID)itzpaxTrashbin, 1, PAGE_EXECUTE_READWRITE, &oldProt);
-	*reinterpret_cast<BYTE*>(itzpaxTrashbin) = 0xEB;
-	VirtualProtect((LPVOID)itzpaxTrashbin, 1, oldProt, &oldProt);
+	DWORD pWpnCompare = g_Tools.SignatureScan(XOR("client.dll"), XOR("\x83\xF8\x05\x75\x17"), XOR("xxxxx")) + 0x3;
+	VirtualProtect((LPVOID)pWpnCompare, 1, PAGE_EXECUTE_READWRITE, &oldProt);
+	*reinterpret_cast<BYTE*>(pWpnCompare) = 0xEB;
+	VirtualProtect((LPVOID)pWpnCompare, 1, oldProt, &oldProt);
 
 	g_HookManager.bHooksAdded = true;
 	return true;
