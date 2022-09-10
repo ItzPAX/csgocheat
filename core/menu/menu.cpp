@@ -252,10 +252,13 @@ void Menu::Draw() {
 		ImGui::SameLine();
 		ImGui::BeginChild(XOR("Chams"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Chams"));
-		std::vector<const char*> pChamTypes; pChamTypes.push_back("debugambientcube"); pChamTypes.push_back("debugdrawflat");
-		/*CHAMCREATOR PUSH BACK CUSTOM MATERIALS*/
-		pChamTypes.push_back("[+] Add");
-		ImGui::Combo(XOR("Chams Type"), &g_Config.ints[XOR("chamtype")].val, &pChamTypes[0], pChamTypes.size());
+
+		g_ChamCreator.UpdateMaterialList();
+		std::vector<char*> cstringmat;
+		for (size_t i = 0; i < g_ChamCreator.vMaterialList.size(); i++)
+			cstringmat.push_back(const_cast<char*>(g_ChamCreator.vMaterialList[i].c_str()));
+
+		ImGui::Combo(XOR("Chams Type"), &g_Config.ints[XOR("chamtype")].val, &cstringmat[0], g_ChamCreator.vMaterialList.size());
 
 		RenderClickableButtons({ XOR("Enemy"), XOR("Local"), XOR("Friendly") }, & g_Chams.iChamsMode, ImVec2{ vSize.x / 2, vSize.y }, style->WindowPadding.x + 5);
 
@@ -328,7 +331,7 @@ void Menu::Draw() {
 
 		if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path)))
 			folder = std::string(path) + XOR("\\raybot\\");
-		for (auto& p : std::filesystem::recursive_directory_iterator(folder)) {
+		for (auto& p : std::filesystem::directory_iterator(folder)) {
 			if (p.path().extension() == ext)
 				g_Config.configs.push_back(p.path().stem().string());
 		}
