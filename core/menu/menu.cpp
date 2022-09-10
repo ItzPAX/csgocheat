@@ -305,10 +305,12 @@ void Menu::Draw() {
 		ImGui::Checkbox(XOR("Preserve TrustFactor"), (bool*)&g_Config.ints[XOR("trustfactor")].val); ImGui::HelpMarker(XOR("Disables / changes features of the cheat to not get flagged by VacNET (SEVERELY limits the cheats capabilities!!)"));
 		ImGui::Checkbox(XOR("Paranaoia Mode"), (bool*)&g_Config.ints[XOR("paranoia")].val); ImGui::HelpMarker(XOR("Disables ESP & Aimbot, while you are being spectated"));
 		ImGui::Checkbox(XOR("GoofyAhh Crosshair"), (bool*)&g_Config.ints[XOR("goofyahhcrosshair")].val); ImGui::HelpMarker(XOR("Makes the crosshair goofy for everyone spectating you"));
-		if (!g_Config.ints[XOR("trustfactor")].val) {
+		//if (!g_Config.ints[XOR("trustfactor")].val) {
 			ImGui::Checkbox(XOR("Bunnyhop"), (bool*)&g_Config.ints[XOR("bunnyhop")].val);
 			ImGui::Checkbox(XOR("Lagcompensation"), (bool*)&g_Config.ints[XOR("lagcomp")].val);
-		}
+		//}
+
+		//@itzpax backtrack und bhop sind nicht detected. backtrack wird von overwatch gefickt und bhop wenn man ne minute lang perfekt durchbhop't
 		
 		ImGui::SliderFloat(XOR("Aspect Ratio"), &g_Config.floats[XOR("aspectratio")].val, 0.5f, 2.f, "%.2f%", 0.05f);
 		ImGui::InputText(XOR("Clantag"), &g_Misc.clantag);
