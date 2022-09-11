@@ -200,6 +200,15 @@ void __stdcall PaintTraverse::hkPaintTraverse(unsigned int iPanel, bool bForceRe
 
 	if (strstr(szPanelToDraw, XOR("MatSystemTopPanel"))) {
 		g_PrevModel.Instance();
+
+		// clear lists when we arent ingame
+		if (!g_Interface.pEngine->IsInGame()) {
+			g_PlayerList.listentries.clear();
+			g_Misc.pSpectators.clear();
+
+			for (auto& entry : g_InputMgr.hotkeysinlist)
+				entry.second.active = false;
+		}
 	}
 
 	oPaintTraverse(g_Interface.pPanel, iPanel, bForceRepaint, bAllowForce);
@@ -282,10 +291,6 @@ void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults*
 }	
 bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {	
 	Game::g_pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
-	if (!g_Interface.pEngine->IsInGame()) {
-		g_PlayerList.listentries.clear();
-		g_Misc.pSpectators.clear();
-	}
 
 	if (!cmd || !cmd->command_number)
 		return false;

@@ -81,6 +81,8 @@ void Menu::Render() {
 	g_Visuals.DrawSpectatorList();
 	g_Visuals.DrawHotkeyList();
 
+	g_ChamCreator.RenderCreator();
+
 	// Render dear imgui into screen
 	ImGui::EndFrame();
 	ImGui::Render();
@@ -273,9 +275,11 @@ void Menu::Draw() {
 			ImGui::SameLine(vSize.x / 4);
 			ImGui::ColorEdit4(XOR("Vis Col"), g_Config.arrfloats[XOR("enemyviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 
-			ImGui::Checkbox(XOR("Enemy Chams Invis"), (bool*)&g_Config.ints[XOR("enemychamsinvis")].val);
-			ImGui::SameLine(vSize.x / 4);
-			ImGui::ColorEdit4(XOR("Invis Col"), g_Config.arrfloats[XOR("enemyinviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+			if (g_Config.ints[XOR("enemychamsvis")].val) {
+				ImGui::Checkbox(XOR("Enemy Chams Invis"), (bool*)&g_Config.ints[XOR("enemychamsinvis")].val);
+				ImGui::SameLine(vSize.x / 4);
+				ImGui::ColorEdit4(XOR("Invis Col"), g_Config.arrfloats[XOR("enemyinviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+			}
 
 			ImGui::Checkbox(XOR("Lagcomp Chams"), (bool*)&g_Config.ints[XOR("lagcompchams")].val);
 			if (g_Config.ints[XOR("lagcompchams")].val) {
@@ -295,9 +299,11 @@ void Menu::Draw() {
 			ImGui::SameLine(vSize.x / 4);
 			ImGui::ColorEdit4(XOR("Vis Col"), g_Config.arrfloats[XOR("friendlyviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 
-			ImGui::Checkbox(XOR("Friendly Chams Invis"), (bool*)&g_Config.ints[XOR("friendlychamsinvis")].val);
-			ImGui::SameLine(vSize.x / 4);
-			ImGui::ColorEdit4(XOR("Invis Col"), g_Config.arrfloats[XOR("friendlyinviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+			if (g_Config.ints[XOR("friendlychamsvis")].val) {
+				ImGui::Checkbox(XOR("Friendly Chams Invis"), (bool*)&g_Config.ints[XOR("friendlychamsinvis")].val);
+				ImGui::SameLine(vSize.x / 4);
+				ImGui::ColorEdit4(XOR("Invis Col"), g_Config.arrfloats[XOR("friendlyinviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+			}
 		}
 			break;
 		}

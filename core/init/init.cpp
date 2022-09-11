@@ -27,11 +27,6 @@ ulong __stdcall Init::InitAll(void* p) {
 		return 0;
 	std::cout << XOR("[ RAYBOT ] Successfully Initialized Interfaces\n");
 
-	// init materials for chams
-	if (!g_Chams.InitMaterials())
-		return 0;
-	std::cout << XOR("[ RAYBOT ] Successfully Initialized Materials\n");
-
 	// then we add all of our hooks
 	if (!g_HookManager.AddAllHooks())
 		return 0;
@@ -46,8 +41,14 @@ ulong __stdcall Init::InitAll(void* p) {
 		return 0;
 	std::cout << XOR("[ RAYBOT ] Successfully Initialized ConVars\n");
 
+	// generate default materials
+	g_ChamCreator.GenerateDefaultMaterialFiles();
+	std::cout << XOR("[ RAYBOT ] Successfully Initialized default materials\n");
+
 	g_Config.LoadDefault();
 	std::cout << XOR("[ RAYBOT ] Loaded default config: ") << g_Config.GetDefault() << std::endl;
+
+	g_ChamCreator.GetMaterialsFromFiles();
 
 	return 1;
 }

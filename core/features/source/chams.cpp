@@ -23,6 +23,12 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 	if (!Game::g_pLocal || !info.m_pRenderable)
 		return;
 
+	// get / update materials from creator
+	if (g_ChamCreator.bMaterialsUpdated) {
+		g_ChamCreator.GetMaterialsFromFiles();
+		g_ChamCreator.bMaterialsUpdated = false;
+	}
+
 	IMatRenderContext* pRenderContext{ g_Interface.pMaterialSystem->GetRenderContext() };
 	if (!pRenderContext)
 		return;
@@ -48,35 +54,37 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 				for (int i = 0; i < g_Backtrack.deqLagRecords[pPlayer->iIndex()].size(); i++) {
 					if (!g_Backtrack.ValidTick(g_Backtrack.deqLagRecords[pPlayer->iIndex()][i]) || !g_Backtrack.deqLagRecords[pPlayer->iIndex()][i].boneMat)
 						continue;
-					OverrideMaterial(g_Config.ints[XOR("chamtype")].val, Color(255 - (i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size())), i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size()), 255.f, 30.f).ToPercent());
+					OverrideMaterial(iRenderedChamType, Color(255 - (i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size())), i * (255 / g_Backtrack.deqLagRecords[pPlayer->iIndex()].size()), 255.f, 30.f).ToPercent());
 					c_oDrawModel(pEcx, pEdx, pResults, info, g_Backtrack.deqLagRecords[pPlayer->iIndex()][i].boneMat, pFlexWeights, pFlexDelayedWeights, g_Backtrack.deqLagRecords[pPlayer->iIndex()][i].vOrigin, flags);
 				}
 			}
 			else {
-				OverrideMaterial(g_Config.ints[XOR("chamtype")].val, Color(0.f, 255.f, 255.f, 30.f).ToPercent());
+				OverrideMaterial(iRenderedChamType, Color(0.f, 255.f, 255.f, 30.f).ToPercent());
 				c_oDrawModel(pEcx, pEdx, pResults, info, g_Backtrack.deqLagRecords[pPlayer->iIndex()].back().boneMat, pFlexWeights, pFlexDelayedWeights, g_Backtrack.deqLagRecords[pPlayer->iIndex()].back().vOrigin, flags);
 			}
 		}
 
 		// vis chams
 		if (g_Config.ints[XOR("enemychamsvis")].val) {
-			OverrideMaterial(g_Config.ints[XOR("chamtype")].val, g_Config.arrfloats[XOR("enemyviscol")].val);
-			pRenderContext->SetStencilState(GenerateStenctilState(false));
+			OverrideMaterial(iRenderedChamType, g_Config.arrfloats[XOR("enemyviscol")].val);
+			
+			if (g_Config.ints[XOR("enemychamsinvis")].val)
+				pRenderContext->SetStencilState(GenerateStenctilState(false));
 
 			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
-		}
 
-		g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
+			// xqz chams
+			if (g_Config.ints[XOR("enemychamsinvis")].val) {
+				g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
 
-		// xqz chams
-		if (g_Config.ints[XOR("enemychamsinvis")].val) {
-			OverrideMaterial(g_Config.ints[XOR("chamtype")].val, g_Config.arrfloats[XOR("enemyinviscol")].val);
-			pRenderContext->SetStencilState(GenerateStenctilState(true));
+				OverrideMaterial(iRenderedChamType, g_Config.arrfloats[XOR("enemyinviscol")].val);
+				pRenderContext->SetStencilState(GenerateStenctilState(true));
 
-			//Set depth
-			pRenderContext->DepthRange(0.f, 0.02f);
-			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
-			pRenderContext->DepthRange(0.f, 1.f);
+				//Set depth
+				pRenderContext->DepthRange(0.f, 0.02f);
+				c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+				pRenderContext->DepthRange(0.f, 1.f);
+			}
 		}
 	}
 
@@ -84,23 +92,25 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 	if (!bEnemy && pPlayer != Game::g_pLocal) {
 		// vis chams
 		if (g_Config.ints[XOR("friendlychamsvis")].val) {
-			OverrideMaterial(g_Config.ints[XOR("chamtype")].val, g_Config.arrfloats[XOR("friendlyviscol")].val);
-			pRenderContext->SetStencilState(GenerateStenctilState(false));
+			OverrideMaterial(iRenderedChamType, g_Config.arrfloats[XOR("friendlyviscol")].val);
+			
+			if (g_Config.ints[XOR("friendlychamsinvis")].val)
+				pRenderContext->SetStencilState(GenerateStenctilState(false));
 
 			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
-		}
 
-		g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
+			// xqz chams
+			if (g_Config.ints[XOR("friendlychamsinvis")].val) {
+				g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
 
-		// xqz chams
-		if (g_Config.ints[XOR("friendlychamsinvis")].val) {
-			OverrideMaterial(g_Config.ints[XOR("chamtype")].val, g_Config.arrfloats[XOR("friendlyinviscol")].val);
-			pRenderContext->SetStencilState(GenerateStenctilState(true));
+				OverrideMaterial(iRenderedChamType, g_Config.arrfloats[XOR("friendlyinviscol")].val);
+				pRenderContext->SetStencilState(GenerateStenctilState(true));
 
-			//Set depth
-			pRenderContext->DepthRange(0.f, 0.02f);
-			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
-			pRenderContext->DepthRange(0.f, 1.f);
+				//Set depth
+				pRenderContext->DepthRange(0.f, 0.02f);
+				c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+				pRenderContext->DepthRange(0.f, 1.f);
+			}
 		}
 	}
 
@@ -108,7 +118,7 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 	if (pPlayer == Game::g_pLocal) {
 		// vis chams
 		if (g_Config.ints[XOR("localchams")].val) {
-			OverrideMaterial(g_Config.ints[XOR("chamtype")].val, g_Config.arrfloats[XOR("localcol")].val);
+			OverrideMaterial(iRenderedChamType, g_Config.arrfloats[XOR("localcol")].val);
 			pRenderContext->SetStencilState(GenerateStenctilState(false));
 
 			c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);

@@ -5,7 +5,7 @@ Backtrack g_Backtrack;
 bool Backtrack::ValidTick(LagRecord& pRecord) {
 	// Get NetChannelInfo
 	INetChannelInfo* pNCI = g_Interface.pEngine->GetNetChannelInfo();
-	if (!pNCI || !pUpdateRate || !pMaxUnlag || !pInterpRatio || !pInterp)
+	if (!pNCI || !pMaxUnlag)
 		return false;
 
 	float flCorrect = 0.f;
@@ -21,6 +21,9 @@ bool Backtrack::ValidTick(LagRecord& pRecord) {
 }
 
 float Backtrack::GetLerpTime() {
+	if (!pUpdateRate || !pInterpRatio || !pInterp)
+		return 0.f;
+
 	int iUpdateRate = pUpdateRate->GetInt();
 	float flInterpRatio = pInterpRatio->GetFloat();
 
@@ -60,6 +63,5 @@ void Backtrack::ApplyRecord(CUserCmd* cmd, LagRecord* record) {
 	if (!cmd || !record)
 		return;
 
-	if (cmd->buttons & CUserCmd::IN_ATTACK)
-		cmd->tick_count = TIME_TO_TICKS(record->flSimTime + GetLerpTime());
+	cmd->tick_count = TIME_TO_TICKS(record->flSimTime + GetLerpTime());
 }

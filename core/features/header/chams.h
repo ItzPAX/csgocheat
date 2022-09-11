@@ -3,10 +3,12 @@
 class Chams {
 private:
 	friend class HookManager;
+	friend class ChamCreator;
 
-private:
+protected:
 	inline static std::vector<IMaterial*> pMats;
 
+private:
 	ShaderStencilState_t GenerateStenctilState(bool bIgnoreZ, bool disable = false) {
 		ShaderStencilState_t state;
 
@@ -41,29 +43,8 @@ public:
 	using tDrawModel = void(__fastcall*)(void*, void*, DrawModelResults*, const DrawModelInfo&, Matrix*, float*, float*, const Vec3D&, int);
 	tDrawModel c_oDrawModel = nullptr;
 
-	enum Materials {
-		DEFAULT,
-		FLAT
-	};
-
 	int iChamsMode = 0;
-
-	inline static bool bMatsInit = false;
-
-	bool InitMaterials() {
-		IMaterial* pMat;
-		pMat = g_Interface.pMaterialSystem->FindMaterial(XOR("debug/debugambientcube"), TEXTURE_GROUP_OTHER);
-		pMats.push_back(pMat);
-		pMat->IncrementReferenceCount();
-
-		pMat = g_Interface.pMaterialSystem->FindMaterial(XOR("debug/debugdrawflat"), TEXTURE_GROUP_OTHER);
-		pMats.push_back(pMat);
-		pMat->IncrementReferenceCount();
-
-
-		bMatsInit = true;
-		return true;
-	}
+	int iRenderedChamType = 0;
 
 	void OverrideMaterial(int iMatIndex, float* col);
 	void OverrideMaterial(int iMatIndex, Color col);
