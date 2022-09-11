@@ -215,17 +215,6 @@ void Menu::Draw() {
 
 		  //ESP
 	case 3: {
-		ImGui::GetForegroundDrawList()->AddRectFilled(ImVec2(vPos.x + 654 + 150, vPos.y), ImVec2(vPos.x + 950 + 150, vPos.y + 440), ImColor(30.0f / 255.0f, 30.0f / 255.0f, 36.0f / 255.0f, 1.0f));
-		if (g_PrevModel.GetTexture())
-		{
-			ImGui::GetForegroundDrawList()->AddImage(
-				g_PrevModel.GetTexture()->pTextureHandles[0]->texture_ptr,
-				ImVec2(vPos.x + 610 + 150, vPos.y - 130),
-				ImVec2(vPos.x + 610 + 150 + g_PrevModel.GetTexture()->GetActualWidth(), vPos.y + g_PrevModel.GetTexture()->GetActualHeight() - 130),
-				ImVec2(0, 0), ImVec2(1, 1),
-				ImColor(1.0f, 1.0f, 1.0f, 1.0f));
-		}
-
 		ImGui::BeginChild(XOR("Main-ESP"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 		ImGui::Text(XOR("Main-ESP"));
 		ImGui::Checkbox(XOR("Box ESP"), (bool*)&g_Config.ints[XOR("boxesp")].val);

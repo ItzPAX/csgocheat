@@ -11,7 +11,7 @@ struct MaterialFile {
 class ChamCreator {
 private:
 	std::string folder;
-	ImVec2 WindowSize = { 700,500 };
+	ImVec2 WindowSize = { 750,500 };
 	ImGuiStyle* style;
 
 	static int Sort(MaterialFile materialfile1, MaterialFile materialfile2) {

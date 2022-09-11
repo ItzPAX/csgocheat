@@ -87,7 +87,7 @@ void ChamCreator::UpdateMaterialList() {
 }
 
 void ChamCreator::RenderCreator() {
-	if (!bCreatorOpened)
+	if (!bCreatorOpened || !g_Menu.bToggled)
 		return;
 
 	style = &ImGui::GetStyle();
@@ -95,7 +95,33 @@ void ChamCreator::RenderCreator() {
 		return;
 
 	ImGui::SetNextWindowSize(WindowSize, ImGuiCond_Once);
-	ImGui::Begin(XOR("Playerlist"), &bCreatorOpened);
+	ImGui::Begin(XOR("ChamCreator"), &bCreatorOpened, ImGuiWindowFlags_NoResize);
 	ImVec2 vSize = ImGui::GetWindowSize();
+	ImVec2 vPos = ImGui::GetWindowPos();
+
+	ImGui::BeginChild(XOR("ChamOptions"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
+	ImGui::Text(XOR("Cham options"));
+	ImGui::EndChild();
+
+	ImGui::SameLine();
+
+	ImGui::BeginChild(XOR("ChamPreview"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
+	ImGui::Text(XOR("Cham preview"));
+
+	ImGui::GetWindowDrawList()->AddRectFilled(
+		ImVec2(vPos.x + style->FramePadding.x + (vSize.x / 2 - style->WindowPadding.x - 2) + 25, vPos.y + 70), 
+		ImVec2(vPos.x + style->FramePadding.x + (vSize.x / 2 - style->WindowPadding.x - 2) + g_PrevModel.GetTexture()->GetActualWidth() + 15, vPos.y + g_PrevModel.GetTexture()->GetActualHeight() - 100),
+		ImColor(style->Colors[ImGuiCol_WindowBg].x - 0.02f, style->Colors[ImGuiCol_WindowBg].y - 0.02f, style->Colors[ImGuiCol_WindowBg].z - 0.02f));
+
+	if (g_PrevModel.GetTexture())
+	{
+		ImGui::GetWindowDrawList()->AddImage(
+			g_PrevModel.GetTexture()->pTextureHandles[0]->texture_ptr,
+			ImVec2(vPos.x + 20 + (vSize.x / 2 - style->WindowPadding.x - 2), vPos.y - 75),
+			ImVec2(vPos.x + 20 + (vSize.x / 2 - style->WindowPadding.x - 2) + g_PrevModel.GetTexture()->GetActualWidth(), vPos.y + g_PrevModel.GetTexture()->GetActualHeight() - 75),
+			ImVec2(0, 0), ImVec2(1, 1),
+			ImColor(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+	ImGui::EndChild();
 	ImGui::End();
 }
