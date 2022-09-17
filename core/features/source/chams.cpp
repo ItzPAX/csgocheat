@@ -5,7 +5,16 @@ Chams g_Chams;
 
 void Chams::OverrideMaterial(int iMatIndex, float* col) {
 	pMats.at(iMatIndex)->AlphaModulate(col[3]);
-	pMats.at(iMatIndex)->ColorModulate(col[0], col[1], col[2]);
+
+	if (iMatIndex < 2)
+		pMats.at(iMatIndex)->ColorModulate(col[0], col[1], col[2]);
+
+	else {
+		bool bFound = false;
+		auto pEnvmaptint = pMats.at(iMatIndex)->FindVar(XOR("$envmaptint"), &bFound);
+		if (bFound)
+			pEnvmaptint->SetVector(col[0], col[1], col[2]);
+	}
 
 	pMats.at(iMatIndex)->SetMaterialVarFlag(MaterialVarFlags_t::MATERIAL_VAR_IGNOREZ, false);
 	g_Interface.pStudioRender->ForcedMaterialOverride(pMats.at(iMatIndex));
@@ -23,10 +32,12 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 	if (!Game::g_pLocal || !info.m_pRenderable)
 		return;
 
-	// get / update materials from creator
-	if (g_ChamCreator.bMaterialsUpdated) {
-		g_ChamCreator.GetMaterialsFromFiles();
-		g_ChamCreator.bMaterialsUpdated = false;
+	if (pMats.size() < g_Config.ints[XOR("chamtype")].val)
+		return;
+
+	if (strstr(info.m_pStudioHdr->cNameCharArray, XOR("arms")) && g_Config.ints[XOR("handchams")].val) {
+		OverrideMaterial(iRenderedChamType, g_Config.arrfloats[XOR("handcol")].val);
+		c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 	}
 
 	IMatRenderContext* pRenderContext{ g_Interface.pMaterialSystem->GetRenderContext() };
@@ -34,8 +45,12 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 		return;
 
 	Entity* pEntity = info.m_pRenderable->GetIClientUnknown()->GetBaseEntity();
+	// ent is valid
+	if (!pEntity)
+		return;
+
 	// we have a valid player
-	if (!pEntity || !pEntity->bIsPlayer() || pEntity->iIndex() > g_Interface.pGlobalVars->iMaxClients || pEntity->iTeamNum() < 2)
+	if (!pEntity->bIsPlayer() || pEntity->iIndex() > g_Interface.pGlobalVars->iMaxClients || pEntity->iTeamNum() < 2)
 		return;
 
 	Player* pPlayer = reinterpret_cast<Player*>(pEntity);

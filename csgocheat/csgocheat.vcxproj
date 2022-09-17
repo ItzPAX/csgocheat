@@ -417,7 +417,6 @@
     <ClInclude Include="..\core\hooks\directx\directx.h" />
     <ClInclude Include="..\core\hooks\directx\endscene.h" />
     <ClInclude Include="..\core\hooks\hooks.h" />
-    <ClInclude Include="..\core\hooks\studiorender\studiorender.h" />
     <ClInclude Include="..\core\imgui\imconfig.h" />
     <ClInclude Include="..\core\imgui\imgui.h" />
     <ClInclude Include="..\core\imgui\imgui_impl_dx9.h" />

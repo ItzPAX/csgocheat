@@ -130,6 +130,59 @@ enum PreviewImageRetVal {
 struct StudioHWData;
 class IClientRenderable;
 class IMatRenderContext;
+class ITexture;
+
+class IMaterialVar
+{
+public:
+	ITexture* GetTexture()
+	{
+		using fn = ITexture * (__thiscall*)(IMaterialVar*);
+		return (*(fn**)this)[1](this);
+	}
+
+	void SetFloat(float flValue)
+	{
+		using fn = void(__thiscall*)(IMaterialVar*, float);
+		(*(fn**)this)[4](this, flValue);
+	}
+
+	void SetInt(int iValue)
+	{
+		using fn = void(__thiscall*)(IMaterialVar*, int);
+		(*(fn**)this)[5](this, iValue);
+	}
+
+	void SetString(const char* szValue)
+	{
+		using fn = void(__thiscall*)(IMaterialVar*, const char*);
+		(*(fn**)this)[6](this, szValue);
+	}
+
+	void SetVector(float x, float y)
+	{
+		using fn = void(__thiscall*)(IMaterialVar*, float, float);
+		(*(fn**)this)[10](this, x, y);
+	}
+
+	void SetVector(float x, float y, float z)
+	{
+		using fn = void(__thiscall*)(IMaterialVar*, float, float, float);
+		(*(fn**)this)[11](this, x, y, z);
+	}
+
+	void SetTexture(ITexture* pTexture)
+	{
+		using fn = void(__thiscall*)(IMaterialVar*, ITexture*);
+		(*(fn**)this)[15](this, pTexture);
+	}
+
+	void SetVectorComponent(float flValue, int iComponent)
+	{
+		using fn = void(__thiscall*)(IMaterialVar*, float, int);
+		(*(fn**)this)[26](this, flValue, iComponent);
+	}
+};
 
 class IMaterial {
 public:
@@ -165,7 +218,7 @@ public:
 	// This is how game code affects how a material is rendered.
 	// The game code must know about the params that are used by
 	// the shader for the material that it is trying to affect.
-	virtual void* FindVar(const char* varName, bool* found, bool complain = true) = 0;
+	virtual IMaterialVar* FindVar(const char* varName, bool* found, bool complain = true) = 0;
 
 	// The user never allocates or deallocates materials.  Reference counting is
 	// used instead.  Garbage collection is done upon a call to 

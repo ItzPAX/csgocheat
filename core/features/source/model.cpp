@@ -92,7 +92,25 @@ void PreviewModel::Instance()
 	g_Math.AngleMatrix(Vec3D(0, -180.f * sin(g_Interface.pGlobalVars->flCurTime / 2), 0), matPlayerView, Vec3D(0, 0, 0));
 
 	g_Interface.pModelRender->SuppressEngineLighting(true);
+	bDrawingModel = true;
+	if (g_ChamCreator.pPreviewMaterial != g_ChamCreator.pEmptyMat) {
+		g_ChamCreator.pPreviewMaterial->AlphaModulate(g_ChamCreator.flPrevCol[3]);
+
+		bool bFound = false;
+		auto pEnvmaptint = g_ChamCreator.pPreviewMaterial->FindVar(XOR("$envmaptint"), &bFound);
+		if (bFound)
+			pEnvmaptint->SetVector(g_ChamCreator.flPrevCol[0], g_ChamCreator.flPrevCol[1], g_ChamCreator.flPrevCol[2]);
+
+		g_ChamCreator.pPreviewMaterial->SetMaterialVarFlag(MaterialVarFlags_t::MATERIAL_VAR_IGNOREZ, false);
+		g_Interface.pStudioRender->ForcedMaterialOverride(g_ChamCreator.pPreviewMaterial);
+	}
+	else
+		g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
+
 	m_PreviewModel->Draw(matPlayerView); /*FIX: Call Instance() in PaintTraverse*/
+	g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
+
+	bDrawingModel = false;
 	g_Interface.pModelRender->SuppressEngineLighting(false);
 
 	g_Interface.pRenderView->PopView(pRenderContext, dummyFrustum);

@@ -39,27 +39,102 @@ void ChamCreator::GatherFileInformation() {
 	}
 }
 
-void ChamCreator::GetMaterialsFromFiles() {
-	GatherFileInformation();
+void ChamCreator::UpdatePreviewMaterial() {
+	if (pPreviewMaterial && pEmptyMat) {
+		pPreviewMaterial->DecrementReferenceCount();
+		pEmptyMat->DecrementReferenceCount();
+	}
 
+	// load empty/nonexistant material
+	if (basematerial.empty()) {
+		if (strstr(texturegroup.c_str(), XOR("auto")))
+			pEmptyMat = g_Interface.pMaterialSystem->FindMaterial(basematerial.c_str(), nullptr);
+		else
+			pEmptyMat = g_Interface.pMaterialSystem->FindMaterial(basematerial.c_str(), texturegroup.c_str());
+	}
+
+	// load the base material
+	if (strstr(texturegroup.c_str(), XOR("auto")))
+		pPreviewMaterial = g_Interface.pMaterialSystem->FindMaterial(basematerial.c_str(), nullptr);
+	else
+		pPreviewMaterial = g_Interface.pMaterialSystem->FindMaterial(basematerial.c_str(), texturegroup.c_str());
+
+	// load extra info
+
+	// load material into cham system and inc reference count
+	if (pPreviewMaterial && pEmptyMat) {
+		pPreviewMaterial->IncrementReferenceCount();
+		pEmptyMat->IncrementReferenceCount();
+	}
+}
+
+void ChamCreator::SavePreviewMaterial() {
+	std::string file;
+	if (materialname.empty()) {
+		status = CcStatus{ true, XOR("Couldn't save Material: ") + materialname };
+		return;
+	}
+
+	// store preview material
+	file = folder + materialname.c_str() + XOR(".ini");
+	WritePrivateProfileString(XOR("Base"), XOR("material"), basematerial.c_str(), file.c_str());
+	WritePrivateProfileString(XOR("Base"), XOR("group"), texturegroup.c_str(), file.c_str());
+	WritePrivateProfileString(XOR("Time"), XOR("creationtime"), std::to_string(time(0)).c_str(), file.c_str());
+
+	if (std::filesystem::exists(file))
+		status = CcStatus{ false, XOR("Saved Material: ") + materialname };
+	else
+		status = CcStatus{ true, XOR("Couldn't save Material: ") + materialname };
+
+	// let the chamsystem know we have a new material
+	GetMaterialsFromFiles();
+}
+
+void ChamCreator::ApplySettingsFromFile(std::string name) {
+	std::string file;
+
+	// store preview material
+	file = folder + name.c_str() + XOR(".ini");
+	char fileval[64] = { '\0' };
+
+	GetPrivateProfileString(XOR("Base"), XOR("material"), "", fileval, sizeof(fileval), file.c_str());
+	basematerial = fileval;
+
+	GetPrivateProfileString(XOR("Base"), XOR("group"), "", fileval, sizeof(fileval), file.c_str());
+	texturegroup = fileval;
+
+	materialname = name;
+}
+
+void ChamCreator::GetMaterialsFromFiles() {
 	// clear mats
 	for (int i = 0; i < g_Chams.pMats.size(); i++)
 		g_Chams.pMats.at(i)->DecrementReferenceCount();
 	g_Chams.pMats.clear();
 
+	GatherFileInformation();
+
 	for (auto ent : materialfiles) {
-		char fileval[32] = { '\0' };
+		char material[64] = { '\0' };
+		char group[64] = { '\0' };
 		IMaterial* pMat;
 
 		// load the base material
-		GetPrivateProfileString(XOR("Base"), XOR("material"), "", fileval, sizeof(fileval), ent.filepath.c_str());
-		pMat = g_Interface.pMaterialSystem->FindMaterial(fileval, TEXTURE_GROUP_OTHER);
+		GetPrivateProfileString(XOR("Base"), XOR("material"), "", material, sizeof(material), ent.filepath.c_str());
+		GetPrivateProfileString(XOR("Base"), XOR("group"), "", group, sizeof(group), ent.filepath.c_str());
+
+		if (strstr(group, XOR("auto")))
+			pMat = g_Interface.pMaterialSystem->FindMaterial(material, nullptr);
+		else
+			pMat = g_Interface.pMaterialSystem->FindMaterial(material, group);
 
 		// load extra info
 
 		// load material into cham system and inc reference count
 		g_Chams.pMats.push_back(pMat);
 		pMat->IncrementReferenceCount();
+
+		std::cout << "added mat: " << material << std::endl;
 	}
 }
 
@@ -69,12 +144,14 @@ void ChamCreator::GenerateDefaultMaterialFiles() {
 	// create debugambientcube
 	file = folder + XOR("debugambientcube.ini");
 	WritePrivateProfileString(XOR("Base"), XOR("material"), XOR("debug/debugambientcube"), file.c_str());
-	WritePrivateProfileString(XOR("Time"), XOR("creationtime"), std::to_string(std::time(0)).c_str(), file.c_str());
+	WritePrivateProfileString(XOR("Base"), XOR("group"), TEXTURE_GROUP_OTHER, file.c_str());
+	WritePrivateProfileString(XOR("Time"), XOR("creationtime"), std::to_string(0).c_str(), file.c_str());
 
 	// create debugdrawflat
 	file = folder + XOR("debugdrawflat.ini");
 	WritePrivateProfileString(XOR("Base"), XOR("material"), XOR("debug/debugdrawflat"), file.c_str());
-	WritePrivateProfileString(XOR("Time"), XOR("creationtime"), std::to_string(std::time(0)).c_str(), file.c_str());
+	WritePrivateProfileString(XOR("Base"), XOR("group"), TEXTURE_GROUP_OTHER, file.c_str());
+	WritePrivateProfileString(XOR("Time"), XOR("creationtime"), std::to_string(0).c_str(), file.c_str());
 }
 
 void ChamCreator::UpdateMaterialList() {
@@ -101,6 +178,39 @@ void ChamCreator::RenderCreator() {
 
 	ImGui::BeginChild(XOR("ChamOptions"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);
 	ImGui::Text(XOR("Cham options"));
+
+	ImGui::Checkbox(XOR("Auto Texturegroup"), &autotexturegroup);
+	if (!autotexturegroup) {
+		ImGui::InputText(XOR("Group"), &texturegroup); ImGui::HelpMarker(XOR("if you don't know this, just leave it on auto mode!"));
+	}
+	else
+		texturegroup = XOR("auto");
+	ImGui::InputText(XOR("Base-Material"), &basematerial);
+
+	for (int i = 0; i < addonmaterials.size(); i++) {
+		std::string name = "Addon " + std::to_string(i);
+		ImGui::InputText(name.c_str(), &addonmaterials[i]);
+
+		if (i == 0) {
+			ImGui::SameLine();
+			if (ImGui::Button(XOR("-"), ImVec2(20.f, 0.f)))
+				addonmaterials.erase(addonmaterials.begin() + i);
+		}
+	}
+
+	if (ImGui::Button(XOR("Add addon"), ImVec2(-1.f, 0.f)))
+		addonmaterials.push_back(XOR(""));
+
+	ImGui::ColorEdit4(XOR("Preview Col"), flPrevCol, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+	ImGui::NewLine();
+	ImGui::InputText(XOR("Name"), &materialname);
+	if (ImGui::Button(XOR("Add Material"), ImVec2(-1.f, 0.f)))
+		SavePreviewMaterial();
+
+	ImGui::PushStyleColor(ImGuiCol_Text, status.error ? IM_COL32(255, 0, 0, 255) : IM_COL32(0, 255, 0, 255));
+	ImGui::Text(status.msg.c_str());
+	ImGui::PopStyleColor();
 	ImGui::EndChild();
 
 	ImGui::SameLine();
@@ -124,4 +234,7 @@ void ChamCreator::RenderCreator() {
 	}
 	ImGui::EndChild();
 	ImGui::End();
+
+
+	UpdatePreviewMaterial();
 }

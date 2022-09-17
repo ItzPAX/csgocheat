@@ -4,7 +4,6 @@
 #include "directx/endscene.h"
 #include "directx/beginscene.h"
 #include "clientmode/clientmode.h"
-#include "studiorender/studiorender.h"
 #include "sdk/manager/interface/interface.h"
 #include "client/hudupdate.h"
 #include "client/framestagenotify.h"
@@ -153,7 +152,7 @@ bool HookManager::AddAllHooks() {
 	g_HookLib.AddHook(HookEntry("panorama.dll", g_Interface.pClient, FSN::hkFrameStageNotfy, FSN::iIndex, (PVOID*)&FSN::oFrameStageNotify));
 	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pEngine, IsPaused::hkIsPaused, IsPaused::iIndex, (PVOID*)&IsPaused::oIsPaused));
 	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pPanel, PaintTraverse::hkPaintTraverse, PaintTraverse::iIndex, (PVOID*)&PaintTraverse::oPaintTraverse));
-
+	
 	g_HookLib.AddHook(HookEntry("client.dll", g_Interface.pClientMode, GetViewmodelFov::hkGetViewmodelFov, GetViewmodelFov::iIndex, (PVOID*)&GetViewmodelFov::oGetViewmodelFov));
 	g_HookLib.AddHook(HookEntry("client.dll", g_Interface.pClientMode, OverrideView::hkOverrideView, OverrideView::iIndex, (PVOID*)&OverrideView::oOverrideView));
 
@@ -198,6 +197,9 @@ void __stdcall PaintTraverse::hkPaintTraverse(unsigned int iPanel, bool bForceRe
 	// render prev. model
 	const char* szPanelToDraw = g_Interface.pPanel->GetPanelName(iPanel);
 
+	if (!g_Interface.pEngine->IsInGame())
+		Game::g_pLocal = nullptr;
+
 	if (strstr(szPanelToDraw, XOR("MatSystemTopPanel"))) {
 		g_PrevModel.Instance();
 
@@ -205,6 +207,8 @@ void __stdcall PaintTraverse::hkPaintTraverse(unsigned int iPanel, bool bForceRe
 		if (!g_Interface.pEngine->IsInGame()) {
 			g_PlayerList.listentries.clear();
 			g_Misc.pSpectators.clear();
+			g_Visuals.pSortedPlayers.clear();
+			g_Visuals.rPlayerRects.clear();
 
 			for (auto& entry : g_InputMgr.hotkeysinlist)
 				entry.second.active = false;
@@ -269,7 +273,7 @@ void __stdcall FSN::hkFrameStageNotfy(IBaseClientDLL::ClientFrameStage_t curStag
 }
 
 void __stdcall HudUpdate::hkHudUpdate(bool bActive) {
-	if (!Game::g_pLocal)
+	if (!Game::g_pLocal || !g_Interface.pEngine->IsInGame())
 		return oHudUpdate(bActive);
 
 	// do worldtoscreen here (only once per frame)
@@ -277,15 +281,32 @@ void __stdcall HudUpdate::hkHudUpdate(bool bActive) {
 	oHudUpdate(bActive);
 }
 
+static bool bIsUIPlayer = false;
 void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags = STUDIORENDER_DRAW_ENTIRE_MODEL) {
+	if (strstr(info.m_pStudioHdr->cNameCharArray, XOR("weapons\\")) && g_Config.ints[XOR("weaponchams")].val) {
+		if (Game::g_pLocal && Game::g_pLocal->bIsScoped());
+		else {
+			g_Chams.OverrideMaterial(g_Chams.iRenderedChamType, g_Config.arrfloats[XOR("weaponcol")].val);
+			g_Chams.c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+		}
+	}
+
+	if (strstr(info.m_pStudioHdr->cNameCharArray, XOR("player")) && g_Config.ints[XOR("uimodelchams")].val && bIsUIPlayer && !g_PrevModel.bDrawingModel) {
+		g_Chams.OverrideMaterial(g_Chams.iRenderedChamType, g_Config.arrfloats[XOR("uimodelcol")].val);
+		g_Chams.c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+		bIsUIPlayer = false;
+	}
+	if (strstr(info.m_pStudioHdr->cNameCharArray, XOR("uiplayer")))
+		bIsUIPlayer = true;
+
 	if (!Game::g_pLocal)
 		return oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 
-	// glow model
-	if (g_Interface.pStudioRender->IsForcedMaterialOverride())
-		return oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+	// glow model [BUGGED]
+	//if (g_Interface.pStudioRender->IsForcedMaterialOverride())
+	//	return oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 
-	cDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+	g_Chams.DrawChams(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 	oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 	g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
 }	

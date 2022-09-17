@@ -79,9 +79,6 @@
     <Filter Include="core\menu">
       <UniqueIdentifier>{b86f5d37-adfd-431d-9715-f6c68d4174be}</UniqueIdentifier>
     </Filter>
-    <Filter Include="core\hooks\studiorender">
-      <UniqueIdentifier>{8321e80a-e2ad-41c9-8cd9-03d6e8d4a387}</UniqueIdentifier>
-    </Filter>
     <Filter Include="core\hooks\client">
       <UniqueIdentifier>{3dc32654-a82a-4962-81fa-f730aa34f91a}</UniqueIdentifier>
     </Filter>
@@ -348,9 +345,6 @@
     </ClInclude>
     <ClInclude Include="..\sdk\manager\interface\classes\IRenderView.h">
       <Filter>sdk\manager\interface\classes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\core\hooks\studiorender\studiorender.h">
-      <Filter>core\hooks\studiorender</Filter>
     </ClInclude>
     <ClInclude Include="..\core\features\header\chams.h">
       <Filter>core\features\header</Filter>

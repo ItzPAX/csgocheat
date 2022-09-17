@@ -14,7 +14,6 @@ public:
 	void SetClantag(const char* tag);
 	void UpdateSpectators();
 	void BunnyHop(CUserCmd* cmd);
-	void SetFovShit(CUserCmd* cmd);
 };
 
 extern Misc g_Misc;

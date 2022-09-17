@@ -27,6 +27,13 @@ void Config::Init() {
 
 	SetupVal(localchams, 1, XOR("chams"), XOR("localchams"));
 	SetupVal(localcol, { 0.3f, 0.8f, 0.5f, 1.f }, 4, XOR("chams"), XOR("localcol"));
+	SetupVal(handchams, 1, XOR("chams"), XOR("handchams"));
+	SetupVal(handcol, { 0.1f, 0.5f, 0.7f, 1.f }, 4, XOR("chams"), XOR("handcol"));
+
+	SetupVal(uimodelchams, 1, XOR("chams"), XOR("uimodelchams"));
+	SetupVal(uimodelcol, { 1.f, 1.f, 1.f, 1.f }, 4, XOR("chams"), XOR("uimodelcol"));
+	SetupVal(weaponchams, 1, XOR("chams"), XOR("weaponchams"));
+	SetupVal(weaponcol, { 1.f, 1.f, 1.f, 1.f }, 4, XOR("chams"), XOR("weaponcol"));
 
 	SetupVal(friendlychamsvis, 1, XOR("chams"), XOR("friendlychamsvis"));
 	SetupVal(friendlyviscol, { 0.3f, 0.8f, 0.9f, 1.f }, 4, XOR("chams"), XOR("friendlyviscol"));

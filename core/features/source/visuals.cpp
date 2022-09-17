@@ -24,6 +24,8 @@ void Visuals::ThirdPerson() {
 }
 
 void Visuals::UpdatePlayerRects() {
+	g_Visuals.rPlayerRects.clear();
+
 	for (int i = 0; i < g_Visuals.pSortedPlayers.size(); i++) {
 		// get and validate player
 		Player* pPlayer = pSortedPlayers[i].pPlayer;
@@ -54,7 +56,11 @@ void Visuals::UpdatePlayerRects() {
 
 void Visuals::SortPlayers() {
 	g_Visuals.pSortedPlayers.clear();
-	g_Visuals.rPlayerRects.clear();
+
+	if (!Game::g_pLocal || Game::g_pLocal == (Player*)0xFFFFFFFF)
+		return;
+
+	Player* specplayer = reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntityFromHandle(Game::g_pLocal->hObserverTarget()));
 
 	static auto SortDistance = [](PlayerDist a, PlayerDist b) {
 		return a.flDist > b.flDist;
@@ -63,7 +69,7 @@ void Visuals::SortPlayers() {
 	for (int i = 1; i <= g_Interface.pGlobalVars->iMaxClients; i++) {
 		// get and validate player
 		Player* pPlayer = reinterpret_cast<Player*>(g_Interface.pClientEntityList->GetClientEntity(i));
-		if (!pPlayer || !pPlayer->bIsAlive() || pPlayer == Game::g_pLocal || !pPlayer->bIsEnemy(Game::g_pLocal))
+		if (!pPlayer || pPlayer == (Player*)0xFFFFFFFF || pPlayer == specplayer || pPlayer == Game::g_pLocal || !pPlayer->bIsAlive() || !pPlayer->bIsEnemy(Game::g_pLocal))
 			continue;
 
 		float flDist = pPlayer->vAbsOrigin().DistanceTo(Game::g_pLocal->vAbsOrigin());
@@ -168,7 +174,7 @@ void Visuals::DrawHealth(RECT rPlayerRect, Player* pPlayer, Color col, PlayerInf
 }
 
 void Visuals::DrawWeapon(RECT rPlayerRect, Player* pPlayer, Color col) {
-	if (!g_Interface.pEngine->IsInGame() || !pPlayer)
+	if (!Game::g_pLocal->bIsAlive())
 		return;
 
 	Entity* weapon = pPlayer->pGetActiveWeapon();
@@ -352,10 +358,16 @@ void Visuals::DrawHotkeyList() {
 void Visuals::OnEndScene() {
 	g_Interface.pICVar->FindVar(XOR("r_aspectratio"))->SetValue(g_Config.floats[XOR("aspectratio")].val);
 
+	if (pSortedPlayers.empty() || rPlayerRects.empty() || !Game::g_pLocal || Game::g_pLocal == (Player*)0xFFFFFFFF) {
+		pSortedPlayers.clear();
+		rPlayerRects.clear();
+		return;
+	}
+
 	for (int i = 0; i < pSortedPlayers.size(); i++) {
 		// get and validate player
 		Player* pPlayer = pSortedPlayers[i].pPlayer;
-		if (!pPlayer || pPlayer == Game::g_pLocal || !pPlayer->bIsAlive() || !pPlayer->bIsEnemy(Game::g_pLocal) || !pPlayer->bIsPlayer())
+		if (!pPlayer || pPlayer == (Player*)0xFFFFFFFF || pPlayer == Game::g_pLocal || !pPlayer->bIsAlive() || !pPlayer->bIsEnemy(Game::g_pLocal))
 			continue;
 
 		// get player rect

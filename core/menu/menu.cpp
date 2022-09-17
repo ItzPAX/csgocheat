@@ -255,10 +255,38 @@ void Menu::Draw() {
 			cstringmat.push_back(const_cast<char*>(g_ChamCreator.vMaterialList[i].c_str()));
 
 		ImGui::Combo(XOR("Chams Type"), &g_Config.ints[XOR("chamtype")].val, &cstringmat[0], g_ChamCreator.vMaterialList.size());
+		if (ImGui::Button(XOR("Edit"), ImVec2(vSize.x / 4 - style->WindowPadding.x + 5, 0.f))) {
+			int iToEdit = g_Config.ints[XOR("chamtype")].val;
+			// base mats
+			if (iToEdit < 2)
+				g_ChamCreator.menustatus = CcStatus{ true, XOR("Cannot edit a base material") };
+			else {
+				g_ChamCreator.ApplySettingsFromFile(g_ChamCreator.materialfiles.at(iToEdit).filename);
+				g_ChamCreator.bCreatorOpened = true;
+				g_ChamCreator.menustatus = CcStatus{ false, XOR("Edited Material: ") + g_ChamCreator.materialfiles.at(iToEdit).filename };
+			}
+		}
+		ImGui::SameLine();
+		if (ImGui::Button(XOR("Remove"), ImVec2(vSize.x / 4 - style->WindowPadding.x + 5, 0.f))) {
+			int iToRemove = g_Config.ints[XOR("chamtype")].val;
+			// base mats
+			if (iToRemove < 2)
+				g_ChamCreator.menustatus = CcStatus{ true, XOR("Cannot delete a base material") };
+			else {
+				g_Config.ints[XOR("chamtype")].val = 0;
+				remove(g_ChamCreator.materialfiles.at(iToRemove).filepath.c_str());
+				g_ChamCreator.menustatus = CcStatus{ false, XOR("Removed Material: ") + g_ChamCreator.materialfiles.at(iToRemove).filename };
+				g_ChamCreator.GetMaterialsFromFiles();
+			}
+		}
 
-		RenderClickableButtons({ XOR("Enemy"), XOR("Local"), XOR("Friendly") }, & g_Chams.iChamsMode, ImVec2{ vSize.x / 2, vSize.y }, style->WindowPadding.x + 5);
+		ImGui::PushStyleColor(ImGuiCol_Text, g_ChamCreator.menustatus.error ? IM_COL32(255, 0, 0, 255) : IM_COL32(0, 255, 0, 255));
+		ImGui::Text(g_ChamCreator.menustatus.msg.c_str());
+		ImGui::PopStyleColor();
 
-		switch(g_Chams.iChamsMode) {
+		RenderClickableButtons({ XOR("Enemy"), XOR("Local"), XOR("Friendly"), XOR("Misc") }, &g_Chams.iChamsMode, ImVec2{ vSize.x / 2, vSize.y }, style->WindowPadding.x - 1);
+
+		switch (g_Chams.iChamsMode) {
 		case 0: {
 			ImGui::Checkbox(XOR("Enemy Chams Vis"), (bool*)&g_Config.ints[XOR("enemychamsvis")].val);
 			ImGui::SameLine(vSize.x / 4);
@@ -276,13 +304,17 @@ void Menu::Draw() {
 				ImGui::Combo(XOR("Lagcompchams Type"), &g_Config.ints[XOR("lagcompchamstype")].val, pLagcompchamsMode, IM_ARRAYSIZE(pLagcompchamsMode));
 			}
 		}
-			break;
+			  break;
 		case 1: {
 			ImGui::Checkbox(XOR("Local Chams"), (bool*)&g_Config.ints[XOR("localchams")].val);
 			ImGui::SameLine(vSize.x / 4);
 			ImGui::ColorEdit4(XOR("Col"), g_Config.arrfloats[XOR("localcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+			ImGui::Checkbox(XOR("Hand Chams"), (bool*)&g_Config.ints[XOR("handchams")].val);
+			ImGui::SameLine(vSize.x / 4);
+			ImGui::ColorEdit4(XOR("Hand Col"), g_Config.arrfloats[XOR("handcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 		}
-			break;
+			  break;
 		case 2: {
 			ImGui::Checkbox(XOR("Friendly Chams"), (bool*)&g_Config.ints[XOR("friendlychamsvis")].val);
 			ImGui::SameLine(vSize.x / 4);
@@ -294,13 +326,24 @@ void Menu::Draw() {
 				ImGui::ColorEdit4(XOR("Invis Col"), g_Config.arrfloats[XOR("friendlyinviscol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 			}
 		}
-			break;
+			  break;
+		case 3: {
+			ImGui::Checkbox(XOR("UIModel Chams"), (bool*)&g_Config.ints[XOR("uimodelchams")].val);
+			ImGui::SameLine(vSize.x / 4);
+			ImGui::ColorEdit4(XOR("UIModel Col"), g_Config.arrfloats[XOR("uimodelcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+			ImGui::Checkbox(XOR("Weapons Chams"), (bool*)&g_Config.ints[XOR("weaponchams")].val);
+			ImGui::SameLine(vSize.x / 4);
+			ImGui::ColorEdit4(XOR("Weapons Col"), g_Config.arrfloats[XOR("weaponcol")].val, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+		}
+			  break;
 		}
 
 
 		ImGui::EndChild();
 	}
-		  break;
+		break;
+
 		  //MISC
 	case 4: {
 		ImGui::BeginChild(XOR("Main-Misc"), ImVec2(vSize.x / 2 - style->WindowPadding.x - 2, 0.f), true);

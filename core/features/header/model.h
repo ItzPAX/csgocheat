@@ -7,6 +7,8 @@ public:
 	ITexture* GetTexture() { return this->m_PreviewTexture; };
 	void SetGlow(int glow) { this->m_iGlow = glow; };
 
+	bool bDrawingModel = false;
+
 private:
 	ITexture* m_PreviewTexture = nullptr;
 	ITexture* m_CubemapTexture = nullptr;

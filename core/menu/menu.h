@@ -50,9 +50,9 @@ public:
 	using tGraphFunction = void(void);
 
 	inline static bool bInitialized = false;
-	inline static bool bToggled = false;
+	inline static bool bToggled = true;
 
-	inline static int iCurrentTab = 0;
+	inline static int iCurrentTab = 3;
 
 	inline static ImGuiStyle* style;
 

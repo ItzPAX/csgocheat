@@ -15,13 +15,11 @@ struct HotkeylistEntry;
 class Visuals {
 private:
 	inline static float flEntOpacity[MAX_PLAYERS] = { 0.f };
+
+public:
 	inline static std::vector<RECT> rPlayerRects;
 	inline static std::vector<PlayerDist> pSortedPlayers;
 
-	Player* pFlexEnt;
-	ITexture* pBuffer;
-
-public:
 	// local stuff
 	void ThirdPerson();
 

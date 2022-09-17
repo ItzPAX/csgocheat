@@ -23,8 +23,8 @@ namespace hkFunctions {
         }
 
         if (lpBuffer && bTamper) {
-            lpBuffer->AllocationProtect = PAGE_READWRITE;
-            lpBuffer->Protect = PAGE_READWRITE;
+            lpBuffer->AllocationProtect = PAGE_READONLY;
+            lpBuffer->Protect = PAGE_READONLY;
         }
 
         return sReturnVal;

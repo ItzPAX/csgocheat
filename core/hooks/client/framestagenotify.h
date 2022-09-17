@@ -30,9 +30,11 @@ void cFrameStageNotify(IBaseClientDLL::ClientFrameStage_t curStage) {
 		}
 		break;
 	case IBaseClientDLL::FRAME_RENDER_START:
-		if (g_Visuals.bInThirdperson) {
-			auto deadflag = g_NetVars.GetOffsetDirect(XOR("DT_CSPlayer"), XOR("deadflag"));
-			*(Vec3D*)(Game::g_pLocal + deadflag + 0x4) = Game::g_pCmd->viewangles;
+		if (g_Visuals.bInThirdperson && Game::g_pCmd) {
+			//auto deadflag = g_NetVars.GetOffsetDirect(XOR("DT_CSPlayer"), XOR("deadflag"));
+			//*(Vec3D*)(Game::g_pLocal + deadflag + 0x4) = Game::g_pCmd->viewangles;
+
+			g_Interface.pPrediction->SetLocalViewAngles(Game::g_pCmd->viewangles);
 		}
 
 		if (Game::g_pLocal && Game::g_pLocal->bIsAlive() && g_Config.ints[XOR("novisualrecoil")].val) {

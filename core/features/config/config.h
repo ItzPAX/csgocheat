@@ -47,6 +47,13 @@ private:
 
 	int localchams;
 	float localcol[4];
+	int handchams;
+	float handcol[4];
+
+	int uimodelchams;
+	float uimodelcol[4];
+	int weaponchams;
+	float weaponcol[4];
 
 	int friendlychamsvis;
 	float friendlyviscol[4];
