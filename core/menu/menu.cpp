@@ -351,13 +351,14 @@ void Menu::Draw() {
 		ImGui::Checkbox(XOR("Preserve TrustFactor"), (bool*)&g_Config.ints[XOR("trustfactor")].val); ImGui::HelpMarker(XOR("Disables / changes features of the cheat to not get flagged by VacNET (SEVERELY limits the cheats capabilities!!)"));
 		ImGui::Checkbox(XOR("Paranaoia Mode"), (bool*)&g_Config.ints[XOR("paranoia")].val); ImGui::HelpMarker(XOR("Disables ESP & Aimbot, while you are being spectated"));
 		ImGui::Checkbox(XOR("GoofyAhh Crosshair"), (bool*)&g_Config.ints[XOR("goofyahhcrosshair")].val); ImGui::HelpMarker(XOR("Makes the crosshair goofy for everyone spectating you"));
-		//if (!g_Config.ints[XOR("trustfactor")].val) {
+		if (!g_Config.ints[XOR("trustfactor")].val) {
 			ImGui::Checkbox(XOR("Bunnyhop"), (bool*)&g_Config.ints[XOR("bunnyhop")].val);
 			ImGui::Checkbox(XOR("Lagcompensation"), (bool*)&g_Config.ints[XOR("lagcomp")].val);
-		//}
+		}
 
 		//@itzpax backtrack und bhop sind nicht detected. backtrack wird von overwatch gefickt und bhop wenn man ne minute lang perfekt durchbhop't
-		
+		//@emlin doch sind sie dumbass
+
 		ImGui::SliderFloat(XOR("Aspect Ratio"), &g_Config.floats[XOR("aspectratio")].val, 0.5f, 2.f, "%.2f%", 0.05f);
 		ImGui::InputText(XOR("Clantag"), &g_Misc.clantag);
 		ImGui::Checkbox(XOR("Watermark"), (bool*)&g_Config.ints[XOR("watermark")].val);
@@ -386,13 +387,19 @@ void Menu::Draw() {
 		for (size_t i = 0; i < g_Config.configs.size(); i++) {
 			cstring.push_back(const_cast<char*>(g_Config.configs[i].c_str()));
 			if (g_Config.configs[i] == defaultname)
-				strcat(cstring[i], XOR(" [*]"));
+				strcat(cstring[i], XOR(" [DEF]"));
 		}
 
 		ImGui::PushItemWidth(-1);
 		ImGui::ListBox(XOR(""), &g_Config.iSelConfig, &cstring[0], g_Config.configs.size(), 5);
-		if (ImGui::Button(XOR("Make default"), ImVec2(-1,25.f)))
+		if (ImGui::Button(XOR("Make default"), ImVec2(vSize.x / 4.f - 27.f ,25.f)))
 			g_Config.MakeDefault(g_Config.iSelConfig);
+		ImGui::SameLine();
+		if (ImGui::Button(XOR("Remove default"), ImVec2(vSize.x / 4.f - 27.f, 25.f)))
+			g_Config.RemoveDefault();
+		if (ImGui::Button(XOR("Reset config to default"), ImVec2(-1, 25.f)))
+			g_Config.ResetToDefault();
+
 		ImGui::NewLine();
 		static std::string name;
 		ImGui::PushStyleColor(ImGuiCol_TextDisabled, IM_COL32(150, 150, 150, 255));

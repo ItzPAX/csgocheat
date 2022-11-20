@@ -50,7 +50,7 @@ void Chams::DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const 
 		return;
 
 	// we have a valid player
-	if (!pEntity->bIsPlayer() || pEntity->iIndex() > g_Interface.pGlobalVars->iMaxClients || pEntity->iTeamNum() < 2)
+	if (!pEntity->bIsPlayer())
 		return;
 
 	Player* pPlayer = reinterpret_cast<Player*>(pEntity);

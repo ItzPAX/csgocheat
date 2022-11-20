@@ -44,7 +44,7 @@ void AntiAim::DoDesync(CUserCmd* cmd, bool bShouldSendPacket) {
 
 	int movetype = g_NetVars.GetOffsetDirect(XOR("DT_BaseEntity"), XOR("movetype"));
 
-	if (cmd->buttons & CUserCmd::IN_ATTACK && g_Ragebot.GunReady() ||
+	if (cmd->buttons & CUserCmd::IN_ATTACK ||
 		!Game::g_pLocal->pGetActiveWeapon() ||
 		Game::g_pLocal->pGetActiveWeapon()->GetWeaponData()->nWeaponType == Entity::WEAPONTYPE_KNIFE ||
 		Game::g_pLocal->pGetActiveWeapon()->GetWeaponData()->nWeaponType == Entity::WEAPONTYPE_GRENADE ||

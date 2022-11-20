@@ -110,7 +110,7 @@ void PreviewModel::Instance()
 	m_PreviewModel->Draw(matPlayerView); /*FIX: Call Instance() in PaintTraverse*/
 	g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
 
-	bDrawingModel = false;
+	//bDrawingModel = false;
 	g_Interface.pModelRender->SuppressEngineLighting(false);
 
 	g_Interface.pRenderView->PopView(pRenderContext, dummyFrustum);

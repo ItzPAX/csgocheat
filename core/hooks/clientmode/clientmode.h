@@ -44,7 +44,7 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 		g_LegitBot.RunTriggerbot(cmd, &pRecord);
 		g_Backtrack.ApplyRecord(cmd, &pRecord);
 
-		g_Ragebot.RunAimbot(cmd);
+		g_Ragebot.RunAimbot(cmd, bSendPacket);
 		g_AntiAim.DoDesync(cmd, *bSendPacket);
 
 		g_Prediction.End(cmd, Game::g_pLocal);
@@ -65,7 +65,7 @@ void cCreateMove(float flInputSampleTime, CUserCmd* cmd) {
 	Game::g_pCmd = cmd;
 
 	// fakelag
-	*bSendPacket = g_AntiAim.FL_ShouldSendPacket(cmd);
+	//*bSendPacket = g_AntiAim.FL_ShouldSendPacket(cmd);
 }
 
 void cDoPostScreenSpaceEffects() {

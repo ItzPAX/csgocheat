@@ -31,7 +31,7 @@ void Config::Init() {
 	SetupVal(handcol, { 0.1f, 0.5f, 0.7f, 1.f }, 4, XOR("chams"), XOR("handcol"));
 
 	SetupVal(uimodelchams, 1, XOR("chams"), XOR("uimodelchams"));
-	SetupVal(uimodelcol, { 1.f, 1.f, 1.f, 1.f }, 4, XOR("chams"), XOR("uimodelcol"));
+	SetupVal(uimodelcol, { 0.2f, 0.3f, 0.8f, 1.f }, 4, XOR("chams"), XOR("uimodelcol"));
 	SetupVal(weaponchams, 1, XOR("chams"), XOR("weaponchams"));
 	SetupVal(weaponcol, { 1.f, 1.f, 1.f, 1.f }, 4, XOR("chams"), XOR("weaponcol"));
 
@@ -265,6 +265,17 @@ void Config::MakeDefault(int index) {
 		outFile << configs[index];
 }
 
+void Config::RemoveDefault() {
+	static char path[MAX_PATH];
+	std::string folder, file;
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path))) {
+		folder = std::string(path) + XOR("\\raybot\\");
+		file = folder + XOR("default.info");
+	}
+
+	remove(file.c_str());
+}
+
 std::string Config::GetDefault() {
 	static char path[MAX_PATH];
 	std::string folder, file;
@@ -289,6 +300,9 @@ void Config::LoadDefault() {
 		folder = std::string(path) + XOR("\\raybot\\");
 		file = folder + XOR("default.info");
 	}
+
+	if (!std::filesystem::exists(file))
+		return;
 
 	std::ifstream f(file);
 	std::ostringstream ss;

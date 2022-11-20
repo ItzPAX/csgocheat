@@ -13,19 +13,13 @@ void Resolver::ResolvePlayer(Player* p)
 	switch (rside)
 	{
 	case 0:
-		p->GetAnimState()->flGoalFeetYaw = p->GetAnimState()->flLastFeetYaw + 25.351;
+		p->GetAnimState()->flGoalFeetYaw = p->GetAnimState()->flLastFeetYaw + 25;
 		break;
 	case 1:
-		p->GetAnimState()->flGoalFeetYaw = p->GetAnimState()->flLastFeetYaw - 25.351;
+		p->GetAnimState()->flGoalFeetYaw = p->GetAnimState()->flLastFeetYaw - 25;
 		break;
 	default:
 		p->GetAnimState()->flGoalFeetYaw = p->GetAnimState()->flLastFeetYaw;
 		break;
-	//case 2:
-	//	p->GetAnimState()->flGoalFeetYaw = p->GetAnimState()->flLastFeetYaw + 50;
-	//	break;
-	//case 3:
-	//	p->GetAnimState()->flGoalFeetYaw = p->GetAnimState()->flLastFeetYaw - 50;
-	//	break;
 	}
 }

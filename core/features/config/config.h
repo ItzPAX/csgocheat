@@ -150,9 +150,12 @@ public:
 	void Load(std::string name);
 	void Delete(int index);
 	void MakeDefault(int index);
+	void RemoveDefault();
 	std::string GetDefault();
 	void LoadDefault();
-	Config() { Init(); activeconfig = "[Default]"; }
+	void ResetToDefault() { Init(); activeconfig = XOR("[Default]"); } // just calls init function to set everything to default
+
+	Config() { Init(); activeconfig = XOR("[Default]"); }
 
 	CfgStatus Status() { return status; }
 

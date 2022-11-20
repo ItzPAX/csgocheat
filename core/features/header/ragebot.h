@@ -21,7 +21,7 @@ private:
 public:
 	int iMenuWeapon = 0;
 	bool GunReady();
-	void RunAimbot(CUserCmd* cmd);
+	void RunAimbot(CUserCmd* cmd, bool* bSendPacket);
 };
 
 extern RageBot g_Ragebot;

@@ -21,43 +21,56 @@ Player* RageBot::GetTargetPlayer() {
 			continue;
 
 		Vec3D vAngle;
-		Vec3D vHitboxPos = pPlayer->vGetHitboxPos(HITBOX_HEAD);
+		static bool bAlternate = false; // gives some minor optimization
 
-		switch (g_Config.ints[XOR("targetmode")].val) {
-		case MODE_DMG: {
-			FireBulletData_t dataout;
-			float flDamage = g_Penetration.GetDamage(Game::g_pLocal, vHitboxPos, dataout);
-			if (flDamage > flBest[MODE_DMG]) {
-				flBest[MODE_DMG] = flDamage;
-				pTarget = pPlayer;
+		std::vector<Vec3D> vAimPoints;
+		UpdateHitboxes();
+		GetMultipoints(vAllowedHitboxes, pPlayer, g_Config.floats[XOR("multipointscale")].val, vAimPoints);
+
+		int pointidx = 0;
+		for (auto point : vAimPoints) {
+			pointidx++;
+
+			if (pointidx % 2 == bAlternate ? 1 : 0)
+				continue;
+
+			switch (g_Config.ints[XOR("targetmode")].val) {
+			case MODE_DMG: {
+				FireBulletData_t dataout;
+				float flDamage = g_Penetration.GetDamage(Game::g_pLocal, point, dataout);
+				if (flDamage > flBest[MODE_DMG]) {
+					flBest[MODE_DMG] = flDamage;
+					pTarget = pPlayer;
+				}
+			}
+				break;
+
+			case MODE_CROSSHAIR: {
+				g_Math.CalcAngle(vEyeOrigin, point, vAngle);
+				vAngle.Clamp();
+
+				float flCurrDelta = (vAngle - vViewAngles).Clamped().Length();
+				if (flCurrDelta < flBest[MODE_CROSSHAIR]) {
+					flBest[MODE_CROSSHAIR] = flCurrDelta;
+					pTarget = pPlayer;
+				}
+			}
+				break;
+
+			case MODE_DISTANCE: {
+				float flDist = point.DistanceTo(vEyeOrigin);
+				if (flDist < flBest[MODE_DISTANCE]) {
+					flBest[MODE_DISTANCE] = flDist;
+					pTarget = pPlayer;
+				}
+			}
+				break;
+			default:
+				pTarget = nullptr;
+				break;
 			}
 		}
-			break;
-
-		case MODE_CROSSHAIR: {
-			g_Math.CalcAngle(vEyeOrigin, vHitboxPos, vAngle);
-			vAngle.Clamp();
-
-			float flCurrDelta = (vAngle - vViewAngles).Clamped().Length();
-			if (flCurrDelta < flBest[MODE_CROSSHAIR]) {
-				flBest[MODE_CROSSHAIR] = flCurrDelta;
-				pTarget = pPlayer;
-			}
-		}
-			break;
-
-		case MODE_DISTANCE: {
-			float flDist = vHitboxPos.DistanceTo(vEyeOrigin);
-			if (flDist < flBest[MODE_DISTANCE]) {
-				flBest[MODE_DISTANCE] = flDist;
-				pTarget = pPlayer;
-			}
-		}
-			break;
-		default:
-			pTarget = nullptr;
-			break;
-		}
+		bAlternate = !bAlternate;
 
 		PlayerInfo pinfo;
 		g_Interface.pEngine->GetPlayerInfo(i, &pinfo);
@@ -233,11 +246,17 @@ LagRecord* RageBot::GetBestRecord(Player* pTarget) {
 }
 
 bool RageBot::GunReady() {
-	if (!Game::g_pLocal->pGetActiveWeapon() || Game::g_pLocal->pGetActiveWeapon()->iClip() <= 0)
+	Entity* pWeapon = Game::g_pLocal->pGetActiveWeapon();
+	if (!pWeapon)
 		return false;
 
-	float flServerTime = static_cast<float>(Game::g_pLocal->iTickBase()) * g_Interface.pGlobalVars->flIntervalPerTick;
-	return flServerTime >= Game::g_pLocal->flNextAttack() && flServerTime >= Game::g_pLocal->pGetActiveWeapon()->flNextPrimary();
+	if (pWeapon->iClip() < 1)
+		return false;
+
+	if (g_Interface.pGlobalVars->flCurTime >= pWeapon->flNextPrimary())
+		return true;
+
+	return false;
 }
 
 bool RageBot::HitChance() {
@@ -252,7 +271,7 @@ bool RageBot::HitChance() {
 	return false;
 }
 
-void RageBot::RunAimbot(CUserCmd* cmd) {
+void RageBot::RunAimbot(CUserCmd* cmd, bool* bSendPacket) {
     if (!g_Config.ints[XOR("ragebot")].val || g_Config.ints[XOR("trustfactor")].val)
         return;
 
@@ -363,16 +382,10 @@ void RageBot::RunAimbot(CUserCmd* cmd) {
 
 	// restore player
 	backuprecord.ApplyToPlayer(pTargetPlayer);
-	pTargetPlayer->SetPosition(vAbsOrigin);
+	//pTargetPlayer->SetPosition(vAbsOrigin);
 
 	if (!bTargetFound)
 		return;
-
-	if (!HitChance()) {
-		if (g_Config.ints[XOR("autoscope")].val && !Game::g_pLocal->bIsScoped())
-			cmd->buttons |= CUserCmd::IN_ZOOM;
-		return;
-	}
 
 	vTargetHitbox = ExtrapolatePlayer(pTargetPlayer, vTargetHitbox);
 
@@ -387,12 +400,25 @@ void RageBot::RunAimbot(CUserCmd* cmd) {
 	if (!g_Config.ints[XOR("ragesilent")].val)
 		g_Interface.pEngine->SetViewAngles(vTargetAngle);
 
-	if (g_Config.ints[XOR("autoshoot")].val) {
-		if (GunReady() && pActiveWeapon->iClip() > 0)
-			cmd->buttons |= CUserCmd::IN_ATTACK;
+	if (!HitChance()) {
+		if (g_Config.ints[XOR("autoscope")].val && !Game::g_pLocal->bIsScoped() && pActiveWeapon->iGetWeaponType() == Entity::WEAPONTYPE_SNIPER && pActiveWeapon->iClip() > 0)
+			cmd->buttons |= CUserCmd::IN_ZOOM;
+		else
+			cmd->buttons &= ~CUserCmd::IN_ZOOM;
+		return;
+	}
 
-		if (pActiveWeapon->iClip() == 0)
+	if (g_Config.ints[XOR("autoshoot")].val) {
+		if (GunReady() && pActiveWeapon->iClip() > 0) {
+			cmd->buttons |= CUserCmd::IN_ATTACK;
+			*bSendPacket = true;
+		}
+
+		else if (pActiveWeapon->iClip() == 0) {
+			cmd->buttons &= ~CUserCmd::IN_ATTACK;
 			cmd->buttons |= CUserCmd::IN_RELOAD;
+			*bSendPacket = true;
+		}
 	}
 
 	g_Backtrack.ApplyRecord(cmd, pTargetRecord);

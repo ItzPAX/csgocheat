@@ -67,7 +67,7 @@ void Misc::UpdateSpectators() {
 }
 
 void Misc::BunnyHop(CUserCmd* cmd) {
-	if (!g_Config.ints[XOR("bunnyhop")].val/* || g_Config.ints[XOR("trustfactor")].val*/)
+	if (!g_Config.ints[XOR("bunnyhop")].val || g_Config.ints[XOR("trustfactor")].val)
 		return;
 
 	if (!(Game::g_pLocal->iFlags() & Entity::FL_ONGROUND))

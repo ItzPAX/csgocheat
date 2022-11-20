@@ -63,5 +63,6 @@ void Backtrack::ApplyRecord(CUserCmd* cmd, LagRecord* record) {
 	if (!cmd || !record)
 		return;
 
-	cmd->tick_count = TIME_TO_TICKS(record->flSimTime + GetLerpTime());
+	if (cmd->buttons & CUserCmd::IN_ATTACK)
+		cmd->tick_count = TIME_TO_TICKS(record->flSimTime + GetLerpTime());
 }

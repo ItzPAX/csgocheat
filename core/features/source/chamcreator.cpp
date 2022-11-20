@@ -106,7 +106,24 @@ void ChamCreator::ApplySettingsFromFile(std::string name) {
 	materialname = name;
 }
 
+void ChamCreator::CheckForNewFiles() {
+	auto dirIter = std::filesystem::directory_iterator(folder);
+
+	int fileCount = std::count_if(
+		begin(dirIter),
+		end(dirIter),
+		[](auto& entry) { return entry.is_regular_file(); }
+	);
+
+	if (fileCount != iOldDirSize)
+		GetMaterialsFromFiles();
+
+	iOldDirSize = fileCount;
+}
+
 void ChamCreator::GetMaterialsFromFiles() {
+	g_Chams.bMatsInitialized = false;
+
 	// clear mats
 	for (int i = 0; i < g_Chams.pMats.size(); i++)
 		g_Chams.pMats.at(i)->DecrementReferenceCount();
@@ -117,11 +134,13 @@ void ChamCreator::GetMaterialsFromFiles() {
 	for (auto ent : materialfiles) {
 		char material[64] = { '\0' };
 		char group[64] = { '\0' };
+		char addon[64] = { '\0' };
 		IMaterial* pMat;
 
 		// load the base material
 		GetPrivateProfileString(XOR("Base"), XOR("material"), "", material, sizeof(material), ent.filepath.c_str());
 		GetPrivateProfileString(XOR("Base"), XOR("group"), "", group, sizeof(group), ent.filepath.c_str());
+		GetPrivateProfileString(XOR("Info"), XOR("addon"), "", addon, sizeof(addon), ent.filepath.c_str());
 
 		if (strstr(group, XOR("auto")))
 			pMat = g_Interface.pMaterialSystem->FindMaterial(material, nullptr);
@@ -130,12 +149,13 @@ void ChamCreator::GetMaterialsFromFiles() {
 
 		// load extra info
 
+
 		// load material into cham system and inc reference count
 		g_Chams.pMats.push_back(pMat);
 		pMat->IncrementReferenceCount();
-
-		std::cout << "added mat: " << material << std::endl;
 	}
+
+	g_Chams.bMatsInitialized = true;
 }
 
 void ChamCreator::GenerateDefaultMaterialFiles() {
@@ -145,12 +165,14 @@ void ChamCreator::GenerateDefaultMaterialFiles() {
 	file = folder + XOR("debugambientcube.ini");
 	WritePrivateProfileString(XOR("Base"), XOR("material"), XOR("debug/debugambientcube"), file.c_str());
 	WritePrivateProfileString(XOR("Base"), XOR("group"), TEXTURE_GROUP_OTHER, file.c_str());
+	WritePrivateProfileString(XOR("Info"), XOR("addon"), std::to_string(0).c_str(), file.c_str());
 	WritePrivateProfileString(XOR("Time"), XOR("creationtime"), std::to_string(0).c_str(), file.c_str());
 
 	// create debugdrawflat
 	file = folder + XOR("debugdrawflat.ini");
 	WritePrivateProfileString(XOR("Base"), XOR("material"), XOR("debug/debugdrawflat"), file.c_str());
 	WritePrivateProfileString(XOR("Base"), XOR("group"), TEXTURE_GROUP_OTHER, file.c_str());
+	WritePrivateProfileString(XOR("Info"), XOR("addon"), std::to_string(0).c_str(), file.c_str());
 	WritePrivateProfileString(XOR("Time"), XOR("creationtime"), std::to_string(0).c_str(), file.c_str());
 }
 
@@ -186,20 +208,7 @@ void ChamCreator::RenderCreator() {
 	else
 		texturegroup = XOR("auto");
 	ImGui::InputText(XOR("Base-Material"), &basematerial);
-
-	for (int i = 0; i < addonmaterials.size(); i++) {
-		std::string name = "Addon " + std::to_string(i);
-		ImGui::InputText(name.c_str(), &addonmaterials[i]);
-
-		if (i == 0) {
-			ImGui::SameLine();
-			if (ImGui::Button(XOR("-"), ImVec2(20.f, 0.f)))
-				addonmaterials.erase(addonmaterials.begin() + i);
-		}
-	}
-
-	if (ImGui::Button(XOR("Add addon"), ImVec2(-1.f, 0.f)))
-		addonmaterials.push_back(XOR(""));
+	ImGui::Checkbox(XOR("Addon? [WIP]"), &isaddon); ImGui::HelpMarker(XOR("Is this material an addon and should be rendered on top of another material?"));
 
 	ImGui::ColorEdit4(XOR("Preview Col"), flPrevCol, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 

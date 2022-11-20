@@ -46,6 +46,8 @@ public:
 	int iChamsMode = 0;
 	int iRenderedChamType = 0;
 
+	bool bMatsInitialized = false;
+
 	void OverrideMaterial(int iMatIndex, float* col);
 	void OverrideMaterial(int iMatIndex, Color col);
 	void DrawChams(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags = STUDIORENDER_DRAW_ENTIRE_MODEL);

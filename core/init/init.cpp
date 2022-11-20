@@ -21,6 +21,23 @@ ulong __stdcall Init::InitAll(void* p) {
 
 	internal_cleancall_wow64_gate = (void*)__readfsdword(0xC0);
 
+	// create required folders
+	static char path[MAX_PATH];
+	std::string folder;
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path)))
+		folder = std::string(path) + XOR("\\raybot");
+
+	if (!std::filesystem::exists(folder))
+		CreateDirectory(folder.c_str(), NULL);
+
+	folder += XOR("\\materials");
+	if (!std::filesystem::exists(folder))
+		CreateDirectory(folder.c_str(), NULL);
+	
+	// generate default materials
+	g_ChamCreator.GenerateDefaultMaterialFiles();
+	std::cout << XOR("[ RAYBOT ] Successfully Initialized default materials\n");
+
 	// find all interfaces
 	std::cout << XOR("[ RAYBOT ] Bruteforcing Interfaces...\n");
 	if (!g_Interface.Init())
@@ -40,10 +57,6 @@ ulong __stdcall Init::InitAll(void* p) {
 	if (!InitConvars())
 		return 0;
 	std::cout << XOR("[ RAYBOT ] Successfully Initialized ConVars\n");
-
-	// generate default materials
-	g_ChamCreator.GenerateDefaultMaterialFiles();
-	std::cout << XOR("[ RAYBOT ] Successfully Initialized default materials\n");
 
 	g_Config.LoadDefault();
 	std::cout << XOR("[ RAYBOT ] Loaded default config: ") << g_Config.GetDefault() << std::endl;

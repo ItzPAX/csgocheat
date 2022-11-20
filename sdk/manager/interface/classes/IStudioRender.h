@@ -255,8 +255,8 @@ struct ColorMeshInfo_t {
 
 struct DrawModelInfo {
 	StudioHDR* m_pStudioHdr;
-	void* m_pHardwareData;
-	int m_iDecals;
+	StudioHWData* m_pHardwareData;
+	StudioDecalHandle m_iDecals;
 	int m_iSkin;
 	int m_iBody;
 	int m_iHitboxSet;

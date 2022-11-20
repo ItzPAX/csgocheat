@@ -21,9 +21,10 @@ private:
 
 	std::string basematerial;
 	std::string texturegroup = TEXTURE_GROUP_OTHER;
-	std::vector<std::string> addonmaterials;
 
+	int iOldDirSize = 0;
 	bool autotexturegroup = true;
+	bool isaddon = false;
 
 	std::string materialname;
 	CcStatus status;
@@ -55,6 +56,7 @@ public:
 	}
 
 	void ApplySettingsFromFile(std::string name);
+	void CheckForNewFiles();
 
 	void GetMaterialsFromFiles();
 

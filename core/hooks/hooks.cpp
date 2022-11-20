@@ -147,8 +147,9 @@ bool HookManager::AddAllHooks() {
 	g_HookLib.AddHook(HookEntry("panorama.dll", g_Interface.pClient, HudUpdate::hkHudUpdate, HudUpdate::iIndex, (PVOID*)&HudUpdate::oHudUpdate));
 	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pEngine, IsHLTV::hkIsHLTV, IsHLTV::iIndex, (PVOID*)&IsHLTV::oIsHLTV));
 	g_HookLib.AddHook(HookEntry("panorama.dll", g_Interface.pSurface, LockCursor::hkLockCursor, LockCursor::iIndex, (PVOID*)&LockCursor::oLockCursor));
+	
 	ConVar* pSvCheats = g_Interface.pICVar->FindVar(XOR("sv_cheats"));
-	g_HookLib.AddHook(HookEntry("panorama.dll", pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex, (PVOID*)&SvCheats::oSvCheats));
+	g_HookLib.AddHook(HookEntry("client.dll", pSvCheats, SvCheats::hkSvCheats, SvCheats::iIndex, (PVOID*)&SvCheats::oSvCheats));
 	g_HookLib.AddHook(HookEntry("panorama.dll", g_Interface.pClient, FSN::hkFrameStageNotfy, FSN::iIndex, (PVOID*)&FSN::oFrameStageNotify));
 	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pEngine, IsPaused::hkIsPaused, IsPaused::iIndex, (PVOID*)&IsPaused::oIsPaused));
 	g_HookLib.AddHook(HookEntry("engine.dll", g_Interface.pPanel, PaintTraverse::hkPaintTraverse, PaintTraverse::iIndex, (PVOID*)&PaintTraverse::oPaintTraverse));
@@ -196,6 +197,9 @@ bool HookManager::ReleaseAll() {
 void __stdcall PaintTraverse::hkPaintTraverse(unsigned int iPanel, bool bForceRepaint, bool bAllowForce) {
 	// render prev. model
 	const char* szPanelToDraw = g_Interface.pPanel->GetPanelName(iPanel);
+	
+	// make sure new files get acknowledged by the system
+	g_ChamCreator.CheckForNewFiles();
 
 	if (!g_Interface.pEngine->IsInGame())
 		Game::g_pLocal = nullptr;
@@ -245,12 +249,9 @@ bool __fastcall IsHLTV::hkIsHLTV(void* thisptr, void* edx) {
 }
 
 bool __fastcall SvCheats::hkSvCheats(void* ConVar, int edx) {
-	static auto pCamThink = reinterpret_cast<void*>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x85\xC0\x75\x30\x38\x86"), XOR("xxxxxx")));
+	static auto pCamThink = reinterpret_cast<void*>(g_Tools.SignatureScan(XOR("client.dll"), XOR("\x85\xC0\x75\x30\x38\x87"), XOR("xxxxxx")));
 
-	if (!ConVar)
-		return false;
-
-	if ((_ReturnAddress()) == pCamThink)
+	if ((_ReturnAddress()) == pCamThink && g_Config.ints[XOR("thirdperson")].val)
 		return true;
 
 	return oSvCheats(ConVar);
@@ -283,6 +284,9 @@ void __stdcall HudUpdate::hkHudUpdate(bool bActive) {
 
 static bool bIsUIPlayer = false;
 void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults* pResults, const DrawModelInfo& info, Matrix* pBoneToWorld, float* pFlexWeights, float* pFlexDelayedWeights, const Vec3D& modelOrigin, int flags = STUDIORENDER_DRAW_ENTIRE_MODEL) {
+	if (!g_Chams.bMatsInitialized)
+		return oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+
 	if (strstr(info.m_pStudioHdr->cNameCharArray, XOR("weapons\\")) && g_Config.ints[XOR("weaponchams")].val) {
 		if (Game::g_pLocal && Game::g_pLocal->bIsScoped());
 		else {
@@ -290,11 +294,17 @@ void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults*
 			g_Chams.c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 		}
 	}
-
-	if (strstr(info.m_pStudioHdr->cNameCharArray, XOR("player")) && g_Config.ints[XOR("uimodelchams")].val && bIsUIPlayer && !g_PrevModel.bDrawingModel) {
-		g_Chams.OverrideMaterial(g_Chams.iRenderedChamType, g_Config.arrfloats[XOR("uimodelcol")].val);
-		g_Chams.c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
-		bIsUIPlayer = false;
+	
+	if (strstr(info.m_pStudioHdr->cNameCharArray, XOR("player")) && g_Config.ints[XOR("uimodelchams")].val && bIsUIPlayer) {
+		if (g_PrevModel.bDrawingModel) {
+			bIsUIPlayer = false;
+			g_PrevModel.bDrawingModel = false;
+		}
+		else {
+			g_Chams.OverrideMaterial(g_Chams.iRenderedChamType, g_Config.arrfloats[XOR("uimodelcol")].val);
+			g_Chams.c_oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
+			bIsUIPlayer = false;
+		}
 	}
 	if (strstr(info.m_pStudioHdr->cNameCharArray, XOR("uiplayer")))
 		bIsUIPlayer = true;
@@ -302,13 +312,15 @@ void __fastcall DrawModel::hkDrawModel(void* pEcx, void* pEdx, DrawModelResults*
 	if (!Game::g_pLocal)
 		return oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 
-	// glow model [BUGGED]
+	// glow model [BUGGED] not drawing chams for other models
 	//if (g_Interface.pStudioRender->IsForcedMaterialOverride())
 	//	return oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 
 	g_Chams.DrawChams(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
 	oDrawModel(pEcx, pEdx, pResults, info, pBoneToWorld, pFlexWeights, pFlexDelayedWeights, modelOrigin, flags);
-	g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
+
+	if (!g_PrevModel.bDrawingModel)
+		g_Interface.pStudioRender->ForcedMaterialOverride(nullptr);
 }	
 bool __stdcall CreateMove::hkCreateMove(float flInputSampleTime, CUserCmd* cmd) {	
 	Game::g_pLocal = (Player*)g_Interface.pClientEntityList->GetClientEntity(g_Interface.pEngine->GetLocalPlayer());
